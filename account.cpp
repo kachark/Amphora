@@ -6,64 +6,64 @@
 #include "account.hpp"
 
 // Account method definitions
-void Account::set_name(std::string name)
+void Account::set_name(std::string &name)
 {
-	Account::m_name = name;
+  Account::name_m = name;
 }
 
-void Account::set_purpose(std::string purpose)
+void Account::set_purpose(std::string &purpose)
 {
-	Account::m_purpose = purpose;
+  Account::purpose_m = purpose;
 }
 
-void Account::set_username(std::string username)
+void Account::set_username(std::string &username)
 {
-	Account::m_username = username;
+  Account::username_m = username;
 }
 
-void Account::set_password(std::string password)
+void Account::set_password(std::string &password)
 {
-	Account::m_password = password;
+  Account::password_m = password;
 }
 
-void Account::set_datecreated(std::string date)
+void Account::set_datecreated(std::string &date)
 {
-	Account::m_datecreated = date;
+  Account::datecreated_m = date;
 }
 
-void Account::set_datemodified(std::string date)
+void Account::set_datemodified(std::string &date)
 {
-	Account::m_datemodified = date;
+  Account::datemodified_m = date;
 }
 
 std::string Account::get_name()
 {
-	return Account::m_name;
+  return Account::name_m;
 }
 
 std::string Account::get_purpose()
 {
-	return Account::m_purpose;
+  return Account::purpose_m;
 }
 
 std::string Account::get_username()
 {
-	return Account::m_username;
+  return Account::username_m;
 }
 
 std::string Account::get_password()
 {
-	return Account::m_password;
+  return Account::password_m;
 }
 
 std::string Account::get_datecreated()
 {
-	return Account::m_datecreated;
+  return Account::datecreated_m;
 }
 
 std::string Account::get_datemodified()
 {
-	return Account::m_datemodified;
+  return Account::datemodified_m;
 }
 
 
