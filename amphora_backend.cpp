@@ -2,13 +2,12 @@
 #include "amphora_backend.hpp"
 #include <iostream>
 #include <fstream>
-
+#include <vector>
 
 AmphoraBackend::AmphoraBackend()
 {
 
 }
-
 
 // sets first-time account member information
 void AmphoraBackend::InitAccount(Account &account)
@@ -98,11 +97,9 @@ void AmphoraBackend::ViewAccount(Account &account)
   }
 }
 
-// CHANGE TO VOID
-// loads account using cereal serialization library
+// loads account using cereal
 void AmphoraBackend::LoadAccountList()
 {
-  // std::vector<Account> accountlist;
   // might be better to have filename as an arg?
   std::string filename = "vault.xml";
   // check if filename is in the pwd
@@ -127,9 +124,7 @@ void AmphoraBackend::LoadAccountList()
 
 }
 
-
 // saves account using cereal serialization library
-// save_account takes in vector of accounts including the new account that was added
 void AmphoraBackend::SaveAccountList(Account &newaccount)
 {
 
@@ -137,7 +132,6 @@ void AmphoraBackend::SaveAccountList(Account &newaccount)
   newaccount.set_datecreated(date);
   newaccount.set_datemodified(date);
   accountlist_m.push_back(newaccount);
-
 
   std::string savedaccount = "vault.xml";
   std::size_t num_saved;
@@ -165,12 +159,23 @@ void AmphoraBackend::ViewAccountList(std::string &format, std::string &sortstyle
   //format "short" displays up to the 5 most recent accounts saved in the vault
   //format "long" displays all of the accounts in a given sort - default sort is by acct purpose
 
+  std::cout << std::endl << "Your Saved Accounts:" << std::endl;
+  std::vector<std::string> accountnamelist;
+  std::size_t largestaccountname = 0;
   // sort accountlist_m before displaying
+
+  // get names from account objects
   if( format == "long" ) {
     for ( auto it = std::begin(accountlist_m); it != std::end(accountlist_m); ++it) {
-      std::cout << it->get_name() << std::endl;
+      // std::cout << it->get_name() << std::endl;
+      std::string accountname = it->get_name();
+      // std::cout << "largest size = " << largestaccountname << std::endl;
+      accountnamelist.push_back(accountname);
       // dereference the iterator pointer [account obj] and call get_name()
       // equivalent to (*it).get_name();
+
+      //DEBUG
+      // std::cout << "name: " << accountname << "\t" << "size: " << namesize << std::endl;
     }
   }
 
@@ -188,6 +193,8 @@ void AmphoraBackend::ViewAccountList(std::string &format, std::string &sortstyle
       // equivalent to (*it).get_name();
     }
   }
+
+  amphora_util_m.PrettyTable(accountnamelist);
 
 
   //void sort_accounts( <pass vector of accounts?>, <<sorting parameters>> );

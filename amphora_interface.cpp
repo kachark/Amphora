@@ -5,15 +5,13 @@
 
 AmphoraInterface::AmphoraInterface()
 {
-  std::cout << "accounts loaded" << std::endl;
+  std::cout << "Accounts loaded" << std::endl;
   amphora_backend_m.LoadAccountList();
 
-  std::string viewstyle = "long";
-  std::string sortchoice = "test";
-  amphora_backend_m.ViewAccountList(viewstyle, sortchoice);
+  // std::string viewstyle = "short";
+  // std::string sortchoice = "test";
+  // amphora_backend_m.ViewAccountList(viewstyle, sortchoice);
 }
-
-
 
 void AmphoraInterface::MainMenu(std::string &userinput)
 {
@@ -35,6 +33,10 @@ void AmphoraInterface::MainMenu(std::string &userinput)
     //AmphoraInterface::delete_account();
   }
 
+  else if(userinput == "4") {
+    AmphoraInterface::ViewAccountsSubmenu();
+  }
+
   // Advanced optios (TBD)
   else if(userinput == "4") {
       //choose Encryption options, fingerprint scanner support, secure password generator etc.
@@ -42,7 +44,6 @@ void AmphoraInterface::MainMenu(std::string &userinput)
   }
 
 }
-
 
 void AmphoraInterface::AddAccountSubmenu()
 {
@@ -81,21 +82,23 @@ void AmphoraInterface::AddAccountSubmenu()
 
 }
 
-
 void AmphoraInterface::EditAccountSubmenu()
 {
   // stuff
   // dialogue asking which account out of the list to edit
 }
 
-
-
 void AmphoraInterface::DeleteAccountSubmenu()
 {
   // stuff
 }
 
-
+void AmphoraInterface::ViewAccountsSubmenu()
+{
+  std::string viewstyle = "long";
+  std::string sortchoice = "test";
+  amphora_backend_m.ViewAccountList(viewstyle, sortchoice);
+}
 
 void AmphoraInterface::OptionsSubmenu()
 {

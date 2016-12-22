@@ -1,6 +1,4 @@
 
-
-
 #ifndef AMPHORA_INTERFACE_HPP
 #define AMPHORA_INTERFACE_HPP
 
@@ -17,6 +15,7 @@ private:
   void AddAccountSubmenu();
   void EditAccountSubmenu();
   void DeleteAccountSubmenu();
+  void ViewAccountsSubmenu();
   void OptionsSubmenu();
 
 };

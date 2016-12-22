@@ -17,7 +17,6 @@ class Account {
 public:
   // default constructor preferred for serialization
   Account() = default;
-  //Account() = {};
 
   void set_name(std::string &name);
   void set_purpose(std::string &purpose);

@@ -14,21 +14,19 @@ int main( int argc, const char* argv[] )
 
   while(1) {
 
-    cout << "****** MAIN MENU ******\n";
+    cout << "\n\n****** MAIN MENU ******\n";
 
     // User actions
-    cout << "\n(1): Add account\n(2): Edit account\n(3): Delete account\n(4): Advanced\n(5): Quit\n\n";
+    cout << "\n(1): Add account\n(2): Edit account\n(3): Delete account\n(4): View Accounts\n(5): Options\n(6): Quit\n\n";
 
     //LOOK UP CORRECT WAY TO HAVE A MAIN LOOP
     getline(cin, userinput);
 
-    if(userinput == "5") {
+    if(userinput == "6") {
       // stuff have to change this actually make it exit
       std::cout << "Exiting App..." << std::endl;
       break;
-    }
-
-    else {
+    } else {
       interface.MainMenu(userinput);
     }
 
