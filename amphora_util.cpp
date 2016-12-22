@@ -28,25 +28,24 @@ std::string AmphoraUtilities::Encrypt()
   return("");
 }
 
+// checks if a file is in the pwd
 int AmphoraUtilities::CheckFile(std::string &filename)
 {
   //see boost filesystem
   return 0;
 }
 
-// OPTIMIZE THIS FUNCTION
 // outputs vector of strings in nice format
 void AmphoraUtilities::PrettyTable(std::vector<std::string> &data)
 {
 
+  // get largest string of characters
   int index = 0;
-
-  // get number of chars of largest string in data
   std::size_t largestaccountname = 0;
   for (auto it = std::begin(data); it != std::end(data); ++it) {
     index += 1;
     std::size_t namesize = it->length();
-    if (namesize >= largestaccountname) {
+    if (namesize > largestaccountname) {
       largestaccountname = namesize;
     }
   }
@@ -54,7 +53,7 @@ void AmphoraUtilities::PrettyTable(std::vector<std::string> &data)
   // define table format
   int columncount = 4;
   std::size_t columnwidth = largestaccountname + 2;
-  // std::char delimiterchar = ' ';
+  char delimiterchar = ' ';
 
   // format table elements
   int c = 0;
@@ -64,8 +63,7 @@ void AmphoraUtilities::PrettyTable(std::vector<std::string> &data)
     std::string token = *it;
     if (token.length() != columnwidth) {
       delimitersize = columnwidth - token.length();
-      // delimiter.assign(delimitersize, delimiterchar);
-      delimiter.assign(delimitersize, ' ');
+      delimiter.assign(delimitersize, delimiterchar);
       token = token + delimiter;
     }
     if (c < columncount) {
@@ -73,29 +71,7 @@ void AmphoraUtilities::PrettyTable(std::vector<std::string> &data)
       ++c;
     } else {
       std::cout << std::endl;
-      // although c is reset here, the for loop is incrementing right after!!
       c = 0;
     }
-
   }
-
-
-
-//   int columncount = 4;
-//   int c = 0;
-//   for (int i = 0; i != index; ++i, ++c) {
-//     if (c != columncount) {
-//       std::cout << data[i] << delimiter;
-//     }
-//     else {
-//       std::cout << std::endl;
-//       c = 0;
-//     }
-//   }
-
-
-// columns size = largest possible accountname + 2 spaces = ?? chars
-  // 4 columns in total
-  // don't want to size of table to be based off of terminal size since it's dependent on operating system
-
 }

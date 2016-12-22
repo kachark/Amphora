@@ -135,7 +135,6 @@ void AmphoraBackend::SaveAccountList(Account &newaccount)
 
   std::string savedaccount = "vault.xml";
   std::size_t num_saved;
-  // appears that number being saved is not increasign with each new account
   std::cout << "NUMBER BEING SAVED" << accountlist_m.size() << std::endl;
   {
     std::ofstream file( savedaccount );
@@ -155,7 +154,6 @@ void AmphoraBackend::SaveAccountList(Account &newaccount)
 
 void AmphoraBackend::ViewAccountList(std::string &format, std::string &sortstyle)
 {
-  // display accountlist_m in a nice way.
   //format "short" displays up to the 5 most recent accounts saved in the vault
   //format "long" displays all of the accounts in a given sort - default sort is by acct purpose
 
@@ -167,36 +165,22 @@ void AmphoraBackend::ViewAccountList(std::string &format, std::string &sortstyle
   // get names from account objects
   if( format == "long" ) {
     for ( auto it = std::begin(accountlist_m); it != std::end(accountlist_m); ++it) {
-      // std::cout << it->get_name() << std::endl;
       std::string accountname = it->get_name();
-      // std::cout << "largest size = " << largestaccountname << std::endl;
       accountnamelist.push_back(accountname);
-      // dereference the iterator pointer [account obj] and call get_name()
-      // equivalent to (*it).get_name();
-
-      //DEBUG
-      // std::cout << "name: " << accountname << "\t" << "size: " << namesize << std::endl;
     }
   }
 
   // displays first 5 accounts stored in accountlist_m
   // sorts by most recently modified!!
-  // prettify this
   else if (format == "short") {
     int i = 0;
     for ( auto it = std::begin(accountlist_m); it != std::end(accountlist_m); ++it,++i) {
       if ( i < 5 ) {
         std::cout << it->get_name() << std::endl;
-        // std::cout << (*it).get_name() << std::endl;
+        accountnamelist.push_back(accountname);
       }
-      // dereference the iterator pointer [account obj] and call get_name()
-      // equivalent to (*it).get_name();
     }
   }
 
   amphora_util_m.PrettyTable(accountnamelist);
-
-
-  //void sort_accounts( <pass vector of accounts?>, <<sorting parameters>> );
-
 }
