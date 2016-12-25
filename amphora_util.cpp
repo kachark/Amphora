@@ -51,12 +51,12 @@ void AmphoraUtilities::PrettyTable(std::vector<std::string> &data)
   }
 
   // define table format
-  int columncount = 4;
+  int numcolumns = 4;
   std::size_t columnwidth = largestaccountname + 2;
   char delimiterchar = ' ';
 
   // format table elements
-  int c = 0;
+  int currentcolumn = 1;
   std::size_t delimitersize = 0;
   for (auto it = std::begin(data); it != std::end(data); ++it) {
     std::string delimiter;
@@ -66,12 +66,13 @@ void AmphoraUtilities::PrettyTable(std::vector<std::string> &data)
       delimiter.assign(delimitersize, delimiterchar);
       token = token + delimiter;
     }
-    if (c < columncount) {
+    // fill buffer with column elements until max column limit reached, then flush to new line
+    if (currentcolumn != numcolumns) {
       std::cout << token;
-      ++c;
-    } else {
-      std::cout << std::endl;
-      c = 0;
+      currentcolumn += 1;
+    } else if (currentcolumn == numcolumns) {
+      std::cout << token << std::endl;
+      currentcolumn = 1;
     }
   }
 }

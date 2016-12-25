@@ -80,6 +80,11 @@ void AmphoraBackend::EditAccount(Account &account)
   }
 }
 
+// searches accountlist for account given accountname
+void AmphoraBackend::FindAccount(std::string &accountname)
+{
+
+}
 
 // displays acccount info in nice format
 void AmphoraBackend::ViewAccount(Account &account)
@@ -176,7 +181,8 @@ void AmphoraBackend::ViewAccountList(std::string &format, std::string &sortstyle
     int i = 0;
     for ( auto it = std::begin(accountlist_m); it != std::end(accountlist_m); ++it,++i) {
       if ( i < 5 ) {
-        std::cout << it->get_name() << std::endl;
+        // std::cout << it->get_name() << std::endl;
+        std::string accountname = it->get_name();
         accountnamelist.push_back(accountname);
       }
     }

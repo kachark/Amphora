@@ -15,6 +15,7 @@ public:
   AmphoraBackend();
   void InitAccount(Account &newaccount);
   void EditAccount(Account &account);
+  void FindAccount(std::string &accountname);
   void ViewAccount(Account &account);
   void LoadAccountList();
   void SaveAccountList(Account &newaccount);

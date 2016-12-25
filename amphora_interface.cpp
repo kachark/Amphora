@@ -23,8 +23,7 @@ void AmphoraInterface::MainMenu(std::string &userinput)
 
   // edit existing account
   else if(userinput == "2") { // edit account
-    //list the accounts in nice tabular format, and allow the user to select the one that they want to edit.
-    //AmphoraInterface::EditAccount();
+    AmphoraInterface::EditAccountSubmenu();
   }
 
   // delete account
@@ -38,7 +37,7 @@ void AmphoraInterface::MainMenu(std::string &userinput)
   }
 
   // Advanced optios (TBD)
-  else if(userinput == "4") {
+  else if(userinput == "5") {
       //choose Encryption options, fingerprint scanner support, secure password generator etc.
       //AmphoraInterface::advanced_options();
   }
@@ -86,6 +85,23 @@ void AmphoraInterface::EditAccountSubmenu()
 {
   // stuff
   // dialogue asking which account out of the list to edit
+  //list the accounts in nice tabular format, and allow the user to select the one that they want to edit.
+  // display the saved accounts
+  // prompt user to select their account
+  // what happens if there are 2 accounts that are the same name?
+  // need a robust way for tracking accounts -> account number?
+  // how to search for account that user queried?
+  //AmphoraInterface::EditAccount();
+
+  std::string userinput;
+  std::string f = "long";
+  std::string s = "test";
+  amphora_backend_m.ViewAccountList(f,s);
+
+  std::cout << "\nPlease type in the name of the account you would like to edit" << std::endl;
+  getline(std::cin, userinput);
+
+
 }
 
 void AmphoraInterface::DeleteAccountSubmenu()
