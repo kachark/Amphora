@@ -29,44 +29,43 @@ std::string AmphoraUtilities::Encrypt()
 }
 
 // checks if a file is in the pwd
-int AmphoraUtilities::CheckFile(std::string &filename)
+int AmphoraUtilities::CheckFile(const std::string &filename)
 {
   //see boost filesystem
   return 0;
 }
 
 // outputs vector of strings in nice format
-void AmphoraUtilities::PrettyTable(std::vector<std::string> &data)
+void AmphoraUtilities::PrettyTable(const std::vector<std::string> &data)
 {
 
   // get largest string of characters
-  int index = 0;
-  std::size_t largestaccountname = 0;
-  for (auto it = std::begin(data); it != std::end(data); ++it) {
-    index += 1;
-    std::size_t namesize = it->length();
-    if (namesize > largestaccountname) {
-      largestaccountname = namesize;
+  std::size_t largestelement = 0;
+  for (auto element : data) {
+    std::size_t elementsize = element.length();
+    if (elementsize > largestelement) {
+      largestelement = elementsize;
     }
   }
 
   // define table format
   int numcolumns = 4;
-  std::size_t columnwidth = largestaccountname + 2;
+  std::size_t columnwidth = largestelement + 2;
   char delimiterchar = ' ';
 
   // format table elements
   int currentcolumn = 1;
   std::size_t delimitersize = 0;
-  for (auto it = std::begin(data); it != std::end(data); ++it) {
+  for (auto element : data) {
     std::string delimiter;
-    std::string token = *it;
-    if (token.length() != columnwidth) {
-      delimitersize = columnwidth - token.length();
+    std::string token = element;
+    std::size_t tokenlength = element.length();
+    if (tokenlength != columnwidth) {
+      delimitersize = columnwidth - tokenlength;
       delimiter.assign(delimitersize, delimiterchar);
       token = token + delimiter;
     }
-    // fill buffer with column elements until max column limit reached, then flush to new line
+
     if (currentcolumn != numcolumns) {
       std::cout << token;
       currentcolumn += 1;

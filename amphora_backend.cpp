@@ -4,51 +4,45 @@
 #include <fstream>
 #include <vector>
 
+// TEST
+
+
+
+// TEST
+
 AmphoraBackend::AmphoraBackend()
 {
 
 }
 
-// sets first-time account member information
-void AmphoraBackend::InitAccount(Account &account)
+// initializes temp account and adds to accountdata_m
+// viewaccount and editaccount will check accountdata_m for the name of tempAccount (similar to how it will check any other account
+// saveaccountlist will serialize the current buffer accountdata_m
+// tempAccount will be reset to NULL
+void AmphoraBackend::AddAccount(const std::string &name, const std::string &purpose, const std::string &username, const std::string &password)
 {
-  std::string user;
-  std::string date;
+  std::string date = amphora_util_m.CurrentDate();
 
-  std::cout << "INSIDE modify_account\n";
+  tempAccount.set_name(name);
+  tempAccount.set_purpose(purpose);
+  tempAccount.set_username(username);
+  tempAccount.set_password(password);
+  tempAccount.set_datecreated(date);
+  tempAccount.set_datemodified(date);
 
-  // populate account object members for the first time
-  std::cout << "first time creating account" << std::endl;
-
-  std::cout << "Please enter the name of the account\n";
-  getline(std::cin, user);
-  account.set_name(user);
-
-  std::cout << "Please enter the purpose of the account\n";
-  getline(std::cin, user);
-  account.set_purpose(user);
-
-  std::cout << "Please enter the username for this account\n";
-  getline(std::cin, user);
-  account.set_username(user);
-
-  std::cout << "Please enter the password for this account\n";
-  getline(std::cin, user);
-  account.set_password(user);
-
-  date = amphora_util_m.CurrentDate();
-  account.set_datecreated(date);
-  account.set_datemodified(date);
+  // store temporary new account in map
+  accountdata_m.insert(std::make_pair(name, tempAccount));
 }
 
 // edit account information
 // make sure to ask user to enter password twice to make sure they entered correctly
-void AmphoraBackend::EditAccount(Account &account)
+void AmphoraBackend::EditAccount(const std::string &accountname)
 {
+  Account &account = accountdata_m[accountname];
+
   std::string user;
-  // bool editing = true;
   while (1) {
-    AmphoraBackend::ViewAccount(account);
+    AmphoraBackend::ViewAccount(accountname);
     std::cout << "\nWhat would you like to edit?\n(1): Name\t(2): Purpose\t(3): Username\t(4): Password\t(5): Finish edit\n";
     getline(std::cin, user);
 
@@ -74,21 +68,33 @@ void AmphoraBackend::EditAccount(Account &account)
     }
     if (user == "5") {
       std::cout << "****** Finished Editing... \n";
-      //account.date_mod = get_date();
       break;
     }
   }
 }
 
-// searches accountlist for account given accountname
-void AmphoraBackend::FindAccount(std::string &accountname)
+void AmphoraBackend::DeleteAccount(const std::string &accountname)
 {
+  accountdata_m.erase(accountname);
+}
+
+// searches accountlist for account given accountname
+// confirms if account is found
+bool AmphoraBackend::FindAccount(const std::string &accountname)
+{
+  // account key valid
+  if (accountdata_m.find(accountname) != accountdata_m.end()) {
+    return true;
+  } else { // account key not valid
+    return false;
+  }
 
 }
 
 // displays acccount info in nice format
-void AmphoraBackend::ViewAccount(Account &account)
+void AmphoraBackend::ViewAccount(const std::string &accountname)
 {
+  Account &account = accountdata_m[accountname];
   std::cout << "Name: \t\t" << account.get_name() << std::endl;
   std::cout << "Purpose: \t" << account.get_purpose() << std::endl;
   std::cout << "Username: \t" << account.get_username() << std::endl;
@@ -122,7 +128,8 @@ void AmphoraBackend::LoadAccountList()
     for ( auto i = 0; i < num_saved; ++i ) {
       Account temp;
       archive( temp );
-      accountlist_m.push_back(temp);
+      // accountlist_m.push_back(temp);
+      accountdata_m.insert(std::make_pair(temp.get_name(), temp));
     }
       std::cout << "DEBUG: num_saved = " << num_saved << std::endl;
   }
@@ -130,34 +137,28 @@ void AmphoraBackend::LoadAccountList()
 }
 
 // saves account using cereal serialization library
-void AmphoraBackend::SaveAccountList(Account &newaccount)
+void AmphoraBackend::SaveAccountList()
 {
-
-  std::string date = amphora_util_m.CurrentDate();
-  newaccount.set_datecreated(date);
-  newaccount.set_datemodified(date);
-  accountlist_m.push_back(newaccount);
 
   std::string savedaccount = "vault.xml";
   std::size_t num_saved;
-  std::cout << "NUMBER BEING SAVED" << accountlist_m.size() << std::endl;
+  // std::cout << "NUMBER BEING SAVED" << accountlist_m.size() << std::endl;
+  std::cout << "NUMBER BEING SAVED" << accountdata_m.size() << std::endl;
   {
     std::ofstream file( savedaccount );
     cereal::XMLOutputArchive archive( file );
 
-    // store the number of saved accounts in the first location
-    num_saved = accountlist_m.size();
-    archive( num_saved );
-    // put each account into the archive
-    // create iterator which is a pointer to objs in vector accountlist
-    for ( auto it = std::begin(accountlist_m); it != std::end(accountlist_m); ++it) {
-      archive( *it );
+    num_saved = accountdata_m.size();
+    archive(num_saved);
+
+    for (auto account : accountdata_m) {
+      archive(account.second);
     }
-  } // when archive goes out of scope it is guaranteed to have flushed its
+ } // when archive goes out of scope it is guaranteed to have flushed its
     // contents to its stream
 }
 
-void AmphoraBackend::ViewAccountList(std::string &format, std::string &sortstyle)
+void AmphoraBackend::ViewAccountList(const std::string &format, const std::string &sortstyle)
 {
   //format "short" displays up to the 5 most recent accounts saved in the vault
   //format "long" displays all of the accounts in a given sort - default sort is by acct purpose
@@ -168,9 +169,9 @@ void AmphoraBackend::ViewAccountList(std::string &format, std::string &sortstyle
   // sort accountlist_m before displaying
 
   // get names from account objects
-  if( format == "long" ) {
-    for ( auto it = std::begin(accountlist_m); it != std::end(accountlist_m); ++it) {
-      std::string accountname = it->get_name();
+  if (format == "long") {
+    for (auto account : accountdata_m) {
+      std::string accountname = account.second.get_name();
       accountnamelist.push_back(accountname);
     }
   }
@@ -179,14 +180,24 @@ void AmphoraBackend::ViewAccountList(std::string &format, std::string &sortstyle
   // sorts by most recently modified!!
   else if (format == "short") {
     int i = 0;
-    for ( auto it = std::begin(accountlist_m); it != std::end(accountlist_m); ++it,++i) {
-      if ( i < 5 ) {
-        // std::cout << it->get_name() << std::endl;
-        std::string accountname = it->get_name();
+    for (auto account : accountdata_m) {
+      if (i < 5) {
+        std::string accountname = account.second.get_name();
         accountnamelist.push_back(accountname);
       }
+      ++i;
     }
   }
-
   amphora_util_m.PrettyTable(accountnamelist);
+}
+
+void AmphoraBackend::ClearTempAccount()
+{
+  // reset temporary account object
+  tempAccount.set_name("");
+  tempAccount.set_purpose("");
+  tempAccount.set_username("");
+  tempAccount.set_password("");
+  tempAccount.set_datecreated("");
+  tempAccount.set_datemodified("");
 }

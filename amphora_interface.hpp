@@ -8,7 +8,7 @@ class AmphoraInterface {
 
 public:
   AmphoraInterface();
-  void MainMenu(std::string &userinput);
+  void MainMenu(const std::string &userinput);
 
 private:
   AmphoraBackend amphora_backend_m;

@@ -12,8 +12,8 @@ class AmphoraUtilities {
 public:
   std::string CurrentDate();
   std::string Encrypt();
-  int CheckFile(std::string &filename);
-  void PrettyTable(std::vector<std::string> &data);
+  int CheckFile(const std::string &filename);
+  void PrettyTable(const std::vector<std::string> &data);
 
 };
 
