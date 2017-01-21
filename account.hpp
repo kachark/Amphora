@@ -2,15 +2,8 @@
 #ifndef ACCOUNT_HPP
 #define ACCOUNT_HPP
 
-
-// needs cereal headers here so it knows about Archive class etc.
-// this gets passed to account_util_new.cpp through account_util_new.hpp
-
-//#include "aes.h"
 #include <cereal/archives/xml.hpp> // serialize in xml format
 #include <cereal/types/string.hpp>
-
-
 
 class Account {
 

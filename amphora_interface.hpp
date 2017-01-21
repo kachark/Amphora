@@ -17,7 +17,8 @@ private:
   void DeleteAccountSubmenu();
   void ViewAccountsSubmenu();
   void OptionsSubmenu();
-
+  void VerifyAddAccountPopup(const std::string &accountname);
+  void VerifyDeleteAccountPopup(const std::string &accountname);
 };
 
 
