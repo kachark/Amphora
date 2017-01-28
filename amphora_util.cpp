@@ -4,6 +4,9 @@
 #include <locale>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
+#include <cryptopp/filters.h>
+#include <cryptopp/hex.h>
+#include <cryptopp/sha.h>
 // #include <boost/filesystem.hpp>
 
 using namespace boost::posix_time;
@@ -75,3 +78,22 @@ void AmphoraUtilities::PrettyTable(const std::vector<std::string> &data)
     }
   }
 }
+
+std::string AmphoraUtilities::GetSHA256(const std::string &message)
+{
+
+  //Crypto++ Wiki:
+  //crypto++ follows a 'pipeline' paradigm whereby data flows from a source to a sink
+  //along the way to the sink, the data is filtered and transformed before being released at the sink
+
+  CryptoPP::SHA256 hashfcn; // hash function type
+  std::string hashedword = "";
+  // the message originiates as a StringSource, a Source for character arrays and strings
+  // the message passes through HashFilter which takes the desired hash function type and output encoding as input
+  // the message ends up at StringSink
+  CryptoPP::StringSource s(message, true,
+      new CryptoPP::HashFilter(hashfcn,
+      new CryptoPP::HexEncoder(new CryptoPP::StringSink(hashedword))));
+  return(hashedword);
+}
+

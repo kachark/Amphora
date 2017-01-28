@@ -4,10 +4,9 @@
 #ifndef __ACCOUNT_UTIL_HPP_INCLUDED__
 #define __ACCOUNT_UTIL_HPP_INCLUDED__
 
-#include <map>
 #include "account.hpp"
 #include "amphora_util.hpp"
-
+#include <map>
 
 class AmphoraBackend {
 

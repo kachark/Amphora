@@ -4,15 +4,12 @@
 #include <fstream>
 #include <vector>
 
-// TEST
-
-
-
-// TEST
 
 AmphoraBackend::AmphoraBackend()
 {
-
+  // test SHA-256 hashing
+  std::string hashedword = amphora_util_m.GetSHA256("Hello World");
+  std::cout << hashedword << std::endl;
 }
 
 // initializes temp account and adds to accountdata_m
@@ -99,13 +96,8 @@ void AmphoraBackend::ViewAccount(const std::string &accountname)
   std::cout << "Purpose: \t" << account.get_purpose() << std::endl;
   std::cout << "Username: \t" << account.get_username() << std::endl;
   std::cout << "Password: \t" << account.get_password() << std::endl;
-
-  // saved accounts receive date info
-  // checks if the account is new yet unsaved (no date_created, date_mod)
-  if (account.get_datecreated() != "") {
-    std::cout << "Date created: \t" << account.get_datecreated() << std::endl;
-    std::cout << "Date modified: \t" << account.get_datemodified() << std::endl;
-  }
+  std::cout << "Date created: \t" << account.get_datecreated() << std::endl;
+  std::cout << "Date modified: \t" << account.get_datemodified() << std::endl;
 }
 
 // loads account using cereal

@@ -8,12 +8,10 @@ using std::cout; using std::cin; using std::endl; using std::string; using std::
 
 int main( int argc, const char* argv[] )
 {
-
   string userinput;
   AmphoraInterface interface;
 
   while(1) {
-
     cout << "\n\n****** MAIN MENU ******\n";
 
     // User actions
