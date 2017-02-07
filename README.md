@@ -7,7 +7,6 @@ Current project goals:
 4. Encrypt account data
 
 Long-term goals:
-1. Run on raspberry pi as a secure standalone device:
-  1. Unlocking the device done via fingerprint scanner or keypad
-  2. User input via keyboard.
+1. Biometric user access
+2. Browser support
 
