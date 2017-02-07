@@ -14,7 +14,10 @@ public:
   std::string Encrypt();
   int CheckFile(const std::string &filename);
   void PrettyTable(const std::vector<std::string> &data);
-  std::string GetSHA256(const std::string &message);
+  std::string GetPBKDF2(const std::string &message);
+  std::string GetSalt(const size_t &saltlength);
+
+private:
 
 };
 

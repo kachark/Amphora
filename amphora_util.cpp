@@ -1,12 +1,18 @@
 
 
 #include "amphora_util.hpp"
+#include "AES_RNG.h"
 #include <locale>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <cryptopp/filters.h>
 #include <cryptopp/hex.h>
 #include <cryptopp/sha.h>
+#include <cryptopp/cryptlib.h>
+#include <cryptopp/pwdbased.h>
+#include <cryptopp/osrng.h>
+#include <cryptopp/secblock.h>
+// #include <cryptopp/drgb.h>
 // #include <boost/filesystem.hpp>
 
 using namespace boost::posix_time;
@@ -79,21 +85,83 @@ void AmphoraUtilities::PrettyTable(const std::vector<std::string> &data)
   }
 }
 
-std::string AmphoraUtilities::GetSHA256(const std::string &message)
+
+// derives PBKDF2 hash for given message using SHA-512
+std::string AmphoraUtilities::GetPBKDF2(const std::string &message)
 {
+  //safely convert std::string inputs to unsigned char (byte) ensuring no buffer overflow
+  size_t messagelength = message.length();
 
-  //Crypto++ Wiki:
-  //crypto++ follows a 'pipeline' paradigm whereby data flows from a source to a sink
-  //along the way to the sink, the data is filtered and transformed before being released at the sink
+  // memory allocation of messagelength+1 chars
+  // char* password = new char[messagelength+1];
+  if (messagelength > 255) {
+    std::cout << "Buffer overflow" << std::endl;
+    return("");
+  }
+  char password[messagelength + 1];
+  std::strcpy(password, message.c_str());
 
-  CryptoPP::SHA256 hashfcn; // hash function type
-  std::string hashedword = "";
-  // the message originiates as a StringSource, a Source for character arrays and strings
-  // the message passes through HashFilter which takes the desired hash function type and output encoding as input
-  // the message ends up at StringSink
-  CryptoPP::StringSource s(message, true,
-      new CryptoPP::HashFilter(hashfcn,
-      new CryptoPP::HexEncoder(new CryptoPP::StringSink(hashedword))));
-  return(hashedword);
+  std::string sal = AmphoraUtilities::GetSalt(16);
+  char salt[sal.length() + 1];
+  std::strcpy(salt, sal.c_str());
+  size_t slen = strlen((const char*)salt);
+
+  // iterations to perform HMAC
+  unsigned int iterations = 20000;
+
+  // time in seconds to perform derivation
+  double timeinSec = 1;
+
+  // byte buffer to receive the derived password
+  unsigned char derived[20];
+  size_t derivedlen = sizeof(derived);
+
+  // declare PBKDF2-SHA512 variable
+  CryptoPP::PKCS5_PBKDF2_HMAC<CryptoPP::SHA512> pbkdf2;
+
+  // Derive key using above parameters
+  // pbkdf2.DeriveKey(derived, sizeof(derived), 0, password, plen, salt, slen, iterations, timeinSec);
+  pbkdf2.DeriveKey(derived, derivedlen, 0, (unsigned char*)password, messagelength, (unsigned char*)salt, slen, iterations);
+
+  // encode result into hex and release as a string
+  std::string result;
+  CryptoPP::HexEncoder encoder(new CryptoPP::StringSink(result));
+
+  // places encoded result in 'derived'
+  encoder.Put(derived, derivedlen);
+  encoder.MessageEnd();
+
+  return(result);
 }
+
+
+// AES_RNG salt
+std::string AmphoraUtilities::GetSalt(const size_t &saltlen)
+{
+  // fetches random seed from the OS
+  CryptoPP::SecByteBlock seed(32);
+  CryptoPP::OS_GenerateRandomBlock(false, seed, seed.size());
+
+  // compute salt
+  AES_RNG prng(seed, seed.size());
+
+  CryptoPP::SecByteBlock t(saltlen);
+  prng.GenerateBlock(t, t.size());
+
+  std::string result;
+  CryptoPP::HexEncoder hex(new CryptoPP::StringSink(result));
+
+  hex.Put(t, t.size());
+  hex.MessageEnd();
+
+  return(result);
+
+}
+
+
+
+
+
+
+
 

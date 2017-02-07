@@ -7,9 +7,14 @@
 
 AmphoraBackend::AmphoraBackend()
 {
-  // test SHA-256 hashing
-  std::string hashedword = amphora_util_m.GetSHA256("Hello World");
-  std::cout << hashedword << std::endl;
+  std::string test = "passwordPASSWORDpasswordPASSWORDaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  std::string somekey = amphora_util_m.GetPBKDF2(test);
+  std::cout << "Derived: " << somekey << std::endl;
+
+  // std::string salttest = amphora_util_m.GetSalt(5);
+  // std::cout << "Salt: " << salttest << std::endl;
+  // std::string somekey2 = amphora_util_m.GetPBKDF2(testbyte);
+  // std::cout << "Derived: " << somekey2 << std::endl;
 }
 
 // initializes temp account and adds to accountdata_m
@@ -40,7 +45,7 @@ void AmphoraBackend::EditAccount(const std::string &accountname)
   std::string user;
   while (1) {
     AmphoraBackend::ViewAccount(accountname);
-    std::cout << "\nWhat would you like to edit?\n(1): Name\t(2): Purpose\t(3): Username\t(4): Password\t(5): Finish edit\n";
+    std::cout << "\nWhat would you like to edit?\n(1): Name\t(2): Purpose\t(3): Username\t(4): Password\t(5): Finish edit and save\n";
     getline(std::cin, user);
 
     if (user == "1") {
@@ -91,7 +96,7 @@ bool AmphoraBackend::FindAccount(const std::string &accountname)
 // displays acccount info in nice format
 void AmphoraBackend::ViewAccount(const std::string &accountname)
 {
-  Account &account = accountdata_m[accountname];
+  const Account &account = accountdata_m[accountname];
   std::cout << "Name: \t\t" << account.get_name() << std::endl;
   std::cout << "Purpose: \t" << account.get_purpose() << std::endl;
   std::cout << "Username: \t" << account.get_username() << std::endl;
