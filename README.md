@@ -1,4 +1,4 @@
-Amphora is a locally hosted text based password manager built on GNUPG. 
+Amphora is a locally hosted text based password manager built on crypto++. 
 
 Current project goals:
 1. Manage account information

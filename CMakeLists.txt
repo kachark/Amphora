@@ -1,35 +1,28 @@
-# specify the minimum version for CMake
+
+# configure dependencies and output paths
 
 cmake_minimum_required(VERSION 2.8)
 
 # Project's name
+project(Amphora)
 
-project(amphora)
+set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-# Version number of the build
-#set(amphora_VERSION_MAJOR 1)
-#set(amphora_VERSION_MINOR 0)
+set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
+set(SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
+set(BINARY_DIR "${PROJECT_SOURCE_DIR}/bin")
 
-# Set the output folder where your program will be created
-# basically sets variables containing these paths
-set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
-set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
-
-# The following folder will be included
-include_directories("${PROJECT_SOURCE_DIR}")
-
-# link boost libraries
-set(Boost_USE_STATIC_LIBS OFF) 
-set(Boost_USE_MULTITHREADED ON)  
-set(Boost_USE_STATIC_RUNTIME OFF) 
-find_package(Boost 1.58.0 COMPONENTS date_time)	 
-
-if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS}) 
-    add_executable(amphora amphora.cpp account_util.cpp) 
-    target_link_libraries(amphora ${Boost_LIBRARIES})
-endif()
+find_package(Boost 1.63 COMPONENTS date_time REQUIRED)
+find_package(CryptoPP REQUIRED)
 
 
-add_executable(amphora ${PROJECT_SOURCE_DIR}/amphora.cpp)
+# make header files accessible to the compiler
+include_directories(${INCLUDE_DIR})
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BINARY_DIR})
+
+# instruct cmake to inspect these subfolders
+add_subdirectory(${SOURCE_DIR})
+# add_subdirectory(test) for unit_tests
+

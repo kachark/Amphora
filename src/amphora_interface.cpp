@@ -5,6 +5,8 @@
 
 AmphoraInterface::AmphoraInterface()
 {
+  // TODO
+  // handle case where vault.xml is empty / needs to be created
   amphora_backend_m.LoadAccountList();
   std::cout << "Accounts loaded" << std::endl;
   std::cout << "Press '~' at any time to return to the main menu" << std::endl;
