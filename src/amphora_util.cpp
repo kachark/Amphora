@@ -12,6 +12,8 @@
 #include <cryptopp/pwdbased.h>
 #include <cryptopp/osrng.h>
 #include <cryptopp/secblock.h>
+#include <cryptopp/aes.h>
+#include <cryptopp/modes.h>
 // #include <cryptopp/drgb.h>
 // #include <boost/filesystem.hpp>
 
@@ -30,10 +32,53 @@ std::string AmphoraUtilities::CurrentDate()
 }
 
 
-// encrypts account information
-std::string AmphoraUtilities::Encrypt()
+// encrypts account information using AES in GCM mode
+std::string AmphoraUtilities::Encrypt(std::string customkey)
 {
   std::cout << "inside encrypt";
+  // key and IV setup
+  byte key[CryptoPP::AES::DEFAULT_KEYLENGTH], iv[CryptoPP::AES::BLOCKSIZE];
+  memset( key, 0x00, CryptoPP::AES::DEFAULT_KEYLENGTH );
+  memset( iv, 0x00, CryptoPP::AES::BLOCKSIZE );
+
+  //string and sink setup
+  std::string plaintext = "hello world!";
+  std::string ciphertext;
+  std::string decryptedtext;
+
+  //dump plaintext
+  std::cout << "Plain Text (" << plaintext.size() << " bytes)" << std::endl;
+  std::cout << plaintext;
+  std::cout << std::endl << std::endl;
+
+  //create ciphertext
+  CryptoPP::AES::Encryption aesEncryption(key, CryptoPP::AES::DEFAULT_KEYLENGTH);
+  CryptoPP::CBC_Mode_ExternalCipher::Encryption cbcEncryption( aesEncryption, iv);
+
+  CryptoPP::StreamTransformationFilter stfEncryptor(cbcEncryption, new CryptoPP::StringSink(ciphertext));
+  stfEncryptor.Put(reinterpret_cast<const unsigned char*>(plaintext.c_str() ), plaintext.length()+1);
+  stfEncryptor.MessageEnd();
+
+  //dump cipher text
+  std::cout << "Cipher Text (" << ciphertext.size() << " bytes)" << std::endl;
+  for( int i=0; i<ciphertext.size(); i++) {
+    std::cout << "0x" << std::hex << (0xFF & static_cast<byte>(ciphertext[i])) << " ";
+  }
+  std::cout << std::endl << std::endl;
+
+  //decrypt
+  CryptoPP::AES::Decryption aesDecryption(key, CryptoPP::AES::DEFAULT_KEYLENGTH);
+  CryptoPP::CBC_Mode_ExternalCipher::Decryption cbcDecryption( aesDecryption, iv );
+
+  CryptoPP::StreamTransformationFilter stfDecryptor(cbcDecryption, new CryptoPP::StringSink(decryptedtext));
+  stfDecryptor.Put( reinterpret_cast<const unsigned char*>( ciphertext.c_str() ), ciphertext.size());
+  stfDecryptor.MessageEnd();
+
+  //dump decrypted text
+  std::cout << "Decrypted Text: " << std::endl;
+  std::cout << decryptedtext;
+  std::cout << std::endl << std::endl;
+
   return("");
 }
 

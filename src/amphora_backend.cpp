@@ -11,6 +11,8 @@ AmphoraBackend::AmphoraBackend()
   std::string somekey = amphora_util_m.GetPBKDF2(test);
   std::cout << "Derived: " << somekey << std::endl;
 
+  amphora_util_m.Encrypt("");
+
   // std::string salttest = amphora_util_m.GetSalt(5);
   // std::cout << "Salt: " << salttest << std::endl;
   // std::string somekey2 = amphora_util_m.GetPBKDF2(testbyte);
