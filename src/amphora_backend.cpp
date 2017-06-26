@@ -8,12 +8,17 @@
 AmphoraBackend::AmphoraBackend()
 {
   std::string test = "passwordPASSWORDpasswordPASSWORDaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-  std::string somekey = amphora_util_m.GetPBKDF2(test);
+  std::string somekey = crypto_util_m.GetPBKDF2(test);
   std::cout << "Derived: " << somekey << std::endl;
 
-  amphora_util_m.Encrypt("");
+  std::string ciphertext;
+  // ciphertext = crypto_util_m.Encrypt("");
+  crypto_util_m.Encrypt("");
 
-  // std::string salttest = amphora_util_m.GetSalt(5);
+  // std::string decrypted;
+  // decrypted = crypto_util_m.Decrypt(ciphertext);
+
+  // std::string salttest = crypto_util_m.GetSalt(5);
   // std::cout << "Salt: " << salttest << std::endl;
   // std::string somekey2 = amphora_util_m.GetPBKDF2(testbyte);
   // std::cout << "Derived: " << somekey2 << std::endl;

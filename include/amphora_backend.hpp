@@ -9,8 +9,7 @@
 #include <map>
 
 //TODO
-//#include "crypto_util.hpp"
-//#include "amphora_util.hpp"
+#include "crypto_util.hpp"
 
 class AmphoraBackend {
 
@@ -27,6 +26,7 @@ public:
 
 private:
   AmphoraUtilities amphora_util_m;
+  CryptoUtilities crypto_util_m;
   Account tempAccount;
   std::map<std::string, Account> accountdata_m;
 
