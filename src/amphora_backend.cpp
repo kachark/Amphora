@@ -7,22 +7,30 @@
 
 AmphoraBackend::AmphoraBackend()
 {
-  std::string test = "passwordPASSWORDpasswordPASSWORDaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-  std::string somekey = crypto_util_m.GetPBKDF2(test);
-  std::cout << "Derived: " << somekey << std::endl;
+  std::string test = "masterpassword";
+  CryptoPP::SecByteBlock somekey = crypto_util_m.GetPBKDF2(test);
+
+  CryptoPP::SecByteBlock iv = crypto_util_m.GetPseudoRNG(16);
 
   std::string ciphertext;
-  // ciphertext = crypto_util_m.Encrypt("");
-  crypto_util_m.Encrypt("");
+  ciphertext = crypto_util_m.Encrypt(somekey, iv);
 
-  // std::string decrypted;
-  // decrypted = crypto_util_m.Decrypt(ciphertext);
+  std::string decrypted;
+  decrypted = crypto_util_m.Decrypt(ciphertext, somekey, iv);
 
-  // std::string salttest = crypto_util_m.GetSalt(5);
-  // std::cout << "Salt: " << salttest << std::endl;
-  // std::string somekey2 = amphora_util_m.GetPBKDF2(testbyte);
-  // std::cout << "Derived: " << somekey2 << std::endl;
+  // CryptoPP::SecByteBlock salttest = crypto_util_m.GetPseudoRNG(32);
+  // std::string salt = crypto_util_m.SecByteBlockToString(salttest);
+  // std::cout << "Salt: " << salt << std::endl;
 }
+
+
+bool AmphoraBackend::CheckUser(const std::string &username, const std::string &password)
+{
+  // return 0 if no match, 1 if match
+  return 0;
+
+}
+
 
 // initializes temp account and adds to accountdata_m
 // viewaccount and editaccount will check accountdata_m for the name of tempAccount (similar to how it will check any other account

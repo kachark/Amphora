@@ -8,10 +8,15 @@ class AmphoraInterface {
 
 public:
   AmphoraInterface();
-  void MainMenu(const std::string &userinput);
+  void LogIn();
+  void MainMenu();
+  void RegisterUser();
+  // void MainMenu(const std::string &userinput);
 
 private:
   AmphoraBackend amphora_backend_m;
+
+  void Exit();
   void AddAccountSubmenu();
   void EditAccountSubmenu();
   void DeleteAccountSubmenu();

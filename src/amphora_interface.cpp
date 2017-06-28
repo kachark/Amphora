@@ -5,6 +5,9 @@
 
 AmphoraInterface::AmphoraInterface()
 {
+  // log in screen test
+  std::cout << "Welcome to AMPHORA" << std::endl;
+
   // TODO
   // handle case where vault.xml is empty / needs to be created
   amphora_backend_m.LoadAccountList();
@@ -12,33 +15,114 @@ AmphoraInterface::AmphoraInterface()
   std::cout << "Press '~' at any time to return to the main menu" << std::endl;
 }
 
-void AmphoraInterface::MainMenu(const std::string &userinput)
+void AmphoraInterface::LogIn()
 {
+  std::string username, password, input;
+  while(1) {
+    std::cout << "LOG IN" << std::endl;
+    std::cout << "\n(1): Log In\n(2): Register new user\n(~): Quit" << std::endl;
+    getline(std::cin, input);
+    if (input == "~") {
+      exit(0); // bad - doesn't permorm clean up
+      // AmphoraInterface::Exit();
+    } else if (input == "1") {
+      std::cout << "Username: ";
+      getline(std::cin, username);
+      std::cout << "Password: ";
+      getline(std::cin, password);
+      bool check = amphora_backend_m.CheckUser(username, password);
 
-  // Add account
-  if(userinput == "1") {
-    AmphoraInterface::AddAccountSubmenu();
+      if (check == false) {
+        std::cout << "Your username or password are not recognized! Please reenter or register. " << std::endl;
+      } else {
+        AmphoraInterface::MainMenu();
+      }
+
+    } else if (input == "2") {
+      AmphoraInterface::RegisterUser();
+    }
+
+
+    //TODO implement
+    // call on backend to check if username/pw is stored and matches!!
+    // if (username != dbusername || password != dbpassword) {
+    //   std::cout << "Username or Password not recognized!" << std::endl;
+    //   AmphoraInterface::RegisterUser();
+    // } else {
+    //   break;
+    // }
   }
+}
 
-  // edit existing account
-  else if(userinput == "2") { // edit account
-    AmphoraInterface::EditAccountSubmenu();
+void AmphoraInterface::RegisterUser()
+{
+  std::string username, password, confirmedpw;
+  while (1) {
+    std::cout << "USER REGISTRATION" << std::endl;
+    std::cout << "\nPlease enter a new username and password" << std::endl;
+    std::cout << "Username: ";
+    getline(std::cin, username);
+    std::cout << "Password: ";
+    getline(std::cin, password);
+    std::cout << "Confirm password: ";
+    getline(std::cin, confirmedpw);
+
+    if (password != confirmedpw) {
+      std::cout << "Please ensure your password is correctly entered" << std::endl;
+    } else {
+      break;
+    }
+
+    // TODO
+    // needs an exit point (or does it?)
+    // hash username, password with pbkdf2, store salt
+    // serialize username, password, and salts
   }
+}
 
-  // delete account
-  else if(userinput == "3") {
-    //go into the xml file and delete the necessary index
-    AmphoraInterface::DeleteAccountSubmenu();
-  }
+void AmphoraInterface::MainMenu()
+{
+  std::string userinput;
+  while(1) {
+    std::cout << "\n\n****** MAIN MENU ******\n";
 
-  else if(userinput == "4") {
-    AmphoraInterface::ViewAccountsSubmenu();
-  }
+    // User actions
+    std::cout << "\n(1): Add account\n(2): Edit account\n(3): Delete account\n(4): View Accounts\n(5): Options\n(6): Quit\n\n";
 
-  // Advanced optios (TBD)
-  else if(userinput == "5") {
-      //choose Encryption options, fingerprint scanner support, secure password generator etc.
-      //AmphoraInterface::advanced_options();
+    getline(std::cin, userinput);
+
+    if(userinput == "6") {
+      // stuff have to change this actually make it exit
+      std::cout << "Exiting App..." << std::endl;
+      break;
+    }
+
+
+    // Add account
+    if(userinput == "1") {
+      AmphoraInterface::AddAccountSubmenu();
+    }
+
+    // edit existing account
+    else if(userinput == "2") { // edit account
+      AmphoraInterface::EditAccountSubmenu();
+    }
+
+    // delete account
+    else if(userinput == "3") {
+      //go into the xml file and delete the necessary index
+      AmphoraInterface::DeleteAccountSubmenu();
+    }
+
+    else if(userinput == "4") {
+      AmphoraInterface::ViewAccountsSubmenu();
+    }
+
+    // Advanced optios (TBD)
+    else if(userinput == "5") {
+        //choose Encryption options, fingerprint scanner support, secure password generator etc.
+        //AmphoraInterface::advanced_options();
+    }
   }
 }
 

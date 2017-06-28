@@ -6,15 +6,15 @@
 
 #include "account.hpp"
 #include "amphora_util.hpp"
+#include "crypto_util.hpp"
 #include <map>
 
-//TODO
-#include "crypto_util.hpp"
 
 class AmphoraBackend {
 
 public:
   AmphoraBackend();
+  bool CheckUser(const std::string &username, const std::string &password);
   void AddAccount(const std::string &name, const std::string &purpose, const std::string &username, const std::string &password);
   void EditAccount(const std::string &account);
   void DeleteAccount(const std::string &accountname);
