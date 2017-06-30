@@ -5,14 +5,24 @@
 
 AmphoraInterface::AmphoraInterface()
 {
+  exit_flag = false;
   // log in screen test
   std::cout << "Welcome to AMPHORA" << std::endl;
 
   // TODO
   // handle case where vault.xml is empty / needs to be created
-  amphora_backend_m.LoadAccountList();
+  account_manager_m.LoadAccountList();
   std::cout << "Accounts loaded" << std::endl;
   std::cout << "Press '~' at any time to return to the main menu" << std::endl;
+}
+
+void AmphoraInterface::Start()
+{
+  AmphoraInterface::LogIn();
+  if (exit_flag == true) {
+    return;
+  }
+
 }
 
 void AmphoraInterface::LogIn()
@@ -23,14 +33,16 @@ void AmphoraInterface::LogIn()
     std::cout << "\n(1): Log In\n(2): Register new user\n(~): Quit" << std::endl;
     getline(std::cin, input);
     if (input == "~") {
-      exit(0); // bad - doesn't permorm clean up
+      // exit(0); // bad - doesn't permorm clean up
+      exit_flag = true;
+      return;
       // AmphoraInterface::Exit();
     } else if (input == "1") {
       std::cout << "Username: ";
       getline(std::cin, username);
       std::cout << "Password: ";
       getline(std::cin, password);
-      bool check = amphora_backend_m.CheckUser(username, password);
+      bool check = user_manager_m.CheckUser(username, password);
 
       if (check == false) {
         std::cout << "Your username or password are not recognized! Please reenter or register. " << std::endl;
@@ -140,7 +152,7 @@ void AmphoraInterface::AddAccountSubmenu()
 
     if (name == "~") {
       return;
-    } else if (amphora_backend_m.FindAccount(name)) {
+    } else if (account_manager_m.FindAccount(name)) {
       std::cout << "The account name you entered is already in use. Please enter a new name for the account." << std::endl;
     } else {
     std::cout << "Please enter the purpose of the account\n";
@@ -155,7 +167,7 @@ void AmphoraInterface::AddAccountSubmenu()
     }
   }
 
-  amphora_backend_m.AddAccount(name, purpose, username, password);
+  account_manager_m.AddAccount(name, purpose, username, password);
   // this needs to change
   AmphoraInterface::VerifyAddAccountPopup(name);
 
@@ -167,7 +179,7 @@ void AmphoraInterface::EditAccountSubmenu()
   std::string userinput;
   std::string f = "long";
   std::string s = "test";
-  amphora_backend_m.ViewAccountList(f,s);
+  account_manager_m.ViewAccountList(f,s);
 
   while(1) {
     std::cout << "\nPlease type in the name of the account you would like to edit" << std::endl;
@@ -175,10 +187,10 @@ void AmphoraInterface::EditAccountSubmenu()
 
     if (userinput == "~") {
       return;
-    } else if (amphora_backend_m.FindAccount(userinput)) {
+    } else if (account_manager_m.FindAccount(userinput)) {
       std::cout << "Account Found!" << std::endl;
-      amphora_backend_m.EditAccount(userinput);
-      amphora_backend_m.SaveAccountList();
+      account_manager_m.EditAccount(userinput);
+      account_manager_m.SaveAccountList();
       std::cout << std::endl;
       break;
     } else {
@@ -193,7 +205,7 @@ void AmphoraInterface::DeleteAccountSubmenu()
   std::string userinput;
   std::string f = "long";
   std::string s = "test";
-  amphora_backend_m.ViewAccountList(f, s);
+  account_manager_m.ViewAccountList(f, s);
 
   while(1) {
     std::cout << "\nPlease type in the name of the account you would like to delete" << std::endl;
@@ -201,7 +213,7 @@ void AmphoraInterface::DeleteAccountSubmenu()
 
     if (userinput == "~") {
       return;
-    } else if (amphora_backend_m.FindAccount(userinput)) {
+    } else if (account_manager_m.FindAccount(userinput)) {
       std::cout << "Account Found!" << std::endl;
       AmphoraInterface::VerifyDeleteAccountPopup(userinput);
       break;
@@ -217,7 +229,7 @@ void AmphoraInterface::ViewAccountsSubmenu()
 {
   std::string viewstyle = "long";
   std::string sortchoice = "test";
-  amphora_backend_m.ViewAccountList(viewstyle, sortchoice);
+  account_manager_m.ViewAccountList(viewstyle, sortchoice);
 }
 
 
@@ -233,27 +245,27 @@ void AmphoraInterface::VerifyAddAccountPopup(const std::string &accountname)
   std::string submenu;
   while(1) {
     std::cout << "\nIs the information correct?\n";
-    amphora_backend_m.ViewAccount(accountname);
+    account_manager_m.ViewAccount(accountname);
     std::cout << "\n(1): Save account\n(2): Edit account\n(3): Return to Main Menu without saving\n";
     getline(std::cin, submenu);
 
     if(submenu == "1") {
       std::cout << "Saving account..." << std::endl;
-      amphora_backend_m.SaveAccountList();
+      account_manager_m.SaveAccountList();
       break;
     }
 
     // edit new account before saving
     else if(submenu == "2") {
       std::cout << "\n****** Editing account..." << std::endl;
-      amphora_backend_m.EditAccount(accountname);
+      account_manager_m.EditAccount(accountname);
     }
 
     //return to mainmenu without creating/saving new account
     else if(submenu == "3") {
       std::cout << "\nAccount not saved.\n";
       std::cout << "\nReturning to Main Menu...\n";
-      amphora_backend_m.DeleteAccount(accountname);
+      account_manager_m.DeleteAccount(accountname);
       break;
     }
   }
@@ -268,8 +280,8 @@ void AmphoraInterface::VerifyDeleteAccountPopup(const std::string &accountname)
   std::cout << "*** " << accountname << " ***" << std::endl;
   getline(std::cin, userinput);
   if(userinput == "y" || userinput == "Y") {
-    amphora_backend_m.DeleteAccount(accountname);
-    amphora_backend_m.SaveAccountList();
+    account_manager_m.DeleteAccount(accountname);
+    account_manager_m.SaveAccountList();
     std::cout << "Account deleted!" << std::endl;
   } else if(userinput == "n" || userinput == "N") {
     return;

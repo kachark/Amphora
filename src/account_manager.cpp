@@ -1,12 +1,14 @@
 
-#include "amphora_backend.hpp"
+#include "account_manager.hpp"
 #include <iostream>
 #include <fstream>
 #include <vector>
 
+using namespace AmphoraBackend;
 
-AmphoraBackend::AmphoraBackend()
+AccountManager::AccountManager()
 {
+  // TEST OF ENCRYPTION ON HASHING
   std::string test = "masterpassword";
   CryptoPP::SecByteBlock somekey = crypto_util_m.GetPBKDF2(test);
 
@@ -24,19 +26,11 @@ AmphoraBackend::AmphoraBackend()
 }
 
 
-bool AmphoraBackend::CheckUser(const std::string &username, const std::string &password)
-{
-  // return 0 if no match, 1 if match
-  return 0;
-
-}
-
-
 // initializes temp account and adds to accountdata_m
 // viewaccount and editaccount will check accountdata_m for the name of tempAccount (similar to how it will check any other account
 // saveaccountlist will serialize the current buffer accountdata_m
 // tempAccount will be reset to NULL
-void AmphoraBackend::AddAccount(const std::string &name, const std::string &purpose, const std::string &username, const std::string &password)
+void AccountManager::AddAccount(const std::string &name, const std::string &purpose, const std::string &username, const std::string &password)
 {
   std::string date = amphora_util_m.CurrentDate();
 
@@ -53,63 +47,68 @@ void AmphoraBackend::AddAccount(const std::string &name, const std::string &purp
 
 // edit account information
 // make sure to ask user to enter password twice to make sure they entered correctly
-void AmphoraBackend::EditAccount(const std::string &accountname)
+// TODO
+// should pickup the account and pass it along to the UI
+// return desired Account obj
+Account AccountManager::EditAccount(const std::string &accountname)
 {
   Account &account = accountdata_m[accountname];
 
-  std::string user;
-  while (1) {
-    AmphoraBackend::ViewAccount(accountname);
-    std::cout << "\nWhat would you like to edit?\n(1): Name\t(2): Purpose\t(3): Username\t(4): Password\t(5): Finish edit and save\n";
-    getline(std::cin, user);
+  return account;
 
-    if (user == "1") {
-      std::cout << "Enter a name for this account:\t";
-      getline(std::cin, user);
-      account.set_name(user);
-    }
-    if (user == "2") {
-      std::cout << "Enter the purpose of this account:\t";
-      getline(std::cin, user);
-      account.set_purpose(user);
-    }
-    if (user == "3") {
-      std::cout << "Enter the username for this account:\t";
-      getline(std::cin, user);
-      account.set_username(user);
-    }
-    if (user == "4") {
-      std::cout << "Enter the password for this account:\t";
-      getline(std::cin, user);
-      account.set_password(user);
-    }
-    if (user == "5") {
-      std::cout << "****** Finished Editing... \n";
-      break;
-    }
-  }
+  // std::string user;
+  // while (1) {
+  //   AmphoraBackend::ViewAccount(accountname);
+  //   std::cout << "\nWhat would you like to edit?\n(1): Name\t(2): Purpose\t(3): Username\t(4): Password\t(5): Finish edit and save\n";
+  //   getline(std::cin, user);
+
+  //   if (user == "1") {
+  //     std::cout << "Enter a name for this account:\t";
+  //     getline(std::cin, user);
+  //     account.set_name(user);
+  //   }
+  //   if (user == "2") {
+  //     std::cout << "Enter the purpose of this account:\t";
+  //     getline(std::cin, user);
+  //     account.set_purpose(user);
+  //   }
+  //   if (user == "3") {
+  //     std::cout << "Enter the username for this account:\t";
+  //     getline(std::cin, user);
+  //     account.set_username(user);
+  //   }
+  //   if (user == "4") {
+  //     std::cout << "Enter the password for this account:\t";
+  //     getline(std::cin, user);
+  //     account.set_password(user);
+  //   }
+  //   if (user == "5") {
+  //     std::cout << "****** Finished Editing... \n";
+  //     break;
+  //   }
+  // }
 }
 
-void AmphoraBackend::DeleteAccount(const std::string &accountname)
+void AccountManager::DeleteAccount(const std::string &accountname)
 {
   accountdata_m.erase(accountname);
 }
 
 // searches accountlist for account given accountname
 // confirms if account is found
-bool AmphoraBackend::FindAccount(const std::string &accountname)
+bool AccountManager::FindAccount(const std::string &accountname)
 {
-  // account key valid
   if (accountdata_m.find(accountname) != accountdata_m.end()) {
-    return true;
-  } else { // account key not valid
+    return true; // found
+  } else { // account key not found
     return false;
   }
-
 }
 
+// TODO remove from backend
+// the UI should handle this! ui call FindAccount -> return desired Account obj GetAccount
 // displays acccount info in nice format
-void AmphoraBackend::ViewAccount(const std::string &accountname)
+void AccountManager::ViewAccount(const std::string &accountname)
 {
   const Account &account = accountdata_m[accountname];
   std::cout << "Name: \t\t" << account.get_name() << std::endl;
@@ -121,7 +120,7 @@ void AmphoraBackend::ViewAccount(const std::string &accountname)
 }
 
 // loads account using cereal
-void AmphoraBackend::LoadAccountList()
+void AccountManager::LoadAccountList()
 {
   // might be better to have filename as an arg?
   std::string filename = "vault.xml";
@@ -149,7 +148,7 @@ void AmphoraBackend::LoadAccountList()
 }
 
 // saves account using cereal serialization library
-void AmphoraBackend::SaveAccountList()
+void AccountManager::SaveAccountList()
 {
 
   std::string savedaccount = "vault.xml";
@@ -170,7 +169,7 @@ void AmphoraBackend::SaveAccountList()
     // contents to its stream
 }
 
-void AmphoraBackend::ViewAccountList(const std::string &format, const std::string &sortstyle)
+void AccountManager::ViewAccountList(const std::string &format, const std::string &sortstyle)
 {
   //format "short" displays up to the 5 most recent accounts saved in the vault
   //format "long" displays all of the accounts in a given sort - default sort is by acct purpose
@@ -203,7 +202,7 @@ void AmphoraBackend::ViewAccountList(const std::string &format, const std::strin
   amphora_util_m.PrettyTable(accountnamelist);
 }
 
-void AmphoraBackend::ClearTempAccount()
+void AccountManager::ClearTempAccount()
 {
   // reset temporary account object
   tempAccount.set_name("");

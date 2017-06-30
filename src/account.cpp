@@ -1,8 +1,5 @@
 
 
-
-//implementation of account class
-
 #include "account.hpp"
 
 // Account method definitions

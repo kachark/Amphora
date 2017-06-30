@@ -2,19 +2,23 @@
 #ifndef AMPHORA_INTERFACE_HPP
 #define AMPHORA_INTERFACE_HPP
 
-#include "amphora_backend.hpp"
+#include "account_manager.hpp"
+#include "user_manager.hpp"
 
 class AmphoraInterface {
 
 public:
   AmphoraInterface();
+  void Start();
   void LogIn();
   void MainMenu();
   void RegisterUser();
   // void MainMenu(const std::string &userinput);
 
 private:
-  AmphoraBackend amphora_backend_m;
+  AmphoraBackend::AccountManager account_manager_m;
+  AmphoraBackend::UserManager user_manager_m;
+  bool exit_flag;
 
   void Exit();
   void AddAccountSubmenu();
