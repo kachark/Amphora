@@ -1,6 +1,8 @@
 
 
 #include "account.hpp"
+#include <cereal/archives/xml.hpp> // serialize in xml format
+#include <cereal/types/string.hpp>
 
 // Account method definitions
 void Account::set_name(const std::string &name)

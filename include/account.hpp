@@ -2,8 +2,9 @@
 #ifndef ACCOUNT_HPP
 #define ACCOUNT_HPP
 
-#include <cereal/archives/xml.hpp> // serialize in xml format
-#include <cereal/types/string.hpp>
+// #include <cereal/archives/xml.hpp> // serialize in xml format
+// #include <cereal/types/string.hpp>
+#include <string>
 
 class Account {
 

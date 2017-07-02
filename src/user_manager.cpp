@@ -9,21 +9,7 @@ using namespace AmphoraBackend;
 
 UserManager::UserManager()
 {
-  // TEST OF ENCRYPTION ON HASHING
-  std::string test = "masterpassword";
-  CryptoPP::SecByteBlock somekey = crypto_util_m.GetPBKDF2(test);
 
-  CryptoPP::SecByteBlock iv = crypto_util_m.GetPseudoRNG(16);
-
-  std::string ciphertext;
-  ciphertext = crypto_util_m.Encrypt(somekey, iv);
-
-  std::string decrypted;
-  decrypted = crypto_util_m.Decrypt(ciphertext, somekey, iv);
-
-  // CryptoPP::SecByteBlock salttest = crypto_util_m.GetPseudoRNG(32);
-  // std::string salt = crypto_util_m.SecByteBlockToString(salttest);
-  // std::cout << "Salt: " << salt << std::endl;
 }
 
 
