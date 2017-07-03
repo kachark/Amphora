@@ -20,18 +20,14 @@ std::string CryptoUtilities::Encrypt(CryptoPP::SecByteBlock &key, CryptoPP::SecB
 {
 
   std::string plaintext = "HELLOWORLD! GCM";
-  std::string ciphertext, encoded, recovered;
+  std::string ciphertext, encoded;
 
-  //convert secbyteblock to std string and print key
   encoded.clear();
-  CryptoPP::StringSource(key, key.size(), true,
-      new CryptoPP::HexEncoder(new CryptoPP::StringSink(encoded)));
+  encoded = CryptoUtilities::SecByteBlockToString(key);
   std::cout << "key: " << encoded << std::endl;
 
-  //pretty print iv
   encoded.clear();
-  CryptoPP::StringSource(iv, iv.size(), true,
-      new CryptoPP::HexEncoder(new CryptoPP::StringSink(encoded)));
+  encoded = CryptoUtilities::SecByteBlockToString(iv);
   std::cout << "iv: " << encoded << std::endl;
 
   try
@@ -50,7 +46,7 @@ std::string CryptoUtilities::Encrypt(CryptoPP::SecByteBlock &key, CryptoPP::SecB
     std::cerr << e.what() << std::endl;
     exit(1);
   }
-  // pretty print
+  // pretty print a std::string
   encoded.clear();
   CryptoPP::StringSource(ciphertext, true,
       new CryptoPP::HexEncoder(new CryptoPP::StringSink(encoded)));
@@ -89,11 +85,7 @@ CryptoPP::SecByteBlock CryptoUtilities::GetPBKDF2(const std::string &message)
 {
 
   CryptoPP::SecByteBlock salt = CryptoUtilities::GetPseudoRNG(16);
-  std::string saltstring;
-  //convert secbyteblock to std string and print key
-  saltstring.clear();
-  CryptoPP::StringSource(salt, salt.size(), true,
-      new CryptoPP::HexEncoder(new CryptoPP::StringSink(saltstring)));
+  std::string saltstring = CryptoUtilities::SecByteBlockToString(salt);
   std::cout << "Salt: " << saltstring << std::endl;
 
   // iterations to perform HMAC
@@ -111,14 +103,7 @@ CryptoPP::SecByteBlock CryptoUtilities::GetPBKDF2(const std::string &message)
   // Derive key using above parameters
   pbkdf2.DeriveKey(derived, derived.size(), 0, (const byte *)message.data(), message.size(), salt, salt.size(), iterations, timeinSec);
 
-  // encode result into hex and release as a string
-  std::string result;
-  CryptoPP::HexEncoder encoder(new CryptoPP::StringSink(result));
-
-  // places encoded result in 'derived'
-  encoder.Put(derived, derived.size());
-  encoder.MessageEnd();
-
+  std::string result = CryptoUtilities::SecByteBlockToString(derived);
   std::cout << "Derived pbkdf2: " << result << std::endl;
 
   return(derived); // return as a secbyte buffer
@@ -143,8 +128,7 @@ CryptoPP::SecByteBlock CryptoUtilities::GetPseudoRNG(const size_t &saltlen)
 }
 
 
-//TODO fix linker error
-std::string SecByteBlockToString(CryptoPP::SecByteBlock &buffer)
+std::string CryptoUtilities::SecByteBlockToString(CryptoPP::SecByteBlock &buffer)
 {
   std::string result;
   //convert secbyteblock to std string and print key
