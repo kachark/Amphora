@@ -20,20 +20,20 @@ namespace AmphoraBackend
 //     void AddAccount(const std::string &name, const std::string &purpose, const std::string &username, const std::string &password);
 //     Account EditAccount(const std::string &account); // changed
 //     void DeleteAccount(const std::string &accountname);
-//     bool FindAccount(const std::string &accountname); // find AND RETURN
+    bool FindAccount(const std::string &accountname); // find AND RETURN
 //     // Account GetAccount(const std::string &accountname); // new
 //     void ViewAccount(const std::string &account);
-//     void LoadAccountList();
-//     void SaveAccountList();
+    void LoadUserList();
+    void SaveUserList();
 //     void ViewAccountList(const std::string &format, const std::string &sortstyle);
 
   private:
     AmphoraUtilities amphora_util_m;
     CryptoUtilities crypto_util_m;
-    // Account tempAccount;
-    // std::map<std::string, Account> accountdata_m;
+    User tempuser;
+    std::map<std::string, User> userdata_m;
 
-    void ClearTempAccount();
+    void ClearTempUser();
 
   };
 

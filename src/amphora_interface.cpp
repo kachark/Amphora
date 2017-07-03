@@ -18,10 +18,16 @@ AmphoraInterface::AmphoraInterface()
 
 void AmphoraInterface::Start()
 {
-  AmphoraInterface::LogIn();
-  // AmphoraInterface::MainMenu();
-  if (exit_flag == true) {
-    return;
+  std::string accountfilename = "vault.xml";
+  std::string userfilename = "vault2.xml";
+  if (amphora_util_m.CheckFile(accountfilename) && amphora_util_m.CheckFile(userfilename)) {
+    AmphoraInterface::MainMenu();
+    // AmphoraInterface::LogIn();
+    if (exit_flag == true) {
+      return;
+    }
+  } else {
+    std::cout << "The necessary files, vault.xml and vault2.xml, are not detected!!" << std::endl;
   }
 
 }

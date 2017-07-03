@@ -1,9 +1,7 @@
 
 #include "account_manager.hpp"
 #include <iostream>
-// #include <fstream>
 #include <vector>
-// #include <map>
 
 namespace AmphoraBackend
 {
@@ -123,6 +121,7 @@ namespace AmphoraBackend
   // loads account using cereal
   void AccountManager::LoadAccountList()
   {
+    // TODO - ensure file exists!
     std::string filename = "vault.xml";
     std::vector<Account> accountvector;
     amphora_util_m.LoadFromFile<Account>(filename, accountvector);
@@ -132,9 +131,11 @@ namespace AmphoraBackend
   }
 
   // saves account using cereal serialization library
+  // will create new file or overwrite existing file
   void AccountManager::SaveAccountList()
   {
 
+    // TODO - filename should be a constant throughout the program
     std::string filename = "vault.xml";
     std::size_t num_saved;
     std::cout << "NUMBER BEING SAVED" << accountdata_m.size() << std::endl;

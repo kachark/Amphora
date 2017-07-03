@@ -10,9 +10,10 @@
 #include <locale>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
-// #include <boost/filesystem.hpp>
+#include <boost/filesystem.hpp>
 
 using namespace boost::posix_time;
+using namespace boost::filesystem;
 
 
 // retrieves system date and time in nice format
@@ -27,10 +28,12 @@ std::string AmphoraUtilities::CurrentDate()
 }
 
 // checks if a file is in the pwd
-int AmphoraUtilities::CheckFile(const std::string &filename)
+bool AmphoraUtilities::CheckFile(const std::string &filename)
 {
-  //see boost filesystem
-  return 0;
+  // TODO
+  // need to get relative path to some directory holding .xml files
+  // need to define where the .xml files should reside by default!!
+  return exists(filename);
 }
 
 // outputs vector of strings in nice format
@@ -74,20 +77,12 @@ void AmphoraUtilities::PrettyTable(const std::vector<std::string> &data)
   }
 }
 
-// loads account using cereal
+// deserializes vector of data using cereal serialization library
 template<typename T> inline
 void AmphoraUtilities::LoadFromFile(const std::string &filename, std::vector<T> &buffer)
 {
-  // might be better to have filename as an arg?
-  // std::string filename = "vault.xml";
-  // check if filename is in the pwd
-  // std::vector<T> loadeddata;
   std::size_t num_saved;
   {
-    // open stream
-    // HOW TO CHECK IF FILENAME EXISTS OR NOT?
-    // IF NOT: create a new vault.xml (default vault filename)
-    // IF exists, but file is empty: terminate load process??
     std::ifstream is(filename);
     cereal::XMLInputArchive archive(is);
     // call archive and get number of saved accounts from archive's first index.
@@ -97,7 +92,6 @@ void AmphoraUtilities::LoadFromFile(const std::string &filename, std::vector<T> 
       T temp;
       archive( temp );
       buffer.push_back(temp);
-      // loadeddata.insert(std::make_pair(temp.get_name(), temp));
     }
       std::cout << "DEBUG: num_saved = " << num_saved << std::endl;
   }
@@ -105,14 +99,11 @@ void AmphoraUtilities::LoadFromFile(const std::string &filename, std::vector<T> 
 }
 
 
-// saves account using cereal serialization library
+// serializes vector of data using cereal serialization library
 template<typename T> inline
 void AmphoraUtilities::SaveToFile(const std::string &filename, std::vector<T> &datalist)
 {
-
-  // std::string savedaccount = "vault.xml";
   std::size_t num_saved;
-  // std::cout << "NUMBER BEING SAVED" << accountlist_m.size() << std::endl;
   std::cout << "NUMBER BEING SAVED" << datalist.size() << std::endl;
   {
     std::ofstream file( filename );

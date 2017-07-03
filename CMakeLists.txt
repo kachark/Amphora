@@ -13,7 +13,7 @@ set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
 set(SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
 set(BINARY_DIR "${PROJECT_SOURCE_DIR}/bin")
 
-find_package(Boost 1.63 COMPONENTS date_time REQUIRED)
+find_package(Boost 1.63 COMPONENTS filesystem date_time REQUIRED)
 find_package(CryptoPP REQUIRED)
 
 
