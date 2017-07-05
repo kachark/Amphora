@@ -35,53 +35,69 @@ namespace AmphoraBackend
   }
 
   // loads account using cereal
-  void UserManager::LoadUserList()
+  bool UserManager::LoadUserList()
   {
     // TODO - ensure file exists!
-    std::string filename = "vault.xml";
+    bool loadstatus;
+    std::string filename = "vault2.xml";
     std::vector<User> uservector;
-    amphora_util_m.LoadFromFile<User>(filename, uservector);
-    for (auto user : uservector) {
-      userdata_m.insert(std::make_pair(user.get_username(), user));
+    if (amphora_util_m.CheckFile(filename)) { // check if file exists in directory
+      std::cout << "File found" << std::endl; // debug
+      loadstatus = amphora_util_m.LoadFromFile<User>(filename, uservector);
+      if (loadstatus) { // if load success + check file -> return true
+        // populate memory
+        for (auto user : uservector) {
+          userdata_m.insert(std::make_pair(user.get_username(), user));
+        }
+        return 1;
+      }
     }
+    return 0;
   }
 
   // saves account using cereal serialization library
   // will create new file or overwrite existing file
-  void UserManager::SaveUserList()
+  bool UserManager::SaveUserList()
   {
 
     // TODO - filename should be a constant throughout the program
-    std::string filename = "vault.xml";
+    bool savestatus;
+    std::string filename = "vault2.xml";
     std::size_t num_saved;
     std::cout << "NUMBER BEING SAVED" << userdata_m.size() << std::endl;
     std::vector<User> uservector;
+    // prepare vector of objects to serialize
     for (auto user : userdata_m) {
       uservector.push_back(user.second);
     }
-    amphora_util_m.SaveToFile<User>(filename, uservector);
+    if (amphora_util_m.CheckFile(filename)) {
+      std::cout << "File found" << std::endl; // debug
+      savestatus = amphora_util_m.SaveToFile<User>(filename, uservector);
+      if (savestatus) { // if save success + check file -> return true
+        return 1;
+      }
+    }
+    return 0;
   }
-
 
 
   // // initializes temp account and adds to accountdata_m
   // // viewaccount and editaccount will check accountdata_m for the name of tempAccount (similar to how it will check any other account
   // // saveaccountlist will serialize the current buffer accountdata_m
   // // tempAccount will be reset to NULL
-  // void UserManager::AddAccount(const std::string &name, const std::string &purpose, const std::string &username, const std::string &password)
-  // {
-  //   std::string date = amphora_util_m.CurrentDate();
+  void UserManager::AddUser(const std::string &username, const std::string &password)
+  {
+    std::string date = amphora_util_m.CurrentDate();
 
-  //   tempAccount.set_name(name);
-  //   tempAccount.set_purpose(purpose);
-  //   tempAccount.set_username(username);
-  //   tempAccount.set_password(password);
-  //   tempAccount.set_datecreated(date);
-  //   tempAccount.set_datemodified(date);
+    tempuser.set_username(username);
+    tempuser.set_password(password);
+    tempuser.set_datecreated(date);
+    tempuser.set_datemodified(date);
 
-  //   // store temporary new account in map
-  //   accountdata_m.insert(std::make_pair(name, tempAccount));
-  // }
+    // store temporary new user in map
+    userdata_m.insert(std::make_pair(username, tempuser));
+    tempuser.clear();
+  }
 
   // // edit account information
   // // make sure to ask user to enter password twice to make sure they entered correctly
@@ -230,15 +246,5 @@ namespace AmphoraBackend
   //   amphora_util_m.PrettyTable(accountnamelist);
   // }
 
-  // void UserManager::ClearTempAccount()
-  // {
-  //   // reset temporary account object
-  //   tempAccount.set_name("");
-  //   tempAccount.set_purpose("");
-  //   tempAccount.set_username("");
-  //   tempAccount.set_password("");
-  //   tempAccount.set_datecreated("");
-  //   tempAccount.set_datemodified("");
-  // }
 
 }

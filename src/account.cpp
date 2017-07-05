@@ -4,7 +4,17 @@
 #include <cereal/archives/xml.hpp> // serialize in xml format
 #include <cereal/types/string.hpp>
 
-// Account method definitions
+
+void Account::clear()
+{
+  Account::name_m.clear();
+  Account::purpose_m.clear();
+  Account::username_m.clear();
+  Account::password_m.clear();
+  Account::datemodified_m.clear();
+  Account::datemodified_m.clear();
+}
+
 void Account::set_name(const std::string &name)
 {
   Account::name_m = name;

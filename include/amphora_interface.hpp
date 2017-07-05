@@ -5,6 +5,7 @@
 #include "account_manager.hpp"
 #include "user_manager.hpp"
 #include "amphora_util.hpp"
+#include <string>
 
 class AmphoraInterface {
 
@@ -23,6 +24,7 @@ private:
   bool exit_flag;
 
   void Exit();
+  void LoadUserFile();
   void AddAccountSubmenu();
   void EditAccountSubmenu();
   void DeleteAccountSubmenu();

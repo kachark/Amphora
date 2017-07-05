@@ -2,14 +2,14 @@
 #ifndef USER_HPP
 #define USER_HPP
 
-#include <cereal/archives/xml.hpp> // serialize in xml format
-#include <cereal/types/string.hpp>
+#include <string>
 
 class User {
 
 public:
   // default constructor preferred for serialization
   User() = default;
+  void clear();
 
   void set_username(const std::string &username);
   void set_password(const std::string &password);
@@ -27,6 +27,7 @@ public:
 
 private:
   std::string username_m, password_m, datecreated_m, datemodified_m;
+  std::string key_m, iv_m, salt_m;
 
 };
 

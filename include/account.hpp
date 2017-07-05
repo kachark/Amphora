@@ -2,8 +2,6 @@
 #ifndef ACCOUNT_HPP
 #define ACCOUNT_HPP
 
-// #include <cereal/archives/xml.hpp> // serialize in xml format
-// #include <cereal/types/string.hpp>
 #include <string>
 
 class Account {
@@ -11,6 +9,7 @@ class Account {
 public:
   // default constructor preferred for serialization
   Account() = default;
+  void clear();
 
   void set_name(const std::string &name);
   void set_purpose(const std::string &purpose);

@@ -1,5 +1,16 @@
 
 #include "user.hpp"
+#include <cereal/archives/xml.hpp> // serialize in xml format
+#include <cereal/types/string.hpp>
+
+
+void User::clear()
+{
+  User::username_m.clear();
+  User::password_m.clear();
+  User::datemodified_m.clear();
+  User::datemodified_m.clear();
+}
 
 void User::set_username(const std::string &username)
 {

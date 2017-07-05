@@ -1,6 +1,7 @@
 
 
 #include "amphora_interface.hpp"
+#include <iostream>
 
 
 AmphoraInterface::AmphoraInterface()
@@ -10,26 +11,24 @@ AmphoraInterface::AmphoraInterface()
   std::cout << "Welcome to AMPHORA" << std::endl;
 
   // TODO
-  // handle case where vault.xml is empty / needs to be created
-  account_manager_m.LoadAccountList();
-  std::cout << "Accounts loaded" << std::endl;
+  // load users -> log in -> load accounts only if successful
+  bool loadaccounts = account_manager_m.LoadAccountList();
+  if(loadaccounts) {
+    std::cout << "Accounts loaded" << std::endl;
+  } else if (!loadaccounts) {
+    std::cout << "LOAD FAILED" << std::endl;
+    // AmphoraInterface::AddAccountSubmenu();
+  }
   std::cout << "Press '~' at any time to return to the main menu" << std::endl;
 }
 
 void AmphoraInterface::Start()
 {
-  std::string accountfilename = "vault.xml";
-  std::string userfilename = "vault2.xml";
-  if (amphora_util_m.CheckFile(accountfilename) && amphora_util_m.CheckFile(userfilename)) {
-    AmphoraInterface::MainMenu();
-    // AmphoraInterface::LogIn();
-    if (exit_flag == true) {
-      return;
-    }
-  } else {
-    std::cout << "The necessary files, vault.xml and vault2.xml, are not detected!!" << std::endl;
-  }
-
+  AmphoraInterface::LoadUserFile();
+  AmphoraInterface::LogIn();
+  // if (exit_flag == true) {
+  //   return;
+  // }
 }
 
 void AmphoraInterface::LogIn()
@@ -43,7 +42,6 @@ void AmphoraInterface::LogIn()
       // exit(0); // bad - doesn't permorm clean up
       exit_flag = true;
       return;
-      // AmphoraInterface::Exit();
     } else if (input == "1") {
       std::cout << "Username: ";
       getline(std::cin, username);
@@ -91,6 +89,33 @@ void AmphoraInterface::RegisterUser()
     } else {
       break;
     }
+
+    // TODO
+    // need to store key, hmac iterations, key length (bytes), salt
+    // need to have vectors of salts, key lengths, iterations, keys and serialize them
+    // may need to create a class for hash and encryption settings - they should be stored independent of the Users/Accounts
+    // inside crypto_util:
+      // need a method to convert string to secbyteblock
+      // getpbkdf2 needs to be able to take in: salt, yourmsg, iterations, key length, # bytes
+      // encrypt needs: plaintext, key (encryption settings already accounted for when key and iv made ie. key.size())
+      // decrypt needs: ciphertext pw/account info, # bytes, key
+
+    // // TEST OF ENCRYPTION ON HASHING
+    // CryptoPP::SecByteBlock somekey = crypto_util_m.GetPBKDF2(password);
+    // // need to convert key to string to save
+
+    // CryptoPP::SecByteBlock iv = crypto_util_m.GetPseudoRNG(16);
+    // // need to convert iv to string to save
+
+    // std::string ciphertext;
+    // ciphertext = crypto_util_m.Encrypt(somekey, iv);
+
+    // std::string decrypted;
+    // decrypted = crypto_util_m.Decrypt(ciphertext, somekey, iv);
+
+    // CryptoPP::SecByteBlock salttest = crypto_util_m.GetPseudoRNG(32);
+    // std::string salt = crypto_util_m.SecByteBlockToString(salttest);
+    // std::cout << "Salt: " << salt << std::endl;
 
     // TODO
     // needs an exit point (or does it?)
@@ -141,6 +166,32 @@ void AmphoraInterface::MainMenu()
     else if(userinput == "5") {
         //choose Encryption options, fingerprint scanner support, secure password generator etc.
         //AmphoraInterface::advanced_options();
+    }
+  }
+}
+
+void AmphoraInterface::LoadUserFile()
+{
+  std::string input;
+  bool loadusers = user_manager_m.LoadUserList();
+  if(loadusers) {
+    std::cout << "Users loaded" << std::endl;
+  } else if (!loadusers) {
+    std::cout << "vault2.xml LOAD FAILED" << std::endl;
+    std::cout << "Would you like to register a new user?" << std::endl;
+
+    while (1) {
+      std::cout << "(1): yes\n" << "(2): no" << std::endl;
+      getline(std::cin, input);
+      if (input == "1") {
+        AmphoraInterface::RegisterUser();
+        break;
+      } else if (input == "2") {
+        exit_flag = true;
+        break;
+      } else {
+        std::cout << "Command not recognized" << std::endl;
+      }
     }
   }
 }

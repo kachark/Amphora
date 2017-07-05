@@ -17,14 +17,14 @@ namespace AmphoraBackend
     UserManager();
     bool CheckUser(const std::string &username, const std::string &password);
 
-//     void AddAccount(const std::string &name, const std::string &purpose, const std::string &username, const std::string &password);
+    void AddUser(const std::string &username, const std::string &password);
 //     Account EditAccount(const std::string &account); // changed
-//     void DeleteAccount(const std::string &accountname);
+    void DeleteUser(const std::string &username);
     bool FindAccount(const std::string &accountname); // find AND RETURN
 //     // Account GetAccount(const std::string &accountname); // new
 //     void ViewAccount(const std::string &account);
-    void LoadUserList();
-    void SaveUserList();
+    bool LoadUserList();
+    bool SaveUserList();
 //     void ViewAccountList(const std::string &format, const std::string &sortstyle);
 
   private:
@@ -33,7 +33,8 @@ namespace AmphoraBackend
     User tempuser;
     std::map<std::string, User> userdata_m;
 
-    void ClearTempUser();
+    void EncryptUsers(); // encrypts Users inside userdata_m
+    void DecryptUsers(); // decrypts Users
 
   };
 

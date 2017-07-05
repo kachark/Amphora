@@ -22,17 +22,15 @@ namespace AmphoraBackend
     bool FindAccount(const std::string &accountname); // find AND RETURN
     // Account GetAccount(const std::string &accountname); // new
     void ViewAccount(const std::string &account);
-    void LoadAccountList();
-    void SaveAccountList();
+    bool LoadAccountList();
+    bool SaveAccountList();
     void ViewAccountList(const std::string &format, const std::string &sortstyle);
 
   private:
     AmphoraUtilities amphora_util_m;
     CryptoUtilities crypto_util_m;
-    Account tempAccount;
+    Account tempaccount;
     std::map<std::string, Account> accountdata_m;
-
-    void ClearTempAccount();
 
   };
 

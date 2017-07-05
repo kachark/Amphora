@@ -15,10 +15,10 @@ public:
   void PrettyTable(const std::vector<std::string> &data);
 
   template<typename T>
-  void LoadFromFile(const std::string &filename, std::vector<T> &buffer);
+  bool LoadFromFile(const std::string &filename, std::vector<T> &buffer);
 
   template<typename T>
-  void SaveToFile(const std::string &filename, std::vector<T> &datalist);
+  bool SaveToFile(const std::string &filename, std::vector<T> &datalist);
 
 private:
 

@@ -7,21 +7,7 @@ namespace AmphoraBackend
 {
   AccountManager::AccountManager()
   {
-    // TEST OF ENCRYPTION ON HASHING
-    std::string test = "masterpassword";
-    CryptoPP::SecByteBlock somekey = crypto_util_m.GetPBKDF2(test);
 
-    CryptoPP::SecByteBlock iv = crypto_util_m.GetPseudoRNG(16);
-
-    std::string ciphertext;
-    ciphertext = crypto_util_m.Encrypt(somekey, iv);
-
-    std::string decrypted;
-    decrypted = crypto_util_m.Decrypt(ciphertext, somekey, iv);
-
-    // CryptoPP::SecByteBlock salttest = crypto_util_m.GetPseudoRNG(32);
-    // std::string salt = crypto_util_m.SecByteBlockToString(salttest);
-    // std::cout << "Salt: " << salt << std::endl;
   }
 
 
@@ -33,15 +19,16 @@ namespace AmphoraBackend
   {
     std::string date = amphora_util_m.CurrentDate();
 
-    tempAccount.set_name(name);
-    tempAccount.set_purpose(purpose);
-    tempAccount.set_username(username);
-    tempAccount.set_password(password);
-    tempAccount.set_datecreated(date);
-    tempAccount.set_datemodified(date);
+    tempaccount.set_name(name);
+    tempaccount.set_purpose(purpose);
+    tempaccount.set_username(username);
+    tempaccount.set_password(password);
+    tempaccount.set_datecreated(date);
+    tempaccount.set_datemodified(date);
 
     // store temporary new account in map
-    accountdata_m.insert(std::make_pair(name, tempAccount));
+    accountdata_m.insert(std::make_pair(name, tempaccount));
+    tempaccount.clear();
   }
 
   // edit account information
@@ -119,31 +106,48 @@ namespace AmphoraBackend
   }
 
   // loads account using cereal
-  void AccountManager::LoadAccountList()
+  bool AccountManager::LoadAccountList()
   {
-    // TODO - ensure file exists!
+    bool loadstatus;
     std::string filename = "vault.xml";
     std::vector<Account> accountvector;
-    amphora_util_m.LoadFromFile<Account>(filename, accountvector);
-    for (auto account : accountvector) {
-      accountdata_m.insert(std::make_pair(account.get_name(), account));
+    if (amphora_util_m.CheckFile(filename)) { // check if file exists in directory
+      std::cout << "File found" << std::endl; // debug
+      loadstatus = amphora_util_m.LoadFromFile<Account>(filename, accountvector);
+      if (loadstatus) { // if load success + check file -> return true
+        // populate memory
+        for (auto account : accountvector) {
+          accountdata_m.insert(std::make_pair(account.get_name(), account));
+        }
+        return 1;
+      }
     }
+    return 0;
   }
 
   // saves account using cereal serialization library
   // will create new file or overwrite existing file
-  void AccountManager::SaveAccountList()
+  bool AccountManager::SaveAccountList()
   {
 
     // TODO - filename should be a constant throughout the program
+    bool savestatus;
     std::string filename = "vault.xml";
     std::size_t num_saved;
     std::cout << "NUMBER BEING SAVED" << accountdata_m.size() << std::endl;
     std::vector<Account> accountvector;
+    // prepare vector of objects to serialize
     for (auto account : accountdata_m) {
       accountvector.push_back(account.second);
     }
-    amphora_util_m.SaveToFile<Account>(filename, accountvector);
+    if (amphora_util_m.CheckFile(filename)) {
+      std::cout << "File found" << std::endl; // debug
+      savestatus = amphora_util_m.SaveToFile<Account>(filename, accountvector);
+      if (savestatus) { // if save success + check file -> return true
+        return 1;
+      }
+    }
+    return 0;
   }
 
   //TODO
@@ -181,14 +185,4 @@ namespace AmphoraBackend
     amphora_util_m.PrettyTable(accountnamelist);
   }
 
-  void AccountManager::ClearTempAccount()
-  {
-    // reset temporary account object
-    tempAccount.set_name("");
-    tempAccount.set_purpose("");
-    tempAccount.set_username("");
-    tempAccount.set_password("");
-    tempAccount.set_datecreated("");
-    tempAccount.set_datemodified("");
-  }
 }
