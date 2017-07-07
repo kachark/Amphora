@@ -1,22 +1,22 @@
 
 
-#include "crypto_util.hpp"
-#include "AES_RNG.h"
-#include <cryptopp/filters.h>
-#include <cryptopp/hex.h>
-#include <cryptopp/sha.h>
-#include <cryptopp/cryptlib.h>
-#include <cryptopp/pwdbased.h>
-#include <cryptopp/osrng.h>
+#include "../include/crypto_util.hpp"
+#include "../include/AES_RNG.h"
 #include <cryptopp/aes.h>
+#include <cryptopp/cryptlib.h>
+#include <cryptopp/filters.h>
 #include <cryptopp/gcm.h>
+#include <cryptopp/hex.h>
 #include <cryptopp/modes.h>
+#include <cryptopp/osrng.h>
+#include <cryptopp/pwdbased.h>
+#include <cryptopp/sha.h>
 #include <iostream>
 
-
 // encrypts account information using AES in GCM mode
-std::string CryptoUtilities::Encrypt(const std::string &plaintext, CryptoPP::SecByteBlock &key, CryptoPP::SecByteBlock &iv)
-{
+std::string CryptoUtilities::Encrypt(const std::string &plaintext,
+                                     CryptoPP::SecByteBlock &key,
+                                     CryptoPP::SecByteBlock &iv) {
 
   std::string ciphertext, encoded;
 
@@ -28,8 +28,7 @@ std::string CryptoUtilities::Encrypt(const std::string &plaintext, CryptoPP::Sec
   encoded = CryptoUtilities::SecByteBlockToString(iv);
   std::cout << "iv: " << encoded << std::endl;
 
-  try
-  {
+  try {
     std::cout << "plain text: " << plaintext << std::endl;
     CryptoPP::GCM<CryptoPP::AES>::Encryption e;
     e.SetKeyWithIV(key, key.size(), iv, iv.size());
@@ -37,10 +36,9 @@ std::string CryptoUtilities::Encrypt(const std::string &plaintext, CryptoPP::Sec
     // as required. GCM and CBC mode must be padded
     // to the block size of the cipher.
     CryptoPP::StringSource(plaintext, true,
-        new CryptoPP::AuthenticatedEncryptionFilter(e, new CryptoPP::StringSink(ciphertext)));
-  }
-  catch(const CryptoPP::Exception& e)
-  {
+                           new CryptoPP::AuthenticatedEncryptionFilter(
+                               e, new CryptoPP::StringSink(ciphertext)));
+  } catch (const CryptoPP::Exception &e) {
     std::cout << "Encryption Failed!" << std::endl;
     std::cerr << e.what() << std::endl;
     encoded.clear();
@@ -48,30 +46,28 @@ std::string CryptoUtilities::Encrypt(const std::string &plaintext, CryptoPP::Sec
   }
   // DEBUG: pretty print a std::string
   encoded.clear();
-  CryptoPP::StringSource(ciphertext, true,
+  CryptoPP::StringSource(
+      ciphertext, true,
       new CryptoPP::HexEncoder(new CryptoPP::StringSink(encoded)));
   std::cout << "cipher text: " << encoded << std::endl;
 
   return ciphertext;
-
 }
 
-
-std::string CryptoUtilities::Decrypt(const std::string &ciphertext, CryptoPP::SecByteBlock &key, CryptoPP::SecByteBlock &iv)
-{
+std::string CryptoUtilities::Decrypt(const std::string &ciphertext,
+                                     CryptoPP::SecByteBlock &key,
+                                     CryptoPP::SecByteBlock &iv) {
   std::string recovered;
 
-  try
-  {
+  try {
     CryptoPP::GCM<CryptoPP::AES>::Decryption d;
     d.SetKeyWithIV(key, key.size(), iv, iv.size());
     // the StreamTransformationFilter removes padding as required
     CryptoPP::StringSource s(ciphertext, true,
-        new CryptoPP::AuthenticatedDecryptionFilter(d, new CryptoPP::StringSink(recovered)));
+                             new CryptoPP::AuthenticatedDecryptionFilter(
+                                 d, new CryptoPP::StringSink(recovered)));
     std::cout << "recovered text: " << recovered << std::endl;
-  }
-  catch(const CryptoPP::Exception& e)
-  {
+  } catch (const CryptoPP::Exception &e) {
     std::cout << "Decryption Failed!" << std::endl;
     std::cerr << e.what() << std::endl;
     recovered.clear();
@@ -81,10 +77,8 @@ std::string CryptoUtilities::Decrypt(const std::string &ciphertext, CryptoPP::Se
   return recovered;
 }
 
-
 // derives PBKDF2 hash for given message using SHA-512
-CryptoPP::SecByteBlock CryptoUtilities::GetPBKDF2(const std::string &message)
-{
+CryptoPP::SecByteBlock CryptoUtilities::GetPBKDF2(const std::string &message) {
 
   CryptoPP::SecByteBlock salt = CryptoUtilities::GetPseudoRNG(16);
   std::string saltstring = CryptoUtilities::SecByteBlockToString(salt);
@@ -103,18 +97,17 @@ CryptoPP::SecByteBlock CryptoUtilities::GetPBKDF2(const std::string &message)
   CryptoPP::PKCS5_PBKDF2_HMAC<CryptoPP::SHA512> pbkdf2;
 
   // Derive key using above parameters
-  pbkdf2.DeriveKey(derived, derived.size(), 0, (const byte *)message.data(), message.size(), salt, salt.size(), iterations, timeinSec);
+  pbkdf2.DeriveKey(derived, derived.size(), 0, (const byte *)message.data(),
+                   message.size(), salt, salt.size(), iterations, timeinSec);
 
   std::string result = CryptoUtilities::SecByteBlockToString(derived);
   std::cout << "Derived pbkdf2: " << result << std::endl;
 
-  return(derived); // return as a secbyte buffer
+  return (derived); // return as a secbyte buffer
 }
 
-
 // AES-256 pseudorandom number generator
-CryptoPP::SecByteBlock CryptoUtilities::GetPseudoRNG(const size_t &saltlen)
-{
+CryptoPP::SecByteBlock CryptoUtilities::GetPseudoRNG(const size_t &saltlen) {
   // fetches random seed from the OS
   CryptoPP::SecByteBlock seed(32); // 32 byte
   CryptoPP::OS_GenerateRandomBlock(false, seed, seed.size());
@@ -125,26 +118,23 @@ CryptoPP::SecByteBlock CryptoUtilities::GetPseudoRNG(const size_t &saltlen)
   CryptoPP::SecByteBlock randomval(saltlen);
   prng.GenerateBlock(randomval, randomval.size());
 
-  return(randomval);
-
+  return (randomval);
 }
 
-
-std::string CryptoUtilities::SecByteBlockToString(CryptoPP::SecByteBlock &buffer)
-{
+std::string
+CryptoUtilities::SecByteBlockToString(CryptoPP::SecByteBlock &buffer) {
   std::string result;
-  //convert secbyteblock to std string and print key
+  // convert secbyteblock to std string and print key
   result.clear();
-  CryptoPP::StringSource(buffer, buffer.size(), true,
+  CryptoPP::StringSource(
+      buffer, buffer.size(), true,
       new CryptoPP::HexEncoder(new CryptoPP::StringSink(result)));
 
-  return(result);
+  return (result);
 }
 
-
-CryptoPP::SecByteBlock CryptoUtilities::StringToSecByteBlock(const std::string
-&buffer)
-{
+CryptoPP::SecByteBlock
+CryptoUtilities::StringToSecByteBlock(const std::string &buffer) {
   CryptoPP::SecByteBlock result((const byte *)buffer.data(), buffer.size());
-  return(result);
+  return (result);
 }

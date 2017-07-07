@@ -1,24 +1,22 @@
 
 
-#include "amphora_util.hpp"
-#include "account.hpp"
-#include "user.hpp"
-#include <cereal/archives/xml.hpp> // serialize in xml format
-#include <cereal/types/string.hpp>
-#include <iostream>
-#include <fstream>
-#include <locale>
+#include "../include/amphora_util.hpp"
+#include "../include/account.hpp"
+#include "../include/user.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <boost/filesystem.hpp>
+#include <cereal/archives/xml.hpp> // serialize in xml format
+#include <cereal/types/string.hpp>
+#include <fstream>
+#include <iostream>
+#include <locale>
 
 using namespace boost::posix_time;
 /* using namespace boost::filesystem; */
 
-
 // retrieves system date and time in nice format
-std::string AmphoraUtilities::CurrentDate()
-{
+std::string AmphoraUtilities::CurrentDate() {
   time_facet *facet = new time_facet("%d-%b-%Y %H:%M:%S");
   std::cout.imbue(std::locale(std::cout.getloc(), facet));
   //  cout << second_clock::local_time() << endl;
@@ -28,8 +26,7 @@ std::string AmphoraUtilities::CurrentDate()
 }
 
 // checks if a file is in the pwd
-bool AmphoraUtilities::CheckFile(const std::string &filename)
-{
+bool AmphoraUtilities::CheckFile(const std::string &filename) {
   // TODO
   // need to get relative path to some directory holding .xml files
   // need to define where the .xml files should reside by default!!
@@ -37,8 +34,7 @@ bool AmphoraUtilities::CheckFile(const std::string &filename)
 }
 
 // outputs vector of strings in nice format
-void AmphoraUtilities::PrettyTable(const std::vector<std::string> &data)
-{
+void AmphoraUtilities::PrettyTable(const std::vector<std::string> &data) {
 
   // get largest string of characters
   std::size_t largestelement = 0;
@@ -78,43 +74,43 @@ void AmphoraUtilities::PrettyTable(const std::vector<std::string> &data)
 }
 
 // deserializes vector of data using cereal serialization library
-template<typename T> inline
-bool AmphoraUtilities::LoadFromFile(const std::string &filename, std::vector<T> &buffer)
-{
+template <typename T>
+inline bool AmphoraUtilities::LoadFromFile(const std::string &filename,
+                                           std::vector<T> &buffer) {
   std::size_t num_saved;
   try {
     {
       std::ifstream is(filename);
       cereal::XMLInputArchive archive(is);
-      // call archive and get number of saved accounts from archive's first index.
-      archive( num_saved );
-      // loop and call archive for the number of saved accounts, to ensure every account is retrieved.
-      for ( auto i = 0; i < num_saved; ++i ) {
+      // call archive and get number of saved accounts from archive's first
+      // index.
+      archive(num_saved);
+      // loop and call archive for the number of saved accounts, to ensure every
+      // account is retrieved.
+      for (auto i = 0; i < num_saved; ++i) {
         T temp;
-        archive( temp );
+        archive(temp);
         buffer.push_back(temp);
       }
-        std::cout << "DEBUG: num_saved = " << num_saved << std::endl;
+      std::cout << "DEBUG: num_saved = " << num_saved << std::endl;
     }
   } catch (cereal::Exception &e) {
     std::cout << filename << " is EMPTY" << std::endl;
     return 0;
   }
   return 1;
-
 }
 
-
 // serializes vector of data using cereal serialization library
-template<typename T> inline
-bool AmphoraUtilities::SaveToFile(const std::string &filename, std::vector<T> &datalist)
-{
+template <typename T>
+inline bool AmphoraUtilities::SaveToFile(const std::string &filename,
+                                         std::vector<T> &datalist) {
   std::size_t num_saved;
   std::cout << "NUMBER BEING SAVED" << datalist.size() << std::endl;
   try {
     {
-      std::ofstream file( filename );
-      cereal::XMLOutputArchive archive( file );
+      std::ofstream file(filename);
+      cereal::XMLOutputArchive archive(file);
 
       num_saved = datalist.size();
       archive(cereal::make_nvp("Total: ", num_saved));
@@ -122,7 +118,7 @@ bool AmphoraUtilities::SaveToFile(const std::string &filename, std::vector<T> &d
       for (auto dataelement : datalist) {
         archive(dataelement);
       }
-   } // when archive goes out of scope it is guaranteed to have flushed its
+    } // when archive goes out of scope it is guaranteed to have flushed its
     // contents to its stream
   } catch (cereal::Exception &e) {
     std::cout << "Failed to save " << filename << std::endl;
@@ -131,15 +127,16 @@ bool AmphoraUtilities::SaveToFile(const std::string &filename, std::vector<T> &d
   return 1;
 }
 
-
 // implemented templates above
-// explicitely instantiated the templates below to work with User and Account types
-template bool AmphoraUtilities::LoadFromFile<Account>(const std::string &filename, std::vector<Account> &buffer);
-template bool AmphoraUtilities::LoadFromFile<User>(const std::string &filename, std::vector<User> &buffer);
-template bool AmphoraUtilities::SaveToFile<Account>(const std::string &filename, std::vector<Account> &datalist);
-template bool AmphoraUtilities::SaveToFile<User>(const std::string &filename, std::vector<User> &datalist);
-
-
-
-
-
+// explicitely instantiated the templates below to work with User and Account
+// types
+template bool
+AmphoraUtilities::LoadFromFile<Account>(const std::string &filename,
+                                        std::vector<Account> &buffer);
+template bool AmphoraUtilities::LoadFromFile<User>(const std::string &filename,
+                                                   std::vector<User> &buffer);
+template bool
+AmphoraUtilities::SaveToFile<Account>(const std::string &filename,
+                                      std::vector<Account> &datalist);
+template bool AmphoraUtilities::SaveToFile<User>(const std::string &filename,
+                                                 std::vector<User> &datalist);

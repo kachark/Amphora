@@ -3,8 +3,8 @@
 #define AMPHORA_INTERFACE_HPP
 
 #include "account_manager.hpp"
-#include "user_manager.hpp"
 #include "amphora_util.hpp"
+#include "user_manager.hpp"
 #include <string>
 
 class AmphoraInterface {
@@ -20,7 +20,7 @@ public:
 private:
   AmphoraBackend::AccountManager account_manager_m;
   AmphoraBackend::UserManager user_manager_m;
-  //AmphoraUtilities amphora_util_m;
+  // AmphoraUtilities amphora_util_m;
   bool exit_flag;
 
   void Exit();
@@ -33,6 +33,5 @@ private:
   void VerifyAddAccountPopup(const std::string &accountname);
   void VerifyDeleteAccountPopup(const std::string &accountname);
 };
-
 
 #endif // AMPHORA_INTERFACE_HPP

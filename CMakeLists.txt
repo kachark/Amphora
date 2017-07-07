@@ -26,3 +26,4 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BINARY_DIR})
 add_subdirectory(${SOURCE_DIR})
 # add_subdirectory(test) for unit_tests
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS=ON )

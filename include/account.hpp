@@ -25,21 +25,12 @@ public:
   std::string get_datecreated() const;
   std::string get_datemodified() const;
 
-
   // this method lets cereal know which data members to serialize for this type
-  template <typename Archive>
-  void serialize(Archive & ar);
+  template <typename Archive> void serialize(Archive &ar);
 
 private:
-  std::string name_m, purpose_m, username_m, password_m, datecreated_m, datemodified_m;
-
+  std::string name_m, purpose_m, username_m, password_m, datecreated_m,
+      datemodified_m;
 };
 
 #endif // ACCOUNT_HPP
-
-
-
-
-
-
-

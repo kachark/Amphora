@@ -1,11 +1,8 @@
-//Amphora main file
+// Amphora main file
 
+#include "../include/amphora_interface.hpp"
 
-#include "amphora_interface.hpp"
-
-
-int main( int argc, const char* argv[] )
-{
+int main(int argc, const char *argv[]) {
   AmphoraInterface interface;
   // maybe have an exit flag for interface
   // exit point is in main if these interface methods drop out early, then
@@ -14,8 +11,3 @@ int main( int argc, const char* argv[] )
 
   return 0;
 }
-
-
-
-
-
