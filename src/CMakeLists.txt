@@ -8,6 +8,7 @@ add_executable(amphora
   account_manager.cpp
   user.cpp
   user_manager.cpp
+  crypto_db.cpp
   )
 
 target_link_libraries(amphora

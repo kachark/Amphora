@@ -7,7 +7,37 @@ namespace AmphoraBackend
 {
   AccountManager::AccountManager()
   {
+    std::string plaintext = "encrypt this";
 
+    std::string masterpassword = "hello world";
+    std::string anothermasterpw = "hi";
+    // // TEST OF ENCRYPTION ON HASHING
+    CryptoPP::SecByteBlock somekey = crypto_util_m.GetPBKDF2(masterpassword);
+    CryptoPP::SecByteBlock somekey2 = crypto_util_m.GetPBKDF2(anothermasterpw);
+    // // need to convert key to string to save
+
+    CryptoPP::SecByteBlock iv = crypto_util_m.GetPseudoRNG(16);
+    CryptoPP::SecByteBlock iv2 = crypto_util_m.GetPseudoRNG(16);
+    // // need to convert iv to string to save
+
+    std::string ciphertext;
+    std::string ciphertext2;
+    ciphertext = crypto_util_m.Encrypt(plaintext, somekey, iv);
+    ciphertext2 = crypto_util_m.Encrypt(plaintext, somekey2, iv2);
+
+    std::string decrypted;
+    // TEST: decrypt using wrong key and/or iv for a given ciphertext
+    // exception caught inside Decrypt
+    decrypted = crypto_util_m.Decrypt(ciphertext2, somekey, iv2);
+    // handle failed decryption (or encryption) for log in or accounts!
+    if (decrypted.empty()) {
+      std::cout << "BAD DECRYPTION" << std::endl;
+    }
+
+
+    // CryptoPP::SecByteBlock salttest = crypto_util_m.GetPseudoRNG(32);
+    // std::string salt = crypto_util_m.SecByteBlockToString(salttest);
+    // std::cout << "Salt: " << salt << std::endl;
   }
 
 
@@ -109,7 +139,7 @@ namespace AmphoraBackend
   bool AccountManager::LoadAccountList()
   {
     bool loadstatus;
-    std::string filename = "vault.xml";
+    std::string filename =  "../data/vault.xml";
     std::vector<Account> accountvector;
     if (amphora_util_m.CheckFile(filename)) { // check if file exists in directory
       std::cout << "File found" << std::endl; // debug
@@ -132,7 +162,7 @@ namespace AmphoraBackend
 
     // TODO - filename should be a constant throughout the program
     bool savestatus;
-    std::string filename = "vault.xml";
+    std::string filename = "../data/vault.xml";
     std::size_t num_saved;
     std::cout << "NUMBER BEING SAVED" << accountdata_m.size() << std::endl;
     std::vector<Account> accountvector;

@@ -11,15 +11,13 @@
 #include <cryptopp/aes.h>
 #include <cryptopp/gcm.h>
 #include <cryptopp/modes.h>
-// #include <cryptopp/drgb.h>
 #include <iostream>
 
 
 // encrypts account information using AES in GCM mode
-std::string CryptoUtilities::Encrypt(CryptoPP::SecByteBlock &key, CryptoPP::SecByteBlock &iv)
+std::string CryptoUtilities::Encrypt(const std::string &plaintext, CryptoPP::SecByteBlock &key, CryptoPP::SecByteBlock &iv)
 {
 
-  std::string plaintext = "HELLOWORLD! GCM";
   std::string ciphertext, encoded;
 
   encoded.clear();
@@ -43,10 +41,12 @@ std::string CryptoUtilities::Encrypt(CryptoPP::SecByteBlock &key, CryptoPP::SecB
   }
   catch(const CryptoPP::Exception& e)
   {
+    std::cout << "Encryption Failed!" << std::endl;
     std::cerr << e.what() << std::endl;
-    exit(1);
+    encoded.clear();
+    // exit(1);
   }
-  // pretty print a std::string
+  // DEBUG: pretty print a std::string
   encoded.clear();
   CryptoPP::StringSource(ciphertext, true,
       new CryptoPP::HexEncoder(new CryptoPP::StringSink(encoded)));
@@ -72,8 +72,10 @@ std::string CryptoUtilities::Decrypt(const std::string &ciphertext, CryptoPP::Se
   }
   catch(const CryptoPP::Exception& e)
   {
+    std::cout << "Decryption Failed!" << std::endl;
     std::cerr << e.what() << std::endl;
-    exit(1);
+    recovered.clear();
+    // exit(1);
   }
 
   return recovered;
@@ -136,5 +138,13 @@ std::string CryptoUtilities::SecByteBlockToString(CryptoPP::SecByteBlock &buffer
   CryptoPP::StringSource(buffer, buffer.size(), true,
       new CryptoPP::HexEncoder(new CryptoPP::StringSink(result)));
 
+  return(result);
+}
+
+
+CryptoPP::SecByteBlock CryptoUtilities::StringToSecByteBlock(const std::string
+&buffer)
+{
+  CryptoPP::SecByteBlock result((const byte *)buffer.data(), buffer.size());
   return(result);
 }

@@ -13,7 +13,7 @@
 #include <boost/filesystem.hpp>
 
 using namespace boost::posix_time;
-using namespace boost::filesystem;
+/* using namespace boost::filesystem; */
 
 
 // retrieves system date and time in nice format
@@ -33,7 +33,7 @@ bool AmphoraUtilities::CheckFile(const std::string &filename)
   // TODO
   // need to get relative path to some directory holding .xml files
   // need to define where the .xml files should reside by default!!
-  return exists(filename);
+  return boost::filesystem::exists(filename);
 }
 
 // outputs vector of strings in nice format

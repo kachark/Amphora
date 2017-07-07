@@ -39,7 +39,7 @@ namespace AmphoraBackend
   {
     // TODO - ensure file exists!
     bool loadstatus;
-    std::string filename = "vault2.xml";
+    std::string filename = "../data/vault2.xml";
     std::vector<User> uservector;
     if (amphora_util_m.CheckFile(filename)) { // check if file exists in directory
       std::cout << "File found" << std::endl; // debug
@@ -62,7 +62,7 @@ namespace AmphoraBackend
 
     // TODO - filename should be a constant throughout the program
     bool savestatus;
-    std::string filename = "vault2.xml";
+    std::string filename = "../data/vault2.xml";
     std::size_t num_saved;
     std::cout << "NUMBER BEING SAVED" << userdata_m.size() << std::endl;
     std::vector<User> uservector;

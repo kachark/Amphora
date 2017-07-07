@@ -25,7 +25,8 @@ AmphoraInterface::AmphoraInterface()
 void AmphoraInterface::Start()
 {
   AmphoraInterface::LoadUserFile();
-  AmphoraInterface::LogIn();
+  //AmphoraInterface::LogIn();
+  AmphoraInterface::MainMenu();
   // if (exit_flag == true) {
   //   return;
   // }

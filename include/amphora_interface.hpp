@@ -20,7 +20,7 @@ public:
 private:
   AmphoraBackend::AccountManager account_manager_m;
   AmphoraBackend::UserManager user_manager_m;
-  AmphoraUtilities amphora_util_m;
+  //AmphoraUtilities amphora_util_m;
   bool exit_flag;
 
   void Exit();
