@@ -1,41 +1,11 @@
 
 #include "../include/account_manager.hpp"
+#include <fstream>
 #include <iostream>
 #include <vector>
 
 namespace AmphoraBackend {
-AccountManager::AccountManager() {
-  std::string plaintext = "encrypt this";
-
-  std::string masterpassword = "hello world";
-  std::string anothermasterpw = "hi";
-  // // TEST OF ENCRYPTION ON HASHING
-  CryptoPP::SecByteBlock somekey = crypto_util_m.GetPBKDF2(masterpassword);
-  CryptoPP::SecByteBlock somekey2 = crypto_util_m.GetPBKDF2(anothermasterpw);
-  // // need to convert key to string to save
-
-  CryptoPP::SecByteBlock iv = crypto_util_m.GetPseudoRNG(16);
-  CryptoPP::SecByteBlock iv2 = crypto_util_m.GetPseudoRNG(16);
-  // // need to convert iv to string to save
-
-  std::string ciphertext;
-  std::string ciphertext2;
-  ciphertext = crypto_util_m.Encrypt(plaintext, somekey, iv);
-  ciphertext2 = crypto_util_m.Encrypt(plaintext, somekey2, iv2);
-
-  std::string decrypted;
-  // TEST: decrypt using wrong key and/or iv for a given ciphertext
-  // exception caught inside Decrypt
-  decrypted = crypto_util_m.Decrypt(ciphertext2, somekey, iv2);
-  // handle failed decryption (or encryption) for log in or accounts!
-  if (decrypted.empty()) {
-    std::cout << "BAD DECRYPTION" << std::endl;
-  }
-
-  // CryptoPP::SecByteBlock salttest = crypto_util_m.GetPseudoRNG(32);
-  // std::string salt = crypto_util_m.SecByteBlockToString(salttest);
-  // std::cout << "Salt: " << salt << std::endl;
-}
+AccountManager::AccountManager() {}
 
 // initializes temp account and adds to accountdata_m
 // viewaccount and editaccount will check accountdata_m for the name of
@@ -48,16 +18,16 @@ void AccountManager::AddAccount(const std::string &name,
                                 const std::string &password) {
   std::string date = amphora_util_m.CurrentDate();
 
-  tempaccount.set_name(name);
-  tempaccount.set_purpose(purpose);
-  tempaccount.set_username(username);
-  tempaccount.set_password(password);
-  tempaccount.set_datecreated(date);
-  tempaccount.set_datemodified(date);
+  tempaccount_m.set_name(name);
+  tempaccount_m.set_purpose(purpose);
+  tempaccount_m.set_username(username);
+  tempaccount_m.set_password(password);
+  tempaccount_m.set_datecreated(date);
+  tempaccount_m.set_datemodified(date);
 
   // store temporary new account in map
-  accountdata_m.insert(std::make_pair(name, tempaccount));
-  tempaccount.clear();
+  accountdata_m.insert(std::make_pair(name, tempaccount_m));
+  tempaccount_m.clear();
 }
 
 // edit account information
@@ -134,11 +104,12 @@ void AccountManager::ViewAccount(const std::string &accountname) {
 }
 
 // loads account using cereal
-bool AccountManager::LoadAccountList() {
+bool AccountManager::LoadAccountList(const std::string &fileid) {
   bool loadstatus;
-  std::string filename = "../data/vault.xml";
+  std::string filename = "../data/" + fileid + ".xml";
+  std::cout << filename << std::endl;
   std::vector<Account> accountvector;
-  if (amphora_util_m.CheckFile(filename)) { // check if file exists in directory
+  if (amphora_util_m.FindFile(filename)) {  // check if file exists in directory
     std::cout << "File found" << std::endl; // debug
     loadstatus = amphora_util_m.LoadFromFile<Account>(filename, accountvector);
     if (loadstatus) { // if load success + check file -> return true
@@ -154,19 +125,25 @@ bool AccountManager::LoadAccountList() {
 
 // saves account using cereal serialization library
 // will create new file or overwrite existing file
-bool AccountManager::SaveAccountList() {
-
-  // TODO - filename should be a constant throughout the program
-  bool savestatus;
-  std::string filename = "../data/vault.xml";
-  std::size_t num_saved;
+bool AccountManager::SaveAccountList(const std::string &fileid) {
+  bool filefound, savestatus;
+  std::string filename = "../data/" + fileid + ".xml";
+  std::cout << filename << std::endl;
   std::cout << "NUMBER BEING SAVED" << accountdata_m.size() << std::endl;
   std::vector<Account> accountvector;
   // prepare vector of objects to serialize
   for (auto account : accountdata_m) {
     accountvector.push_back(account.second);
   }
-  if (amphora_util_m.CheckFile(filename)) {
+  filefound = amphora_util_m.FindFile(filename);
+  while (!filefound) {
+    // create file if not found/doesn't exist
+    std::fstream fs;
+    fs.open(filename.data(), std::ios::out);
+    fs.close();
+    filefound = amphora_util_m.FindFile(filename);
+  }
+  if (filefound) {
     std::cout << "File found" << std::endl; // debug
     savestatus = amphora_util_m.SaveToFile<Account>(filename, accountvector);
     if (savestatus) { // if save success + check file -> return true
@@ -177,7 +154,7 @@ bool AccountManager::SaveAccountList() {
 }
 
 // TODO
-// move to amphorainterface
+// move to amphorainterface?
 void AccountManager::ViewAccountList(const std::string &format,
                                      const std::string &sortstyle) {
   // format "short" displays up to the 5 most recent accounts saved in the vault

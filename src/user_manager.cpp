@@ -8,8 +8,10 @@ namespace AmphoraBackend {
 
 UserManager::UserManager() {}
 
-bool UserManager::CheckUser(const std::string &username,
-                            const std::string &password) {
+// TODO
+// verifies user as being registered in system
+bool UserManager::VerifyUser(const std::string &username,
+                             const std::string &password) {
   // return 0 if no match, 1 if match
   return 0;
 }
@@ -33,7 +35,7 @@ bool UserManager::LoadUserList() {
   bool loadstatus;
   std::string filename = "../data/vault2.xml";
   std::vector<User> uservector;
-  if (amphora_util_m.CheckFile(filename)) { // check if file exists in directory
+  if (amphora_util_m.FindFile(filename)) {  // check if file exists in directory
     std::cout << "File found" << std::endl; // debug
     loadstatus = amphora_util_m.LoadFromFile<User>(filename, uservector);
     if (loadstatus) { // if load success + check file -> return true
@@ -54,14 +56,13 @@ bool UserManager::SaveUserList() {
   // TODO - filename should be a constant throughout the program
   bool savestatus;
   std::string filename = "../data/vault2.xml";
-  std::size_t num_saved;
   std::cout << "NUMBER BEING SAVED" << userdata_m.size() << std::endl;
   std::vector<User> uservector;
   // prepare vector of objects to serialize
   for (auto user : userdata_m) {
     uservector.push_back(user.second);
   }
-  if (amphora_util_m.CheckFile(filename)) {
+  if (amphora_util_m.FindFile(filename)) {
     std::cout << "File found" << std::endl; // debug
     savestatus = amphora_util_m.SaveToFile<User>(filename, uservector);
     if (savestatus) { // if save success + check file -> return true
@@ -77,17 +78,20 @@ bool UserManager::SaveUserList() {
 // // saveaccountlist will serialize the current buffer accountdata_m
 // // tempAccount will be reset to NULL
 void UserManager::AddUser(const std::string &username,
-                          const std::string &password) {
+                          const std::string &password,
+                          const std::string &fileid) {
   std::string date = amphora_util_m.CurrentDate();
 
-  tempuser.set_username(username);
-  tempuser.set_password(password);
-  tempuser.set_datecreated(date);
-  tempuser.set_datemodified(date);
+  tempuser_m.set_username(username);
+  tempuser_m.set_password(password);
+  tempuser_m.set_datecreated(date);
+  tempuser_m.set_datemodified(date);
+  tempuser_m.set_accountfileid(fileid);
 
   // store temporary new user in map
-  userdata_m.insert(std::make_pair(username, tempuser));
-  tempuser.clear();
+  userdata_m.insert(std::make_pair(username, tempuser_m));
+  // clear temporary user
+  tempuser_m.clear();
 }
 
 // // edit account information

@@ -15,17 +15,19 @@ public:
   void set_password(const std::string &password);
   void set_datecreated(const std::string &date);
   void set_datemodified(const std::string &date);
+  void set_accountfileid(const std::string &fileid);
   std::string get_username() const;
   std::string get_password() const;
   std::string get_datecreated() const;
   std::string get_datemodified() const;
+  std::string get_accountfileid() const;
 
   // this method lets cereal know which data members to serialize for this type
   template <typename Archive> void serialize(Archive &ar);
 
 private:
-  std::string username_m, password_m, datecreated_m, datemodified_m;
-  std::string key_m, iv_m, salt_m;
+  std::string username_m, password_m, datecreated_m, datemodified_m,
+      accountfileid_m;
 };
 
 #endif // USER_HPP

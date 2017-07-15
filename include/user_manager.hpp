@@ -13,9 +13,10 @@ class UserManager {
 
 public:
   UserManager();
-  bool CheckUser(const std::string &username, const std::string &password);
+  bool VerifyUser(const std::string &username, const std::string &password);
 
-  void AddUser(const std::string &username, const std::string &password);
+  void AddUser(const std::string &username, const std::string &password,
+               const std::string &fileid);
   //     Account EditAccount(const std::string &account); // changed
   void DeleteUser(const std::string &username);
   bool FindAccount(const std::string &accountname); // find AND RETURN
@@ -29,7 +30,7 @@ public:
 private:
   AmphoraUtilities amphora_util_m;
   CryptoUtilities crypto_util_m;
-  User tempuser;
+  User tempuser_m;
   std::map<std::string, User> userdata_m;
 
   void EncryptUsers(); // encrypts Users inside userdata_m

@@ -3,35 +3,37 @@
 #include "../include/amphora_interface.hpp"
 #include <iostream>
 
+/* Amphora Interface Constructor */
 AmphoraInterface::AmphoraInterface() {
   exit_flag = false;
   // log in screen test
   std::cout << "Welcome to AMPHORA" << std::endl;
 
   // TODO
+  // remove from constructor
   // load users -> log in -> load accounts only if successful
-  bool loadaccounts = account_manager_m.LoadAccountList();
-  if (loadaccounts) {
-    std::cout << "Accounts loaded" << std::endl;
-  } else if (!loadaccounts) {
-    std::cout << "LOAD FAILED" << std::endl;
-    // AmphoraInterface::AddAccountSubmenu();
-  }
   std::cout << "Press '~' at any time to return to the main menu" << std::endl;
 }
 
 void AmphoraInterface::Start() {
   AmphoraInterface::LoadUserFile();
-  // AmphoraInterface::LogIn();
+  AmphoraInterface::LogIn();
+  AmphoraInterface::LoadAccountFile(currentfileid_m);
   AmphoraInterface::MainMenu();
   // if (exit_flag == true) {
   //   return;
   // }
 }
 
+/* Log In Page */
+/* Shows options for user log in, registration, or exiting the program.
+   (1) selected, asks user for username and password to verify.
+   (2) Opens the RegisterUser page.
+   (~) Exits the program. */
 void AmphoraInterface::LogIn() {
   std::string username, password, input;
-  while (1) {
+  unsigned int attempts = 0;
+  while (attempts < maxlogins_m) {
     std::cout << "LOG IN" << std::endl;
     std::cout << "\n(1): Log In\n(2): Register new user\n(~): Quit"
               << std::endl;
@@ -45,31 +47,28 @@ void AmphoraInterface::LogIn() {
       getline(std::cin, username);
       std::cout << "Password: ";
       getline(std::cin, password);
-      bool check = user_manager_m.CheckUser(username, password);
+      bool verification = user_manager_m.VerifyUser(username, password);
 
-      if (check == false) {
+      if (verification == false) {
         std::cout << "Your username or password are not recognized! Please "
                      "reenter or register. "
                   << std::endl;
-      } else {
-        AmphoraInterface::MainMenu();
       }
+      // else {
+      //   // TODO
+      //   // should this go here??
+      // }
 
     } else if (input == "2") {
       AmphoraInterface::RegisterUser();
     }
-
-    // TODO implement
-    // call on backend to check if username/pw is stored and matches!!
-    // if (username != dbusername || password != dbpassword) {
-    //   std::cout << "Username or Password not recognized!" << std::endl;
-    //   AmphoraInterface::RegisterUser();
-    // } else {
-    //   break;
-    // }
+    attempts++;
   }
 }
 
+/* Registration Page */
+/* Asks user to enter username and password and compares them against the
+ * database. If username/password is unique, the username/password is hashed. */
 void AmphoraInterface::RegisterUser() {
   std::string username, password, confirmedpw;
   while (1) {
@@ -85,45 +84,20 @@ void AmphoraInterface::RegisterUser() {
     if (password != confirmedpw) {
       std::cout << "Please ensure your password is correctly entered"
                 << std::endl;
-    } else {
+    } else { // register user
+      // generate fileid for new User to create/manage Accounts
+      CryptoPP::SecByteBlock fileidbyte = crypto_util_m.Get_AES_PseudoRNG(3);
+      std::string fileid = crypto_util_m.SecByteBlockToString(fileidbyte);
+      std::cout << "FILE ID: " << fileid << std::endl;
+      // add user to manager
+      user_manager_m.AddUser(username, password, fileid);
+      // add current user fileid to amphora interface
+      currentfileid_m = fileid;
+      // AmphoraInterface::MainMenu();
+
       break;
+      // continue;
     }
-
-    // TODO
-    // need to store key, hmac iterations, key length (bytes), salt
-    // need to have vectors of salts, key lengths, iterations, keys and
-    // serialize them
-    // may need to create a class for hash and encryption settings - they should
-    // be stored independent of the Users/Accounts
-    // inside crypto_util:
-    // need a method to convert string to secbyteblock
-    // getpbkdf2 needs to be able to take in: salt, yourmsg, iterations, key
-    // length, # bytes
-    // encrypt needs: plaintext, key (encryption settings already accounted for
-    // when key and iv made ie. key.size())
-    // decrypt needs: ciphertext pw/account info, # bytes, key
-
-    // // TEST OF ENCRYPTION ON HASHING
-    // CryptoPP::SecByteBlock somekey = crypto_util_m.GetPBKDF2(password);
-    // // need to convert key to string to save
-
-    // CryptoPP::SecByteBlock iv = crypto_util_m.GetPseudoRNG(16);
-    // // need to convert iv to string to save
-
-    // std::string ciphertext;
-    // ciphertext = crypto_util_m.Encrypt(somekey, iv);
-
-    // std::string decrypted;
-    // decrypted = crypto_util_m.Decrypt(ciphertext, somekey, iv);
-
-    // CryptoPP::SecByteBlock salttest = crypto_util_m.GetPseudoRNG(32);
-    // std::string salt = crypto_util_m.SecByteBlockToString(salttest);
-    // std::cout << "Salt: " << salt << std::endl;
-
-    // TODO
-    // needs an exit point (or does it?)
-    // hash username, password with pbkdf2, store salt
-    // serialize username, password, and salts
   }
 }
 
@@ -164,22 +138,28 @@ void AmphoraInterface::MainMenu() {
       AmphoraInterface::ViewAccountsSubmenu();
     }
 
+    // TODO
+    // config file for encryption settings
     // Advanced optios (TBD)
     else if (userinput == "5") {
-      // choose Encryption options, fingerprint scanner support, secure password
+      // choose Encryption options, fingerprint scanner support, secure
+      // password
       // generator etc.
       // AmphoraInterface::advanced_options();
     }
   }
 }
 
+/* Load User File */
+/* Attempts to load Users into memory from user file. If Users are unable to be
+ * loaded, it will give the user the option of registering. */
 void AmphoraInterface::LoadUserFile() {
   std::string input;
   bool loadusers = user_manager_m.LoadUserList();
   if (loadusers) {
     std::cout << "Users loaded" << std::endl;
   } else if (!loadusers) {
-    std::cout << "vault2.xml LOAD FAILED" << std::endl;
+    std::cout << "User File LOAD FAILED" << std::endl;
     std::cout << "Would you like to register a new user?" << std::endl;
 
     while (1) {
@@ -199,6 +179,21 @@ void AmphoraInterface::LoadUserFile() {
   }
 }
 
+/* Load Account File */
+/* Loads Account File for the currently logged in User */
+void AmphoraInterface::LoadAccountFile(const std::string &fileid) {
+  bool loadaccounts = account_manager_m.LoadAccountList(fileid);
+  if (loadaccounts) {
+    std::cout << "Accounts loaded" << std::endl;
+  } else if (!loadaccounts) {
+    std::cout << "LOAD FAILED" << std::endl;
+    // AmphoraInterface::AddAccountSubmenu();
+  }
+}
+
+/* Add Account */
+/* Presents the user with the option of adding new Accounts that they would like
+ * to save */
 void AmphoraInterface::AddAccountSubmenu() {
   std::string submenu;
   std::string name, purpose, username, password;
@@ -233,6 +228,8 @@ void AmphoraInterface::AddAccountSubmenu() {
   AmphoraInterface::VerifyAddAccountPopup(name);
 }
 
+/* Edit Account */
+/* Presents the user with the option of editing Accounts that they have saved */
 void AmphoraInterface::EditAccountSubmenu() {
   std::string userinput;
   std::string f = "long";
@@ -250,17 +247,20 @@ void AmphoraInterface::EditAccountSubmenu() {
     } else if (account_manager_m.FindAccount(userinput)) {
       std::cout << "Account Found!" << std::endl;
       account_manager_m.EditAccount(userinput);
-      account_manager_m.SaveAccountList();
+      account_manager_m.SaveAccountList(currentfileid_m);
       std::cout << std::endl;
       break;
     } else {
-      std::cout
-          << "\nPlease re-enter the name of the account you would like to edit"
-          << std::endl;
+      std::cout << "\nPlease re-enter the name of the account you would "
+                   "like to edit"
+                << std::endl;
     }
   }
 }
 
+/* Delete Account */
+/* Presents the user with the option of deleting an Account that they have saved
+ */
 void AmphoraInterface::DeleteAccountSubmenu() {
   std::string userinput;
   std::string f = "long";
@@ -268,9 +268,9 @@ void AmphoraInterface::DeleteAccountSubmenu() {
   account_manager_m.ViewAccountList(f, s);
 
   while (1) {
-    std::cout
-        << "\nPlease type in the name of the account you would like to delete"
-        << std::endl;
+    std::cout << "\nPlease type in the name of the account you would like "
+                 "to delete"
+              << std::endl;
     getline(std::cin, userinput);
 
     if (userinput == "~") {
@@ -288,17 +288,24 @@ void AmphoraInterface::DeleteAccountSubmenu() {
 }
 
 // user should be able select the account they want to view.
+/* View Accounts */
+/* Displays Accounts that the currently logged in User has saved */
 void AmphoraInterface::ViewAccountsSubmenu() {
   std::string viewstyle = "long";
   std::string sortchoice = "test";
   account_manager_m.ViewAccountList(viewstyle, sortchoice);
 }
 
+/* Options */
+/* (1) Encryption Settings
+   (2)
+   */
 void AmphoraInterface::OptionsSubmenu() {
   // stuff
 }
 
-// Asks user to verify their entry
+/* Verify Add Account Popup */
+/* Asks user to verify their entry */
 void AmphoraInterface::VerifyAddAccountPopup(const std::string &accountname) {
   std::string submenu;
   while (1) {
@@ -310,7 +317,7 @@ void AmphoraInterface::VerifyAddAccountPopup(const std::string &accountname) {
 
     if (submenu == "1") {
       std::cout << "Saving account..." << std::endl;
-      account_manager_m.SaveAccountList();
+      account_manager_m.SaveAccountList(currentfileid_m);
       break;
     }
 
@@ -330,7 +337,8 @@ void AmphoraInterface::VerifyAddAccountPopup(const std::string &accountname) {
   }
 }
 
-// Asks user to verify their entry
+/* Verify Delete Account Popup */
+/* Asks user to verify their delete account entry */
 void AmphoraInterface::VerifyDeleteAccountPopup(
     const std::string &accountname) {
   std::string userinput;
@@ -340,7 +348,7 @@ void AmphoraInterface::VerifyDeleteAccountPopup(
   getline(std::cin, userinput);
   if (userinput == "y" || userinput == "Y") {
     account_manager_m.DeleteAccount(accountname);
-    account_manager_m.SaveAccountList();
+    account_manager_m.SaveAccountList(currentfileid_m);
     std::cout << "Account deleted!" << std::endl;
   } else if (userinput == "n" || userinput == "N") {
     return;

@@ -2,6 +2,7 @@
 
 #include "../include/amphora_util.hpp"
 #include "../include/account.hpp"
+#include "../include/crypto_db.hpp"
 #include "../include/user.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
@@ -21,12 +22,11 @@ std::string AmphoraUtilities::CurrentDate() {
   std::cout.imbue(std::locale(std::cout.getloc(), facet));
   //  cout << second_clock::local_time() << endl;
   std::string date = to_simple_string(second_clock::local_time());
-  std::cout << "INSIDE get_date() -> " << date << std::endl;
   return date;
 }
 
 // checks if a file is in the pwd
-bool AmphoraUtilities::CheckFile(const std::string &filename) {
+bool AmphoraUtilities::FindFile(const std::string &filename) {
   // TODO
   // need to get relative path to some directory holding .xml files
   // need to define where the .xml files should reside by default!!
@@ -128,15 +128,21 @@ inline bool AmphoraUtilities::SaveToFile(const std::string &filename,
 }
 
 // implemented templates above
-// explicitely instantiated the templates below to work with User and Account
-// types
+// explicitely instantiated the templates below to work with User, Account,
+// CryptoDB types
 template bool
 AmphoraUtilities::LoadFromFile<Account>(const std::string &filename,
                                         std::vector<Account> &buffer);
 template bool AmphoraUtilities::LoadFromFile<User>(const std::string &filename,
                                                    std::vector<User> &buffer);
 template bool
+AmphoraUtilities::LoadFromFile<CryptoDB>(const std::string &filename,
+                                         std::vector<CryptoDB> &buffer);
+template bool
 AmphoraUtilities::SaveToFile<Account>(const std::string &filename,
                                       std::vector<Account> &datalist);
 template bool AmphoraUtilities::SaveToFile<User>(const std::string &filename,
                                                  std::vector<User> &datalist);
+template bool
+AmphoraUtilities::SaveToFile<CryptoDB>(const std::string &filename,
+                                       std::vector<CryptoDB> &datalist);

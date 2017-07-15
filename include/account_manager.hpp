@@ -21,14 +21,14 @@ public:
   bool FindAccount(const std::string &accountname); // find AND RETURN
   // Account GetAccount(const std::string &accountname); // new
   void ViewAccount(const std::string &account);
-  bool LoadAccountList();
-  bool SaveAccountList();
+  bool LoadAccountList(const std::string &fileid);
+  bool SaveAccountList(const std::string &fileid);
   void ViewAccountList(const std::string &format, const std::string &sortstyle);
 
 private:
   AmphoraUtilities amphora_util_m;
-  CryptoUtilities crypto_util_m;
-  Account tempaccount;
+  CryptoUtilities crypto_util_m; // debug
+  Account tempaccount_m;
   std::map<std::string, Account> accountdata_m;
 };
 }
