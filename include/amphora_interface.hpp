@@ -30,7 +30,7 @@ private:
   CryptoUtilities crypto_util_m;
   // CryptoDB cryptodb_m;
   // AmphoraUtilities amphora_util_m;
-  bool exit_flag;
+  bool exit_flag_m;
   static const unsigned int maxlogins_m = 3;
 
   void Exit();

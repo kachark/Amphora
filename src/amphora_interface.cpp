@@ -5,24 +5,20 @@
 
 /* Amphora Interface Constructor */
 AmphoraInterface::AmphoraInterface() {
-  exit_flag = false;
-  // log in screen test
-  std::cout << "Welcome to AMPHORA" << std::endl;
-
-  // TODO
-  // remove from constructor
-  // load users -> log in -> load accounts only if successful
-  std::cout << "Press '~' at any time to return to the main menu" << std::endl;
+  exit_flag_m = false;
+  // ensure directories are arranged correctly
+  // ./data/user/useraccounts.xml
+  // have to ensure user folder is there and if it isn't, make it
 }
 
+/* Start Amphora Interface */
 void AmphoraInterface::Start() {
+  std::cout << "Welcome to AMPHORA" << std::endl;
+  std::cout << "Press '~' at any time to return to the main menu" << std::endl;
   AmphoraInterface::LoadUserFile();
   AmphoraInterface::LogIn();
   AmphoraInterface::LoadAccountFile(currentfileid_m);
   AmphoraInterface::MainMenu();
-  // if (exit_flag == true) {
-  //   return;
-  // }
 }
 
 /* Log In Page */
@@ -31,6 +27,10 @@ void AmphoraInterface::Start() {
    (2) Opens the RegisterUser page.
    (~) Exits the program. */
 void AmphoraInterface::LogIn() {
+  if (exit_flag_m == true) {
+    return;
+  }
+
   std::string username, password, input;
   unsigned int attempts = 0;
   while (attempts < maxlogins_m) {
@@ -38,31 +38,27 @@ void AmphoraInterface::LogIn() {
     std::cout << "\n(1): Log In\n(2): Register new user\n(~): Quit"
               << std::endl;
     getline(std::cin, input);
+
     if (input == "~") {
       // exit(0); // bad - doesn't permorm clean up
-      exit_flag = true;
+      exit_flag_m = true;
       return;
     } else if (input == "1") {
+      attempts++;
       std::cout << "Username: ";
       getline(std::cin, username);
       std::cout << "Password: ";
       getline(std::cin, password);
       bool verification = user_manager_m.VerifyUser(username, password);
-
       if (verification == false) {
         std::cout << "Your username or password are not recognized! Please "
                      "reenter or register. "
                   << std::endl;
       }
-      // else {
-      //   // TODO
-      //   // should this go here??
-      // }
 
     } else if (input == "2") {
       AmphoraInterface::RegisterUser();
     }
-    attempts++;
   }
 }
 
@@ -70,6 +66,10 @@ void AmphoraInterface::LogIn() {
 /* Asks user to enter username and password and compares them against the
  * database. If username/password is unique, the username/password is hashed. */
 void AmphoraInterface::RegisterUser() {
+  if (exit_flag_m == true) {
+    return;
+  }
+
   std::string username, password, confirmedpw;
   while (1) {
     std::cout << "USER REGISTRATION" << std::endl;
@@ -96,12 +96,15 @@ void AmphoraInterface::RegisterUser() {
       // AmphoraInterface::MainMenu();
 
       break;
-      // continue;
     }
   }
 }
 
 void AmphoraInterface::MainMenu() {
+  if (exit_flag_m == true) {
+    return;
+  }
+
   std::string userinput;
   while (1) {
     std::cout << "\n\n****** MAIN MENU ******\n";
@@ -170,7 +173,7 @@ void AmphoraInterface::LoadUserFile() {
         AmphoraInterface::RegisterUser();
         break;
       } else if (input == "2") {
-        exit_flag = true;
+        exit_flag_m = true;
         break;
       } else {
         std::cout << "Command not recognized" << std::endl;
@@ -182,6 +185,10 @@ void AmphoraInterface::LoadUserFile() {
 /* Load Account File */
 /* Loads Account File for the currently logged in User */
 void AmphoraInterface::LoadAccountFile(const std::string &fileid) {
+  if (exit_flag_m == true) {
+    return;
+  }
+
   bool loadaccounts = account_manager_m.LoadAccountList(fileid);
   if (loadaccounts) {
     std::cout << "Accounts loaded" << std::endl;

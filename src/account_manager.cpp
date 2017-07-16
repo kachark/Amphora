@@ -106,7 +106,7 @@ void AccountManager::ViewAccount(const std::string &accountname) {
 // loads account using cereal
 bool AccountManager::LoadAccountList(const std::string &fileid) {
   bool loadstatus;
-  std::string filename = "../data/" + fileid + ".xml";
+  std::string filename = "../data/user/" + fileid + ".xml";
   std::cout << filename << std::endl;
   std::vector<Account> accountvector;
   if (amphora_util_m.FindFile(filename)) {  // check if file exists in directory
@@ -127,7 +127,7 @@ bool AccountManager::LoadAccountList(const std::string &fileid) {
 // will create new file or overwrite existing file
 bool AccountManager::SaveAccountList(const std::string &fileid) {
   bool filefound, savestatus;
-  std::string filename = "../data/" + fileid + ".xml";
+  std::string filename = "../data/user/" + fileid + ".xml";
   std::cout << filename << std::endl;
   std::cout << "NUMBER BEING SAVED" << accountdata_m.size() << std::endl;
   std::vector<Account> accountvector;
