@@ -16,6 +16,7 @@ void AmphoraInterface::Start() {
   std::cout << "Welcome to AMPHORA" << std::endl;
   std::cout << "Press '~' at any time to return to the main menu" << std::endl;
   AmphoraInterface::LoadUserFile();
+  AmphoraInterface::LoadCryptoFile();
   AmphoraInterface::LogIn();
   AmphoraInterface::LoadAccountFile(currentfileid_m);
   AmphoraInterface::MainMenu();
@@ -40,7 +41,6 @@ void AmphoraInterface::LogIn() {
     getline(std::cin, input);
 
     if (input == "~") {
-      // exit(0); // bad - doesn't permorm clean up
       exit_flag_m = true;
       return;
     } else if (input == "1") {
@@ -49,11 +49,16 @@ void AmphoraInterface::LogIn() {
       getline(std::cin, username);
       std::cout << "Password: ";
       getline(std::cin, password);
-      bool verification = user_manager_m.VerifyUser(username, password);
-      if (verification == false) {
+      bool verified =
+          user_manager_m.VerifyUser(username, password, crypto_manager_m);
+      if (!verified) {
         std::cout << "Your username or password are not recognized! Please "
                      "reenter or register. "
                   << std::endl;
+      } else if (verified) { // logged in!
+        // TODO
+        // set the cryptodb to the current user!!
+        // cryptodb_m = crypto_manager_m.GetCryptoDB(
       }
 
     } else if (input == "2") {
@@ -89,12 +94,17 @@ void AmphoraInterface::RegisterUser() {
       CryptoPP::SecByteBlock fileidbyte = crypto_util_m.Get_AES_PseudoRNG(3);
       std::string fileid = crypto_util_m.SecByteBlockToString(fileidbyte);
       std::cout << "FILE ID: " << fileid << std::endl;
-      // add user to manager
+      // TODO
+      // add user to manager and save
+      // need to hash password
+      // CryptoPP::SecByteBlock salt = crypto_util_m.Get_AES_PseudoRNG(
+      // std::string hashedpassword =
+      // need to save crypto settings!
+      // register using default crypto settings
       user_manager_m.AddUser(username, password, fileid);
+      user_manager_m.SaveUserList();
       // add current user fileid to amphora interface
       currentfileid_m = fileid;
-      // AmphoraInterface::MainMenu();
-
       break;
     }
   }
@@ -179,6 +189,30 @@ void AmphoraInterface::LoadUserFile() {
         std::cout << "Command not recognized" << std::endl;
       }
     }
+  }
+}
+
+/* Load Crypto Settings File */
+/* Attempts to load Crypto Settings into memory from crypto file. If CryptoDB is
+ * unable to be loaded, it will resort to default settings. */
+void AmphoraInterface::LoadCryptoFile() {
+  bool loadcryptodb = crypto_manager_m.LoadCryptoDB();
+  if (loadcryptodb) {
+    std::cout << "Crypto settings loaded" << std::endl;
+  } else if (!loadcryptodb) {
+    std::cout << "Crypto settings LOAD FAILED" << std::endl;
+    std::cout << "Reverting to default settings!" << std::endl;
+    std::cout << "Salt Size: 16 bytes\nIV Size: 16 bytes\nKey Size: 32 "
+                 "bytes\nHMAC Iterations: 200,000"
+              << std::endl;
+    std::size_t saltsize = 16;
+    std::size_t ivsize = 16;
+    std::size_t keysize = 32;
+    unsigned int iterations = 200000;
+    crypto_manager_m.AddCryptoDB("default", saltsize, ivsize, keysize,
+                                 iterations);
+    crypto_manager_m.SaveCryptoDB();
+    cryptodb_m = crypto_manager_m.GetCryptoDB("default");
   }
 }
 

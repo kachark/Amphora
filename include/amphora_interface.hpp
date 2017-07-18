@@ -28,7 +28,7 @@ private:
   AmphoraBackend::UserManager user_manager_m;
   AmphoraBackend::CryptoManager crypto_manager_m;
   CryptoUtilities crypto_util_m;
-  // CryptoDB cryptodb_m;
+  CryptoDB cryptodb_m;
   // AmphoraUtilities amphora_util_m;
   bool exit_flag_m;
   static const unsigned int maxlogins_m = 3;
@@ -36,6 +36,7 @@ private:
   void Exit();
   void test();
   void LoadUserFile();
+  void LoadCryptoFile();
   void LoadAccountFile(const std::string &fileid);
   void AddAccountSubmenu();
   void EditAccountSubmenu();

@@ -3,6 +3,7 @@
 #define USER_MANAGER_HPP
 
 #include "amphora_util.hpp"
+#include "crypto_manager.hpp"
 #include "crypto_util.hpp"
 #include "user.hpp"
 #include <map>
@@ -13,13 +14,14 @@ class UserManager {
 
 public:
   UserManager();
-  bool VerifyUser(const std::string &username, const std::string &password);
+  bool VerifyUser(const std::string &username, const std::string &password,
+                  CryptoManager &crypto_manager);
 
   void AddUser(const std::string &username, const std::string &password,
                const std::string &fileid);
   //     Account EditAccount(const std::string &account); // changed
   void DeleteUser(const std::string &username);
-  bool FindAccount(const std::string &accountname); // find AND RETURN
+  bool FindUser(const std::string &accountname); // find AND RETURN
   //     // Account GetAccount(const std::string &accountname); // new
   //     void ViewAccount(const std::string &account);
   bool LoadUserList();

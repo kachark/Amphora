@@ -9,6 +9,7 @@ void User::clear() {
   datemodified_m.clear();
   datemodified_m.clear();
   accountfileid_m.clear();
+  cryptofileid_m.clear();
 }
 
 void User::set_username(const std::string &username) { username_m = username; }
@@ -23,6 +24,10 @@ void User::set_accountfileid(const std::string &fileid) {
   accountfileid_m = fileid;
 }
 
+void User::set_cryptodbname(const std::string &cryptofileid) {
+  cryptofileid_m = cryptofileid;
+}
+
 std::string User::get_username() const { return username_m; }
 
 std::string User::get_password() const { return password_m; }
@@ -30,6 +35,10 @@ std::string User::get_password() const { return password_m; }
 std::string User::get_datecreated() const { return datecreated_m; }
 
 std::string User::get_datemodified() const { return datemodified_m; }
+
+std::string User::get_accountfileid() const { return accountfileid_m; }
+
+std::string User::get_cryptodbname() const { return cryptofileid_m; }
 
 template <typename Archive> inline void User::serialize(Archive &ar) {
   ar(username_m, password_m, datecreated_m, datemodified_m);

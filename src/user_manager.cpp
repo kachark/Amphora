@@ -11,20 +11,42 @@ UserManager::UserManager() {}
 // TODO
 // verifies user as being registered in system
 bool UserManager::VerifyUser(const std::string &username,
-                             const std::string &password) {
-  // return 0 if no match, 1 if match
+                             const std::string &password,
+                             CryptoManager &crypto_manager) {
+  auto userfound = FindUser(username);
+  if (!userfound) {
+    std::cout << "User not found in userdata" << std::endl;
+  } else {
+    // compare this user's pw/key with what was passed into this function
+    User loggedin = userdata_m[username];
+    // access this user's crypto settings
+    CryptoDB cryptodb = crypto_manager.GetCryptoDB(username);
+    // std::size_t saltsize = cryptodb.get_saltsize();
+    std::string saltstr = cryptodb.get_salt();
+    CryptoPP::SecByteBlock salt = crypto_util_m.StringToSecByteBlock(saltstr);
+    std::size_t keysize = cryptodb.get_keysize();
+    unsigned int iterations = cryptodb.get_iterations();
+
+    CryptoPP::SecByteBlock masterkey =
+        crypto_util_m.GetPBKDF2(iterations, salt, keysize, password);
+    std::string hashedpassword = crypto_util_m.SecByteBlockToString(masterkey);
+    // TODO
+    std::cout << "YOUR PBKDF2: " << hashedpassword << std::endl; // debug
+    std::cout << "THE USERS PBKDF2: " << password << std::endl;  // debug
+    if (hashedpassword == loggedin.get_password()) {
+      return 1;
+    }
+  }
   return 0;
 }
 
-// TODO
-// what is the correct way to identify a user? ie. not by username
-
 // searches accountlist for account given accountname
 // confirms if account is found
-bool UserManager::FindAccount(const std::string &username) {
-  if (userdata_m.find(username) != userdata_m.end()) {
-    return true; // found
-  } else {       // account key not found
+bool UserManager::FindUser(const std::string &username) {
+  if (userdata_m.count(
+          username)) { // assumes userdata_m is map and all items are unique
+    return true;       // found
+  } else {             // account key not found
     return false;
   }
 }
@@ -33,7 +55,7 @@ bool UserManager::FindAccount(const std::string &username) {
 bool UserManager::LoadUserList() {
   // TODO - ensure file exists!
   bool loadstatus;
-  std::string filename = "../data/vault2.xml";
+  std::string filename = "../data/users/users.xml";
   std::vector<User> uservector;
   if (amphora_util_m.FindFile(filename)) {  // check if file exists in directory
     std::cout << "File found" << std::endl; // debug
@@ -55,7 +77,7 @@ bool UserManager::SaveUserList() {
 
   // TODO - filename should be a constant throughout the program
   bool savestatus;
-  std::string filename = "../data/vault2.xml";
+  std::string filename = "../data/users/users.xml";
   std::cout << "NUMBER BEING SAVED" << userdata_m.size() << std::endl;
   std::vector<User> uservector;
   // prepare vector of objects to serialize
@@ -156,7 +178,8 @@ void UserManager::AddUser(const std::string &username,
 //   std::cout << "Purpose: \t" << account.get_purpose() << std::endl;
 //   std::cout << "Username: \t" << account.get_username() << std::endl;
 //   std::cout << "Password: \t" << account.get_password() << std::endl;
-//   std::cout << "Date created: \t" << account.get_datecreated() << std::endl;
+//   std::cout << "Date created: \t" << account.get_datecreated() <<
+//   std::endl;
 //   std::cout << "Date modified: \t" << account.get_datemodified() <<
 //   std::endl;
 // }
@@ -197,7 +220,8 @@ void UserManager::AddUser(const std::string &username,
 
 //   std::string savedaccount = "vault.xml";
 //   std::size_t num_saved;
-//   // std::cout << "NUMBER BEING SAVED" << accountlist_m.size() << std::endl;
+//   // std::cout << "NUMBER BEING SAVED" << accountlist_m.size() <<
+//   std::endl;
 //   std::cout << "NUMBER BEING SAVED" << accountdata_m.size() << std::endl;
 //   {
 //     std::ofstream file( savedaccount );
@@ -218,7 +242,8 @@ void UserManager::AddUser(const std::string &username,
 // {
 //   //format "short" displays up to the 5 most recent accounts saved in the
 //   vault
-//   //format "long" displays all of the accounts in a given sort - default sort
+//   //format "long" displays all of the accounts in a given sort - default
+//   sort
 //   is by acct purpose
 
 //   std::cout << std::endl << "Your Saved Accounts:" << std::endl;
