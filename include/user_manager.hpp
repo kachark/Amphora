@@ -18,10 +18,12 @@ public:
                   CryptoManager &crypto_manager);
 
   void AddUser(const std::string &username, const std::string &password,
-               const std::string &fileid);
+               const std::string &salt, const std::string &accountfileid,
+               const std::string &cryptofileid);
   //     Account EditAccount(const std::string &account); // changed
   void DeleteUser(const std::string &username);
   bool FindUser(const std::string &accountname); // find AND RETURN
+  User &GetUser(const std::string &username);
   //     // Account GetAccount(const std::string &accountname); // new
   //     void ViewAccount(const std::string &account);
   bool LoadUserList();

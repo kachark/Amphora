@@ -6,6 +6,7 @@
 void User::clear() {
   username_m.clear();
   password_m.clear();
+  salt_m.clear();
   datemodified_m.clear();
   datemodified_m.clear();
   accountfileid_m.clear();
@@ -28,6 +29,8 @@ void User::set_cryptodbname(const std::string &cryptofileid) {
   cryptofileid_m = cryptofileid;
 }
 
+void User::set_salt(const std::string &salt) { salt_m = salt; }
+
 std::string User::get_username() const { return username_m; }
 
 std::string User::get_password() const { return password_m; }
@@ -40,8 +43,11 @@ std::string User::get_accountfileid() const { return accountfileid_m; }
 
 std::string User::get_cryptodbname() const { return cryptofileid_m; }
 
+std::string User::get_salt() const { return salt_m; }
+
 template <typename Archive> inline void User::serialize(Archive &ar) {
-  ar(username_m, password_m, datecreated_m, datemodified_m);
+  ar(username_m, password_m, salt_m, datecreated_m, datemodified_m,
+     accountfileid_m, cryptofileid_m);
 }
 
 // have to initialize template for loading and saving although there is only a

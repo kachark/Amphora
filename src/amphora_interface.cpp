@@ -1,4 +1,10 @@
 
+// TODO
+// make sure account_manager, user_manager, crypto_manager each have similar
+// naming styles, code layout, and general functionality
+// name vs username, list vs vector vs data etc etc
+// TODO
+// if user changes their encryption settings, reencrypt everything
 
 #include "../include/amphora_interface.hpp"
 #include <iostream>
@@ -6,17 +12,14 @@
 /* Amphora Interface Constructor */
 AmphoraInterface::AmphoraInterface() {
   exit_flag_m = false;
-  // ensure directories are arranged correctly
-  // ./data/user/useraccounts.xml
-  // have to ensure user folder is there and if it isn't, make it
 }
 
 /* Start Amphora Interface */
 void AmphoraInterface::Start() {
   std::cout << "Welcome to AMPHORA" << std::endl;
   std::cout << "Press '~' at any time to return to the main menu" << std::endl;
-  AmphoraInterface::LoadUserFile();
   AmphoraInterface::LoadCryptoFile();
+  AmphoraInterface::LoadUserFile();
   AmphoraInterface::LogIn();
   AmphoraInterface::LoadAccountFile(currentfileid_m);
   AmphoraInterface::MainMenu();
@@ -56,9 +59,12 @@ void AmphoraInterface::LogIn() {
                      "reenter or register. "
                   << std::endl;
       } else if (verified) { // logged in!
+        std::cout << "Logged In!" << std::endl;
         // TODO
         // set the cryptodb to the current user!!
-        // cryptodb_m = crypto_manager_m.GetCryptoDB(
+        User tempuser = user_manager_m.GetUser(username);
+        cryptodb_m = crypto_manager_m.GetCryptoDB(tempuser.get_cryptodbname());
+        break;
       }
 
     } else if (input == "2") {
@@ -86,25 +92,44 @@ void AmphoraInterface::RegisterUser() {
     std::cout << "Confirm password: ";
     getline(std::cin, confirmedpw);
 
+    // check username against database
+    bool usercollision = user_manager_m.FindUser(username);
+    if (usercollision) {
+      std::cout << "The username you entered is taken. Please enter another name" << std::endl;
+    }
     if (password != confirmedpw) {
       std::cout << "Please ensure your password is correctly entered"
                 << std::endl;
-    } else { // register user
+    } else if ((usercollision == false) && (password == confirmedpw)) { // register user
+      // TODO
+      // should this be in a separate function? yes
       // generate fileid for new User to create/manage Accounts
       CryptoPP::SecByteBlock fileidbyte = crypto_util_m.Get_AES_PseudoRNG(3);
-      std::string fileid = crypto_util_m.SecByteBlockToString(fileidbyte);
-      std::cout << "FILE ID: " << fileid << std::endl;
-      // TODO
-      // add user to manager and save
-      // need to hash password
-      // CryptoPP::SecByteBlock salt = crypto_util_m.Get_AES_PseudoRNG(
-      // std::string hashedpassword =
-      // need to save crypto settings!
-      // register using default crypto settings
-      user_manager_m.AddUser(username, password, fileid);
+      std::string accountfileid =
+          crypto_util_m.SecByteBlockToString(fileidbyte);
+      std::string cryptofileid = "default";
+      //TODO should the db be available from RegisterUser or after log in?
+      // make crypto database available to the interface
+      cryptodb_m = crypto_manager_m.GetCryptoDB(cryptofileid);
+      CryptoPP::SecByteBlock salt =
+          crypto_util_m.Get_AES_PseudoRNG(cryptodb_m.get_saltsize());
+      std::string saltstr = crypto_util_m.SecByteBlockToString(salt);
+      CryptoPP::SecByteBlock test = crypto_util_m.StringToSecByteBlock(saltstr);
+      std::string testsalt = crypto_util_m.SecByteBlockToString(test);
+      unsigned int iterations = cryptodb_m.get_iterations();
+      std::size_t keysize = cryptodb_m.get_keysize();
+
+      CryptoPP::SecByteBlock hashedpassword =
+          crypto_util_m.GetPBKDF2(iterations, salt, keysize, password);
+      std::string hashedpwstr =
+          crypto_util_m.SecByteBlockToString(hashedpassword);
+      user_manager_m.AddUser(username, hashedpwstr, saltstr, accountfileid,
+                             cryptofileid);
       user_manager_m.SaveUserList();
-      // add current user fileid to amphora interface
-      currentfileid_m = fileid;
+
+      // add current user fileid to amphora interface to access their accounts
+      // file
+      currentfileid_m = accountfileid;
       break;
     }
   }
@@ -153,6 +178,7 @@ void AmphoraInterface::MainMenu() {
 
     // TODO
     // config file for encryption settings
+    // edit user settings - password
     // Advanced optios (TBD)
     else if (userinput == "5") {
       // choose Encryption options, fingerprint scanner support, secure
@@ -167,6 +193,9 @@ void AmphoraInterface::MainMenu() {
 /* Attempts to load Users into memory from user file. If Users are unable to be
  * loaded, it will give the user the option of registering. */
 void AmphoraInterface::LoadUserFile() {
+  if (exit_flag_m == true) {
+    return;
+  }
   std::string input;
   bool loadusers = user_manager_m.LoadUserList();
   if (loadusers) {
@@ -196,10 +225,13 @@ void AmphoraInterface::LoadUserFile() {
 /* Attempts to load Crypto Settings into memory from crypto file. If CryptoDB is
  * unable to be loaded, it will resort to default settings. */
 void AmphoraInterface::LoadCryptoFile() {
-  bool loadcryptodb = crypto_manager_m.LoadCryptoDB();
-  if (loadcryptodb) {
+  if (exit_flag_m == true) {
+    return;
+  }
+  bool loaded = crypto_manager_m.LoadCryptoDB();
+  if (loaded) {
     std::cout << "Crypto settings loaded" << std::endl;
-  } else if (!loadcryptodb) {
+  } else if (!loaded) {
     std::cout << "Crypto settings LOAD FAILED" << std::endl;
     std::cout << "Reverting to default settings!" << std::endl;
     std::cout << "Salt Size: 16 bytes\nIV Size: 16 bytes\nKey Size: 32 "
@@ -212,7 +244,6 @@ void AmphoraInterface::LoadCryptoFile() {
     crypto_manager_m.AddCryptoDB("default", saltsize, ivsize, keysize,
                                  iterations);
     crypto_manager_m.SaveCryptoDB();
-    cryptodb_m = crypto_manager_m.GetCryptoDB("default");
   }
 }
 

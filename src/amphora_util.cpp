@@ -101,7 +101,7 @@ inline bool AmphoraUtilities::LoadFromFile(const std::string &filename,
   return 1;
 }
 
-// serializes vector of data using cereal serialization library
+// serializes vector of objects using cereal serialization library
 template <typename T>
 inline bool AmphoraUtilities::SaveToFile(const std::string &filename,
                                          std::vector<T> &datalist) {
