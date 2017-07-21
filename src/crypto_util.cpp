@@ -13,10 +13,10 @@
 #include <cryptopp/sha.h>
 #include <iostream>
 
-// encrypts account information using AES in GCM mode
+/* AES-GCM Encryption */
 std::string CryptoUtilities::AES_GCM_Encrypt(const std::string &plaintext,
-                                                   CryptoPP::SecByteBlock &key,
-                                                   CryptoPP::SecByteBlock &iv) {
+                                             CryptoPP::SecByteBlock &key,
+                                             CryptoPP::SecByteBlock &iv) {
 
   std::string ciphertext, encoded;
 
@@ -41,7 +41,7 @@ std::string CryptoUtilities::AES_GCM_Encrypt(const std::string &plaintext,
   } catch (const CryptoPP::Exception &e) {
     std::cout << "Encryption Failed!" << std::endl;
     std::cerr << e.what() << std::endl;
-    encoded.clear();
+    encoded.clear(); // if returns empty string, encryption failed
     // exit(1);
   }
   // DEBUG: pretty print a std::string
@@ -54,10 +54,10 @@ std::string CryptoUtilities::AES_GCM_Encrypt(const std::string &plaintext,
   return encoded;
 }
 
-std::string
-CryptoUtilities::AES_GCM_Decrypt(const std::string &ciphertext,
-                                 CryptoPP::SecByteBlock &key,
-                                 CryptoPP::SecByteBlock &iv) {
+/* AES-GCM Decryption */
+std::string CryptoUtilities::AES_GCM_Decrypt(const std::string &ciphertext,
+                                             CryptoPP::SecByteBlock &key,
+                                             CryptoPP::SecByteBlock &iv) {
   std::string recovered;
 
   try {
@@ -78,14 +78,15 @@ CryptoUtilities::AES_GCM_Decrypt(const std::string &ciphertext,
   return recovered;
 }
 
-// derives PBKDF2 hash for given message using SHA-512
-CryptoPP::SecByteBlock
-CryptoUtilities::GetPBKDF2(unsigned int iterations,
-                           CryptoPP::SecByteBlock &salt, std::size_t keysize,
-                           const std::string &message) {
+/* PBKDF2 using SHA-512 */
+CryptoPP::SecByteBlock CryptoUtilities::GetPBKDF2(unsigned int iterations,
+                                                  CryptoPP::SecByteBlock &salt,
+                                                  std::size_t keysize,
+                                                  const std::string &message) {
 
   // time in seconds to perform derivation
-  double timeinSec = 0; // if 0, total iterations will be run
+  // if 0, time not considered as a parameter
+  double timeinSec = 0;
 
   // byte buffer to receive the derived password
   CryptoPP::SecByteBlock derived(keysize);
@@ -102,7 +103,7 @@ CryptoUtilities::GetPBKDF2(unsigned int iterations,
   return (derived); // return as a secbyte buffer
 }
 
-// AES-256 pseudorandom number generator
+/* Pseudo-Random Number Generator */
 CryptoPP::SecByteBlock
 CryptoUtilities::Get_AES_PseudoRNG(const size_t &saltlen) {
   // fetches random seed from the OS
@@ -118,6 +119,7 @@ CryptoUtilities::Get_AES_PseudoRNG(const size_t &saltlen) {
   return (randomval);
 }
 
+/* Converts CryptoPP::SecByteBlock to std::string with hex encoding */
 std::string
 CryptoUtilities::SecByteBlockToString(CryptoPP::SecByteBlock &buffer) {
   std::string result;
@@ -130,13 +132,15 @@ CryptoUtilities::SecByteBlockToString(CryptoPP::SecByteBlock &buffer) {
   return (result);
 }
 
+/* Decodes hex std::string and converts to CryptoPP::SecByteBlock */
 CryptoPP::SecByteBlock
 CryptoUtilities::StringToSecByteBlock(const std::string &buffer) {
   std::string decoded;
   decoded.clear();
   // decode string from hex
-  CryptoPP::StringSource ss(buffer, true,
-                  new CryptoPP::HexDecoder(new CryptoPP::StringSink(decoded)));
+  CryptoPP::StringSource ss(
+      buffer, true,
+      new CryptoPP::HexDecoder(new CryptoPP::StringSink(decoded)));
   CryptoPP::SecByteBlock result((const byte *)decoded.data(), decoded.size());
   return (result);
 }

@@ -5,6 +5,10 @@
 // name vs username, list vs vector vs data etc etc
 // TODO
 // if user changes their encryption settings, reencrypt everything
+// TODO
+// if user tries to edit if they have no accounts, infinite loop
+// TODO
+// account loading not working or not checking for name collisions
 
 #include "../include/amphora_interface.hpp"
 #include <iostream>
@@ -64,6 +68,7 @@ void AmphoraInterface::LogIn() {
         // set the cryptodb to the current user!!
         User tempuser = user_manager_m.GetUser(username);
         cryptodb_m = crypto_manager_m.GetCryptoDB(tempuser.get_cryptodbname());
+        currentfileid_m = tempuser.get_accountfileid();
         break;
       }
 
@@ -295,6 +300,11 @@ void AmphoraInterface::AddAccountSubmenu() {
     }
   }
 
+  // TODO
+  // ENCRYPT!!
+  // need to access user for the master key
+  // unique iv per account
+  // 
   account_manager_m.AddAccount(name, purpose, username, password);
   // this needs to change
   AmphoraInterface::VerifyAddAccountPopup(name);
@@ -389,6 +399,7 @@ void AmphoraInterface::VerifyAddAccountPopup(const std::string &accountname) {
 
     if (submenu == "1") {
       std::cout << "Saving account..." << std::endl;
+      std::cout << "currentfileid_m: " << currentfileid_m << std::endl;
       account_manager_m.SaveAccountList(currentfileid_m);
       break;
     }

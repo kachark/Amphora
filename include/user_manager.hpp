@@ -35,7 +35,7 @@ private:
   AmphoraUtilities amphora_util_m;
   CryptoUtilities crypto_util_m;
   User tempuser_m;
-  std::map<std::string, User> userdata_m;
+  std::map<std::string, User> userlist_m;
 
   void EncryptUsers(); // encrypts Users inside userdata_m
   void DecryptUsers(); // decrypts Users

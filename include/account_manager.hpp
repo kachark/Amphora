@@ -19,7 +19,7 @@ public:
   Account EditAccount(const std::string &account); // changed
   void DeleteAccount(const std::string &accountname);
   bool FindAccount(const std::string &accountname); // find AND RETURN
-  // Account GetAccount(const std::string &accountname); // new
+  Account &GetAccount(const std::string &accountname); // new
   void ViewAccount(const std::string &account);
   bool LoadAccountList(const std::string &fileid);
   bool SaveAccountList(const std::string &fileid);
@@ -29,7 +29,7 @@ private:
   AmphoraUtilities amphora_util_m;
   CryptoUtilities crypto_util_m; // debug
   Account tempaccount_m;
-  std::map<std::string, Account> accountdata_m;
+  std::map<std::string, Account> accountlist_m;
 };
 }
 

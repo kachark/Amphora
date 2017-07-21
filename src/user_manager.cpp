@@ -19,7 +19,7 @@ bool UserManager::VerifyUser(const std::string &username,
     std::cout << "User not found in userdata" << std::endl;
   } else {
     // compare this user's pw/key with what was passed into this function
-    User loggedin = userdata_m[username];
+    User loggedin = userlist_m[username];
     // access this user's crypto settings
     CryptoDB cryptodb = crypto_manager.GetCryptoDB(loggedin.get_cryptodbname());
     // std::size_t saltsize = cryptodb.get_saltsize();
@@ -41,8 +41,8 @@ bool UserManager::VerifyUser(const std::string &username,
 // searches accountlist for account given accountname
 // confirms if account is found
 bool UserManager::FindUser(const std::string &username) {
-  // assumes userdata_m is map and all items are unique
-  if (userdata_m.count(username)) {
+  // assumes userlist_m is map and all items are unique
+  if (userlist_m.count(username)) {
     return true;       // found
   } else {             // account key not found
     return false;
@@ -51,7 +51,7 @@ bool UserManager::FindUser(const std::string &username) {
 
 // returns reference to User
 User &UserManager::GetUser(const std::string &username) {
-  return userdata_m[username];
+  return userlist_m[username];
 }
 
 // loads account using cereal
@@ -66,7 +66,7 @@ bool UserManager::LoadUserList() {
     if (loadstatus) { // if load success + check file -> return true
       // populate memory
       for (auto user : uservector) {
-        userdata_m.insert(std::make_pair(user.get_username(), user));
+        userlist_m.insert(std::make_pair(user.get_username(), user));
       }
       return 1;
     }
@@ -81,10 +81,10 @@ bool UserManager::SaveUserList() {
   // TODO - filename should be a constant throughout the program
   bool savestatus;
   std::string filename = "../data/users/users.xml";
-  std::cout << "NUMBER BEING SAVED" << userdata_m.size() << std::endl;
+  std::cout << "NUMBER BEING SAVED" << userlist_m.size() << std::endl;
   std::vector<User> uservector;
   // prepare vector of objects to serialize
-  for (auto user : userdata_m) {
+  for (auto user : userlist_m) {
     uservector.push_back(user.second);
   }
   bool filefound = amphora_util_m.FindFile(filename);
@@ -105,7 +105,7 @@ bool UserManager::SaveUserList() {
   return 0;
 }
 
-// // initializes temp account and adds to accountdata_m
+// // initializes temp User and adds to userlist_m
 // // viewaccount and editaccount will check accountdata_m for the name of
 // tempAccount (similar to how it will check any other account
 // // saveaccountlist will serialize the current buffer accountdata_m
@@ -125,7 +125,7 @@ void UserManager::AddUser(const std::string &username,
   tempuser_m.set_salt(salt);
 
   // store temporary new user in map
-  userdata_m.insert(std::make_pair(username, tempuser_m));
+  userlist_m.insert(std::make_pair(username, tempuser_m));
   // clear temporary user
   tempuser_m.clear();
 }

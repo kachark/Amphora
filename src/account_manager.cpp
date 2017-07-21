@@ -7,10 +7,10 @@
 namespace AmphoraBackend {
 AccountManager::AccountManager() {}
 
-// initializes temp account and adds to accountdata_m
-// viewaccount and editaccount will check accountdata_m for the name of
+// initializes temp account and adds to accountlist_m
+// viewaccount and editaccount will check accountlist_m for the name of
 // tempAccount (similar to how it will check any other account
-// saveaccountlist will serialize the current buffer accountdata_m
+// saveaccountlist will serialize the current buffer accountlist_m
 // tempAccount will be reset to NULL
 void AccountManager::AddAccount(const std::string &name,
                                 const std::string &purpose,
@@ -26,7 +26,7 @@ void AccountManager::AddAccount(const std::string &name,
   tempaccount_m.set_datemodified(date);
 
   // store temporary new account in map
-  accountdata_m.insert(std::make_pair(name, tempaccount_m));
+  accountlist_m.insert(std::make_pair(name, tempaccount_m));
   tempaccount_m.clear();
 }
 
@@ -37,7 +37,7 @@ void AccountManager::AddAccount(const std::string &name,
 // should pickup the account and pass it along to the UI
 // return desired Account obj
 Account AccountManager::EditAccount(const std::string &accountname) {
-  Account &account = accountdata_m[accountname];
+  Account &account = accountlist_m[accountname];
 
   return account;
 
@@ -76,17 +76,22 @@ Account AccountManager::EditAccount(const std::string &accountname) {
 }
 
 void AccountManager::DeleteAccount(const std::string &accountname) {
-  accountdata_m.erase(accountname);
+  accountlist_m.erase(accountname);
 }
 
 // searches accountlist for account given accountname
-// confirms if account is found
+// returns true if found, false if not found
 bool AccountManager::FindAccount(const std::string &accountname) {
-  if (accountdata_m.find(accountname) != accountdata_m.end()) {
-    return true; // found
-  } else {       // account key not found
+  if (accountlist_m.count(accountname)) {
+    return true;       // found
+  } else {             // account key not found
     return false;
   }
+}
+
+// returns reference to Account
+Account &AccountManager::GetAccount(const std::string &accountname) {
+  return accountlist_m[accountname];
 }
 
 // TODO remove from backend
@@ -94,7 +99,7 @@ bool AccountManager::FindAccount(const std::string &accountname) {
 // GetAccount
 // displays acccount info in nice format
 void AccountManager::ViewAccount(const std::string &accountname) {
-  const Account &account = accountdata_m[accountname];
+  const Account &account = accountlist_m[accountname];
   std::cout << "Name: \t\t" << account.get_name() << std::endl;
   std::cout << "Purpose: \t" << account.get_purpose() << std::endl;
   std::cout << "Username: \t" << account.get_username() << std::endl;
@@ -115,7 +120,7 @@ bool AccountManager::LoadAccountList(const std::string &fileid) {
     if (loadstatus) { // if load success + check file -> return true
       // populate memory
       for (auto account : accountvector) {
-        accountdata_m.insert(std::make_pair(account.get_name(), account));
+        accountlist_m.insert(std::make_pair(account.get_name(), account));
       }
       return 1;
     }
@@ -127,16 +132,18 @@ bool AccountManager::LoadAccountList(const std::string &fileid) {
 // will create new file or overwrite existing file
 bool AccountManager::SaveAccountList(const std::string &fileid) {
   bool filefound, savestatus;
-  std::string filename = "../data/user/" + fileid + ".xml";
+  std::string filename = "../data/users/" + fileid + ".xml";
   std::cout << filename << std::endl;
-  std::cout << "NUMBER BEING SAVED" << accountdata_m.size() << std::endl;
+  std::cout << "NUMBER BEING SAVED" << accountlist_m.size() << std::endl;
   std::vector<Account> accountvector;
   // prepare vector of objects to serialize
-  for (auto account : accountdata_m) {
+  for (auto account : accountlist_m) {
     accountvector.push_back(account.second);
   }
   filefound = amphora_util_m.FindFile(filename);
-  while (!filefound) {
+  // TODO not finding the file and creating a new one
+  if (!filefound) {
+    std::cout << "DEBUG" << std::endl;
     // create file if not found/doesn't exist
     std::fstream fs;
     fs.open(filename.data(), std::ios::out);
@@ -168,7 +175,7 @@ void AccountManager::ViewAccountList(const std::string &format,
 
   // get names from account objects
   if (format == "long") {
-    for (auto account : accountdata_m) {
+    for (auto account : accountlist_m) {
       std::string accountname = account.second.get_name();
       accountnamelist.push_back(accountname);
     }
@@ -178,7 +185,7 @@ void AccountManager::ViewAccountList(const std::string &format,
   // sorts by most recently modified!!
   else if (format == "short") {
     int i = 0;
-    for (auto account : accountdata_m) {
+    for (auto account : accountlist_m) {
       if (i < 5) {
         std::string accountname = account.second.get_name();
         accountnamelist.push_back(accountname);
