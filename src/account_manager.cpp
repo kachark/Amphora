@@ -15,13 +15,26 @@ AccountManager::AccountManager() {}
 void AccountManager::AddAccount(const std::string &name,
                                 const std::string &purpose,
                                 const std::string &username,
-                                const std::string &password) {
+                                const std::string &password, CryptoDB &cryptodb,
+                                User &currentuser) {
+
   std::string date = amphora_util_m.CurrentDate();
+
+  std::string key = currentuser.get_password();
+  std::string iv = crypto_util_m.AES_PRNG(cryptodb.get_ivsize());
+  // cryptodb_m.set_iv(ivstr);
+  // second iv save?
+  std::string encrypted_uname =
+      crypto_util_m.AES_GCM_Encrypt(username, key, iv);
+  encrypted_uname = iv + encrypted_uname;
+  std::string iv2 = crypto_util_m.AES_PRNG(cryptodb.get_ivsize());
+  std::string encrypted_pw = crypto_util_m.AES_GCM_Encrypt(password, key, iv2);
+  encrypted_pw = iv2 + encrypted_pw;
 
   tempaccount_m.set_name(name);
   tempaccount_m.set_purpose(purpose);
-  tempaccount_m.set_username(username);
-  tempaccount_m.set_password(password);
+  tempaccount_m.set_username(encrypted_uname);
+  tempaccount_m.set_password(encrypted_pw);
   tempaccount_m.set_datecreated(date);
   tempaccount_m.set_datemodified(date);
 
@@ -83,8 +96,8 @@ void AccountManager::DeleteAccount(const std::string &accountname) {
 // returns true if found, false if not found
 bool AccountManager::FindAccount(const std::string &accountname) {
   if (accountlist_m.count(accountname)) {
-    return true;       // found
-  } else {             // account key not found
+    return true; // found
+  } else {       // account key not found
     return false;
   }
 }

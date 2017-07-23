@@ -8,15 +8,23 @@
 // TODO
 // if user tries to edit if they have no accounts, infinite loop
 // TODO
-// account loading not working or not checking for name collisions
+// crypto_util change parameters and returns to be solely with std::string and
+// void
+// TODO
+// crypto_db prepend the iv to the the ciphertext - common practice
+// salt is also prepended to the pw hash
+// TODO CRITICAL
+// need to refactor such that hashing, encryption, decryption all done outside
+// of interface.
+// too messy and should be more simple to use - coincide with refactor of
+// crypto_util
+// rename crypto_manager.
 
 #include "../include/amphora_interface.hpp"
 #include <iostream>
 
 /* Amphora Interface Constructor */
-AmphoraInterface::AmphoraInterface() {
-  exit_flag_m = false;
-}
+AmphoraInterface::AmphoraInterface() { exit_flag_m = false; }
 
 /* Start Amphora Interface */
 void AmphoraInterface::Start() {
@@ -25,7 +33,7 @@ void AmphoraInterface::Start() {
   AmphoraInterface::LoadCryptoFile();
   AmphoraInterface::LoadUserFile();
   AmphoraInterface::LogIn();
-  AmphoraInterface::LoadAccountFile(currentfileid_m);
+  AmphoraInterface::LoadAccountFile(currentacctid_m);
   AmphoraInterface::MainMenu();
 }
 
@@ -41,7 +49,7 @@ void AmphoraInterface::LogIn() {
 
   std::string username, password, input;
   unsigned int attempts = 0;
-  while (attempts < maxlogins_m) {
+  while (attempts < MAXLOGINS_m) {
     std::cout << "LOG IN" << std::endl;
     std::cout << "\n(1): Log In\n(2): Register new user\n(~): Quit"
               << std::endl;
@@ -64,11 +72,10 @@ void AmphoraInterface::LogIn() {
                   << std::endl;
       } else if (verified) { // logged in!
         std::cout << "Logged In!" << std::endl;
-        // TODO
-        // set the cryptodb to the current user!!
-        User tempuser = user_manager_m.GetUser(username);
-        cryptodb_m = crypto_manager_m.GetCryptoDB(tempuser.get_cryptodbname());
-        currentfileid_m = tempuser.get_accountfileid();
+        currentuser_m = user_manager_m.GetUser(username);
+        cryptodb_m =
+            crypto_manager_m.GetCryptoDB(currentuser_m.get_cryptodbname());
+        currentacctid_m = currentuser_m.get_accountfileid();
         break;
       }
 
@@ -100,41 +107,22 @@ void AmphoraInterface::RegisterUser() {
     // check username against database
     bool usercollision = user_manager_m.FindUser(username);
     if (usercollision) {
-      std::cout << "The username you entered is taken. Please enter another name" << std::endl;
+      std::cout
+          << "The username you entered is taken. Please enter another name"
+          << std::endl;
     }
     if (password != confirmedpw) {
       std::cout << "Please ensure your password is correctly entered"
                 << std::endl;
-    } else if ((usercollision == false) && (password == confirmedpw)) { // register user
-      // TODO
-      // should this be in a separate function? yes
-      // generate fileid for new User to create/manage Accounts
-      CryptoPP::SecByteBlock fileidbyte = crypto_util_m.Get_AES_PseudoRNG(3);
-      std::string accountfileid =
-          crypto_util_m.SecByteBlockToString(fileidbyte);
-      std::string cryptofileid = "default";
-      //TODO should the db be available from RegisterUser or after log in?
-      // make crypto database available to the interface
-      cryptodb_m = crypto_manager_m.GetCryptoDB(cryptofileid);
-      CryptoPP::SecByteBlock salt =
-          crypto_util_m.Get_AES_PseudoRNG(cryptodb_m.get_saltsize());
-      std::string saltstr = crypto_util_m.SecByteBlockToString(salt);
-      CryptoPP::SecByteBlock test = crypto_util_m.StringToSecByteBlock(saltstr);
-      std::string testsalt = crypto_util_m.SecByteBlockToString(test);
-      unsigned int iterations = cryptodb_m.get_iterations();
-      std::size_t keysize = cryptodb_m.get_keysize();
-
-      CryptoPP::SecByteBlock hashedpassword =
-          crypto_util_m.GetPBKDF2(iterations, salt, keysize, password);
-      std::string hashedpwstr =
-          crypto_util_m.SecByteBlockToString(hashedpassword);
-      user_manager_m.AddUser(username, hashedpwstr, saltstr, accountfileid,
-                             cryptofileid);
+    } else if ((usercollision == false) &&
+               (password == confirmedpw)) { // register user
+      user_manager_m.AddUser(username, password, crypto_manager_m);
       user_manager_m.SaveUserList();
+      currentuser_m = user_manager_m.GetUser(username);
 
       // add current user fileid to amphora interface to access their accounts
       // file
-      currentfileid_m = accountfileid;
+      currentacctid_m = currentuser_m.get_accountfileid();
       break;
     }
   }
@@ -182,7 +170,8 @@ void AmphoraInterface::MainMenu() {
     }
 
     // TODO
-    // config file for encryption settings
+    // config file for encryption settings - when it's changed from 'default',
+    // name it the username
     // edit user settings - password
     // Advanced optios (TBD)
     else if (userinput == "5") {
@@ -300,12 +289,8 @@ void AmphoraInterface::AddAccountSubmenu() {
     }
   }
 
-  // TODO
-  // ENCRYPT!!
-  // need to access user for the master key
-  // unique iv per account
-  // 
-  account_manager_m.AddAccount(name, purpose, username, password);
+  account_manager_m.AddAccount(name, purpose, username, password, cryptodb_m,
+                               currentuser_m);
   // this needs to change
   AmphoraInterface::VerifyAddAccountPopup(name);
 }
@@ -329,7 +314,7 @@ void AmphoraInterface::EditAccountSubmenu() {
     } else if (account_manager_m.FindAccount(userinput)) {
       std::cout << "Account Found!" << std::endl;
       account_manager_m.EditAccount(userinput);
-      account_manager_m.SaveAccountList(currentfileid_m);
+      account_manager_m.SaveAccountList(currentacctid_m);
       std::cout << std::endl;
       break;
     } else {
@@ -399,8 +384,8 @@ void AmphoraInterface::VerifyAddAccountPopup(const std::string &accountname) {
 
     if (submenu == "1") {
       std::cout << "Saving account..." << std::endl;
-      std::cout << "currentfileid_m: " << currentfileid_m << std::endl;
-      account_manager_m.SaveAccountList(currentfileid_m);
+      std::cout << "currentacctid_m: " << currentacctid_m << std::endl;
+      account_manager_m.SaveAccountList(currentacctid_m);
       break;
     }
 
@@ -431,7 +416,7 @@ void AmphoraInterface::VerifyDeleteAccountPopup(
   getline(std::cin, userinput);
   if (userinput == "y" || userinput == "Y") {
     account_manager_m.DeleteAccount(accountname);
-    account_manager_m.SaveAccountList(currentfileid_m);
+    account_manager_m.SaveAccountList(currentacctid_m);
     std::cout << "Account deleted!" << std::endl;
   } else if (userinput == "n" || userinput == "N") {
     return;

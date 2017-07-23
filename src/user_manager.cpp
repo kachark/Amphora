@@ -9,29 +9,60 @@ namespace AmphoraBackend {
 
 UserManager::UserManager() {}
 
-// TODO
-// verifies user as being registered in system
+// // initializes temp User and adds to userlist_m
+// // viewaccount and editaccount will check accountdata_m for the name of
+// tempAccount (similar to how it will check any other account
+// // saveaccountlist will serialize the current buffer accountdata_m
+// // tempAccount will be reset to NULL
+void UserManager::AddUser(const std::string &username,
+                          const std::string &password,
+                          CryptoManager &crypto_manager) {
+
+  std::string date = amphora_util_m.CurrentDate();
+
+  // generate fileid for new User to create/manage Accounts
+  CryptoDB defaultcrypto = crypto_manager.GetCryptoDB("default");
+  unsigned int iterations = defaultcrypto.get_iterations();
+  std::string accountfileid = crypto_util_m.AES_PRNG(3);
+  std::string salt = crypto_util_m.AES_PRNG(defaultcrypto.get_saltsize());
+  std::size_t keysize = defaultcrypto.get_keysize();
+  std::string hashedpassword =
+      crypto_util_m.PBKDF2(iterations, salt, keysize, password);
+
+  tempuser_m.set_username(username);
+  tempuser_m.set_password(hashedpassword);
+  tempuser_m.set_datecreated(date);
+  tempuser_m.set_datemodified(date);
+  tempuser_m.set_accountfileid(accountfileid);
+  tempuser_m.set_cryptodbname("default");
+  tempuser_m.set_salt(salt);
+
+  // store temporary new user in map
+  userlist_m.insert(std::make_pair(username, tempuser_m));
+  // clear temporary user
+  tempuser_m.clear();
+}
+
+// verifies provided username and password as being registered in system
 bool UserManager::VerifyUser(const std::string &username,
                              const std::string &password,
                              CryptoManager &crypto_manager) {
-  auto userfound = FindUser(username);
+  bool userfound = FindUser(username);
   if (!userfound) {
     std::cout << "User not found in userdata" << std::endl;
-  } else {
+  } else { // username in database, now verify the password
     // compare this user's pw/key with what was passed into this function
     User loggedin = userlist_m[username];
     // access this user's crypto settings
     CryptoDB cryptodb = crypto_manager.GetCryptoDB(loggedin.get_cryptodbname());
     // std::size_t saltsize = cryptodb.get_saltsize();
-    std::string saltstr = loggedin.get_salt();
-    CryptoPP::SecByteBlock salt = crypto_util_m.StringToSecByteBlock(saltstr);
+    std::string salt = loggedin.get_salt();
     std::size_t keysize = cryptodb.get_keysize();
     unsigned int iterations = cryptodb.get_iterations();
-    CryptoPP::SecByteBlock masterkey =
-        crypto_util_m.GetPBKDF2(iterations, salt, keysize, password);
-    std::string hashedpassword = crypto_util_m.SecByteBlockToString(masterkey);
+    std::string masterkey =
+        crypto_util_m.PBKDF2(iterations, salt, keysize, password);
 
-    if (hashedpassword == loggedin.get_password()) {
+    if (masterkey == loggedin.get_password()) {
       return 1;
     }
   }
@@ -43,8 +74,8 @@ bool UserManager::VerifyUser(const std::string &username,
 bool UserManager::FindUser(const std::string &username) {
   // assumes userlist_m is map and all items are unique
   if (userlist_m.count(username)) {
-    return true;       // found
-  } else {             // account key not found
+    return true; // found
+  } else {       // account key not found
     return false;
   }
 }
@@ -103,31 +134,6 @@ bool UserManager::SaveUserList() {
     }
   }
   return 0;
-}
-
-// // initializes temp User and adds to userlist_m
-// // viewaccount and editaccount will check accountdata_m for the name of
-// tempAccount (similar to how it will check any other account
-// // saveaccountlist will serialize the current buffer accountdata_m
-// // tempAccount will be reset to NULL
-void UserManager::AddUser(const std::string &username,
-                          const std::string &password, const std::string &salt,
-                          const std::string &fileid,
-                          const std::string &cryptofileid) {
-  std::string date = amphora_util_m.CurrentDate();
-
-  tempuser_m.set_username(username);
-  tempuser_m.set_password(password);
-  tempuser_m.set_datecreated(date);
-  tempuser_m.set_datemodified(date);
-  tempuser_m.set_accountfileid(fileid);
-  tempuser_m.set_cryptodbname(cryptofileid);
-  tempuser_m.set_salt(salt);
-
-  // store temporary new user in map
-  userlist_m.insert(std::make_pair(username, tempuser_m));
-  // clear temporary user
-  tempuser_m.clear();
 }
 
 // void UserManager::DeleteAccount(const std::string &accountname)

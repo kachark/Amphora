@@ -14,11 +14,17 @@
 #include <iostream>
 
 /* AES-GCM Encryption */
+// std::string CryptoUtilities::AES_GCM_Encrypt(const std::string &plaintext,
+//                                              CryptoPP::SecByteBlock &key,
+//                                              CryptoPP::SecByteBlock &iv) {
 std::string CryptoUtilities::AES_GCM_Encrypt(const std::string &plaintext,
-                                             CryptoPP::SecByteBlock &key,
-                                             CryptoPP::SecByteBlock &iv) {
+                                             const std::string &keystr,
+                                             const std::string &ivstr) {
 
   std::string ciphertext, encoded;
+  // convert key and iv to CryptoPP::SecByteBlock
+  CryptoPP::SecByteBlock key = CryptoUtilities::StringToSecByteBlock(keystr);
+  CryptoPP::SecByteBlock iv = CryptoUtilities::StringToSecByteBlock(ivstr);
 
   encoded.clear();
   encoded = CryptoUtilities::SecByteBlockToString(key);
@@ -45,6 +51,7 @@ std::string CryptoUtilities::AES_GCM_Encrypt(const std::string &plaintext,
     // exit(1);
   }
   // DEBUG: pretty print a std::string
+  // encode string to hex
   encoded.clear();
   CryptoPP::StringSource(
       ciphertext, true,
@@ -55,10 +62,16 @@ std::string CryptoUtilities::AES_GCM_Encrypt(const std::string &plaintext,
 }
 
 /* AES-GCM Decryption */
+// std::string CryptoUtilities::AES_GCM_Decrypt(const std::string &ciphertext,
+//                                              CryptoPP::SecByteBlock &key,
+//                                              CryptoPP::SecByteBlock &iv) {
 std::string CryptoUtilities::AES_GCM_Decrypt(const std::string &ciphertext,
-                                             CryptoPP::SecByteBlock &key,
-                                             CryptoPP::SecByteBlock &iv) {
+                                             const std::string &keystr,
+                                             const std::string &ivstr) {
   std::string recovered;
+  // convert key and iv to CryptoPP::SecByteBlock
+  CryptoPP::SecByteBlock key = CryptoUtilities::StringToSecByteBlock(keystr);
+  CryptoPP::SecByteBlock iv = CryptoUtilities::StringToSecByteBlock(ivstr);
 
   try {
     CryptoPP::GCM<CryptoPP::AES>::Decryption d;
@@ -79,11 +92,16 @@ std::string CryptoUtilities::AES_GCM_Decrypt(const std::string &ciphertext,
 }
 
 /* PBKDF2 using SHA-512 */
-CryptoPP::SecByteBlock CryptoUtilities::GetPBKDF2(unsigned int iterations,
-                                                  CryptoPP::SecByteBlock &salt,
-                                                  std::size_t keysize,
-                                                  const std::string &message) {
+// CryptoPP::SecByteBlock CryptoUtilities::GetPBKDF2(unsigned int iterations,
+//                                                   CryptoPP::SecByteBlock &salt,
+//                                                   std::size_t keysize,
+//                                                   const std::string &message) {
+std::string CryptoUtilities::PBKDF2(unsigned int iterations,
+                                                    const std::string &saltstr,
+                                                    std::size_t keysize,
+                                                    const std::string &message) {
 
+  CryptoPP::SecByteBlock salt = StringToSecByteBlock(saltstr);
   // time in seconds to perform derivation
   // if 0, time not considered as a parameter
   double timeinSec = 0;
@@ -100,12 +118,13 @@ CryptoPP::SecByteBlock CryptoUtilities::GetPBKDF2(unsigned int iterations,
 
   std::string result = CryptoUtilities::SecByteBlockToString(derived);
 
-  return (derived); // return as a secbyte buffer
+  // return (derived); // return as a secbyte buffer
+  return result;
 }
 
 /* Pseudo-Random Number Generator */
-CryptoPP::SecByteBlock
-CryptoUtilities::Get_AES_PseudoRNG(const size_t &saltlen) {
+std::string
+CryptoUtilities::AES_PRNG(const size_t &saltlen) {
   // fetches random seed from the OS
   CryptoPP::SecByteBlock seed(32); // 32 byte
   CryptoPP::OS_GenerateRandomBlock(false, seed, seed.size());
@@ -116,7 +135,9 @@ CryptoUtilities::Get_AES_PseudoRNG(const size_t &saltlen) {
   CryptoPP::SecByteBlock randomval(saltlen);
   prng.GenerateBlock(randomval, randomval.size());
 
-  return (randomval);
+  std::string result = SecByteBlockToString(randomval);
+  // return (randomval);
+  return result;
 }
 
 /* Converts CryptoPP::SecByteBlock to std::string with hex encoding */

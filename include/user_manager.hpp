@@ -14,20 +14,20 @@ class UserManager {
 
 public:
   UserManager();
+  // void AddUser(const std::string &username, const std::string &password,
+  //              const std::string &salt, const std::string &accountfileid,
+  //              const std::string &cryptofileid);
+  void AddUser(const std::string &username, const std::string &password,
+               CryptoManager &crypto_manager);
   bool VerifyUser(const std::string &username, const std::string &password,
                   CryptoManager &crypto_manager);
-
-  void AddUser(const std::string &username, const std::string &password,
-               const std::string &salt, const std::string &accountfileid,
-               const std::string &cryptofileid);
-  //     Account EditAccount(const std::string &account); // changed
   void DeleteUser(const std::string &username);
   bool FindUser(const std::string &accountname); // find AND RETURN
   User &GetUser(const std::string &username);
-  //     // Account GetAccount(const std::string &accountname); // new
-  //     void ViewAccount(const std::string &account);
   bool LoadUserList();
   bool SaveUserList();
+  //     Account EditAccount(const std::string &account); // changed
+  //     void ViewAccount(const std::string &account);
   //     void ViewAccountList(const std::string &format, const std::string
   //     &sortstyle);
 
@@ -36,9 +36,6 @@ private:
   CryptoUtilities crypto_util_m;
   User tempuser_m;
   std::map<std::string, User> userlist_m;
-
-  void EncryptUsers(); // encrypts Users inside userdata_m
-  void DecryptUsers(); // decrypts Users
 };
 }
 
