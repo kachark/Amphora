@@ -8,9 +8,6 @@
 // TODO
 // if user tries to edit if they have no accounts, infinite loop
 // TODO
-// crypto_util change parameters and returns to be solely with std::string and
-// void
-// TODO
 // crypto_db prepend the iv to the the ciphertext - common practice
 // salt is also prepended to the pw hash
 // TODO CRITICAL

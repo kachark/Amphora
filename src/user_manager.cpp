@@ -9,11 +9,6 @@ namespace AmphoraBackend {
 
 UserManager::UserManager() {}
 
-// // initializes temp User and adds to userlist_m
-// // viewaccount and editaccount will check accountdata_m for the name of
-// tempAccount (similar to how it will check any other account
-// // saveaccountlist will serialize the current buffer accountdata_m
-// // tempAccount will be reset to NULL
 void UserManager::AddUser(const std::string &username,
                           const std::string &password,
                           CryptoManager &crypto_manager) {
