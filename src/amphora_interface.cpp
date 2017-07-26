@@ -30,7 +30,7 @@ void AmphoraInterface::Start() {
   AmphoraInterface::LoadCryptoFile();
   AmphoraInterface::LoadUserFile();
   AmphoraInterface::LogIn();
-  AmphoraInterface::LoadAccountFile(currentacctid_m);
+  AmphoraInterface::LoadAccountFile();
   AmphoraInterface::MainMenu();
 }
 
@@ -240,12 +240,12 @@ void AmphoraInterface::LoadCryptoFile() {
 
 /* Load Account File */
 /* Loads Account File for the currently logged in User */
-void AmphoraInterface::LoadAccountFile(const std::string &fileid) {
+void AmphoraInterface::LoadAccountFile() {
   if (exit_flag_m == true) {
     return;
   }
 
-  bool loadaccounts = account_manager_m.LoadAccountList(fileid);
+  bool loadaccounts = account_manager_m.LoadAccountList(currentacctid_m);
   if (loadaccounts) {
     std::cout << "Accounts loaded" << std::endl;
   } else if (!loadaccounts) {

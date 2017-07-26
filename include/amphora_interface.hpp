@@ -35,7 +35,7 @@ private:
   void test();
   void LoadUserFile();
   void LoadCryptoFile();
-  void LoadAccountFile(const std::string &fileid);
+  void LoadAccountFile();
   void AddAccountSubmenu();
   void EditAccountSubmenu();
   void DeleteAccountSubmenu();

@@ -1,12 +1,12 @@
-Amphora is a locally hosted text based password manager built on crypto++. 
+# Amphora
 
-Current project goals:
-1. Manage account information
-2. Simple text-based user interface
-3. Able to generate new passwords
-4. Encrypt account data
+Amphora is a locally hosted CLI based password manager built on crypto++. 
 
-Long-term goals:
-1. Biometric user access
-2. Browser support
+## Security
+
+PBKDF2 user password hashing
+AES-GCM encryption for user data
+AES based pseudo-random number generator for salts
+
+
 
