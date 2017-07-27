@@ -231,7 +231,7 @@ void AmphoraInterface::LoadCryptoFile() {
     std::size_t saltsize = 16;
     std::size_t ivsize = 16;
     std::size_t keysize = 32;
-    unsigned int iterations = 200000;
+    unsigned int iterations = 1000000;
     crypto_manager_m.AddCryptoDB("default", saltsize, ivsize, keysize,
                                  iterations);
     crypto_manager_m.SaveCryptoDB();
@@ -292,6 +292,7 @@ void AmphoraInterface::AddAccountSubmenu() {
   AmphoraInterface::VerifyAddAccountPopup(name);
 }
 
+// TODO
 /* Edit Account */
 /* Presents the user with the option of editing Accounts that they have saved */
 void AmphoraInterface::EditAccountSubmenu() {
@@ -322,6 +323,7 @@ void AmphoraInterface::EditAccountSubmenu() {
   }
 }
 
+// TODO
 /* Delete Account */
 /* Presents the user with the option of deleting an Account that they have saved
  */
@@ -351,6 +353,7 @@ void AmphoraInterface::DeleteAccountSubmenu() {
   }
 }
 
+// TODO
 // user should be able select the account they want to view.
 /* View Accounts */
 /* Displays Accounts that the currently logged in User has saved */
@@ -360,6 +363,7 @@ void AmphoraInterface::ViewAccountsSubmenu() {
   account_manager_m.ViewAccountList(viewstyle, sortchoice);
 }
 
+// TODO
 /* Options */
 /* (1) Encryption Settings
    (2)

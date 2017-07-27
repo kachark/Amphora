@@ -22,8 +22,6 @@ void AccountManager::AddAccount(const std::string &name,
 
   std::string key = currentuser.get_password();
   std::string iv = crypto_util_m.AES_PRNG(cryptodb.get_ivsize());
-  // cryptodb_m.set_iv(ivstr);
-  // second iv save?
   std::string encrypted_uname =
       crypto_util_m.AES_GCM_Encrypt(username, key, iv);
   encrypted_uname = iv + encrypted_uname;
@@ -107,12 +105,26 @@ Account &AccountManager::GetAccount(const std::string &accountname) {
   return accountlist_m[accountname];
 }
 
-// TODO remove from backend
+// TODO remove from backend?
+// TODO decrypt username, password
 // the UI should handle this! ui call FindAccount -> return desired Account obj
 // GetAccount
 // displays acccount info in nice format
-void AccountManager::ViewAccount(const std::string &accountname) {
+void AccountManager::ViewAccount(const std::string &accountname,
+                                 CryptoDB &cryptodb, User &currentuser) {
+
   const Account &account = accountlist_m[accountname];
+  std::string username_cipher = account.get_username();
+  // TODO
+  std::string iv1 = username_cipher; // extract iv1 from username
+  std::string password_cipher = account.get_password();
+  // TODO
+  std::string iv2 = password_cipher; // extract iv2 from password
+  std::string username = crypto_util_m.AES_GCM_Decrypt(
+      username_cipher, currentuser.get_password(), iv1);
+  std::string password = crypto_util_m.AES_GCM_Decrypt(
+      password_cipher, currentuser.get_password(), iv2);
+
   std::cout << "Name: \t\t" << account.get_name() << std::endl;
   std::cout << "Purpose: \t" << account.get_purpose() << std::endl;
   std::cout << "Username: \t" << account.get_username() << std::endl;

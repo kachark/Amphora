@@ -23,7 +23,8 @@ public:
   void DeleteAccount(const std::string &accountname);
   bool FindAccount(const std::string &accountname);    // find AND RETURN
   Account &GetAccount(const std::string &accountname); // new
-  void ViewAccount(const std::string &account);
+  void ViewAccount(const std::string &account, CryptoDB &cryptodb,
+                   User &currentuser);
   bool LoadAccountList(const std::string &fileid);
   bool SaveAccountList(const std::string &fileid);
   void ViewAccountList(const std::string &format, const std::string &sortstyle);
