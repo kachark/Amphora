@@ -1,23 +1,29 @@
 
 
-#include "../include/user_manager.hpp"
+#include "user_controller.hpp"
+#include "crypto.hpp"
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
-namespace AmphoraBackend {
+using amphora::internal::Crypto;
+using amphora::internal::User;
 
-UserManager::UserManager() {}
+namespace amphora {
+namespace core {
 
-void UserManager::AddUser(const std::string &username,
-                          const std::string &password,
-                          CryptoManager &crypto_manager) {
+UserController::UserController() {}
+
+void UserController::AddUser(const std::string &username,
+                             const std::string &password,
+                             CryptoController &crypto_controller) {
 
   std::string date = amphora_util_m.CurrentDate();
 
   // generate fileid for new User to create/manage Accounts
-  CryptoDB defaultcrypto = crypto_manager.GetCryptoDB("default");
-  unsigned int iterations = defaultcrypto.get_iterations();
+  internal::Crypto defaultcrypto = crypto_controller.get_crypto("default");
+  unsigned int iterations = defaultcrypto.get_hmac_iterations();
   std::string accountfileid = crypto_util_m.AES_PRNG(3);
   std::string salt = crypto_util_m.AES_PRNG(defaultcrypto.get_saltsize());
   std::size_t keysize = defaultcrypto.get_keysize();
@@ -29,7 +35,7 @@ void UserManager::AddUser(const std::string &username,
   tempuser_m.set_datecreated(date);
   tempuser_m.set_datemodified(date);
   tempuser_m.set_accountfileid(accountfileid);
-  tempuser_m.set_cryptodbname("default");
+  tempuser_m.set_cryptoname("default");
   tempuser_m.set_salt(salt);
 
   // store temporary new user in map
@@ -39,9 +45,9 @@ void UserManager::AddUser(const std::string &username,
 }
 
 // verifies provided username and password as being registered in system
-bool UserManager::VerifyUser(const std::string &username,
-                             const std::string &password,
-                             CryptoManager &crypto_manager) {
+bool UserController::VerifyUser(const std::string &username,
+                                const std::string &password,
+                                CryptoController &crypto_controller) {
   bool userfound = FindUser(username);
   if (!userfound) {
     std::cout << "User not found in userdata" << std::endl;
@@ -49,24 +55,32 @@ bool UserManager::VerifyUser(const std::string &username,
     // compare this user's pw/key with what was passed into this function
     User loggedin = userlist_m[username];
     // access this user's crypto settings
-    CryptoDB cryptodb = crypto_manager.GetCryptoDB(loggedin.get_cryptodbname());
+    internal::Crypto crypto =
+        crypto_controller.get_crypto(loggedin.get_cryptoname());
     // std::size_t saltsize = cryptodb.get_saltsize();
     std::string salt = loggedin.get_salt();
-    std::size_t keysize = cryptodb.get_keysize();
-    unsigned int iterations = cryptodb.get_iterations();
+    std::size_t keysize = crypto.get_keysize();
+    unsigned int iterations = crypto.get_hmac_iterations();
     std::string masterkey =
         crypto_util_m.PBKDF2(iterations, salt, keysize, password);
 
-    if (masterkey == loggedin.get_password()) {
+    std::cout << masterkey << std::endl;
+    std::cout << loggedin.get_password() << std::endl;
+
+    // if (masterkey == loggedin.get_password()) {
+    // if (masterkey.compare(loggedin.get_password())) {
+    if (std::lexicographical_compare(masterkey.begin(), masterkey.end(),
+                                     loggedin.get_password().begin(),
+                                     loggedin.get_password().end())) {
       return 1;
     }
   }
   return 0;
-}
+} // namespace core
 
 // searches accountlist for account given accountname
 // confirms if account is found
-bool UserManager::FindUser(const std::string &username) {
+bool UserController::FindUser(const std::string &username) {
   // assumes userlist_m is map and all items are unique
   if (userlist_m.count(username)) {
     return true; // found
@@ -76,12 +90,12 @@ bool UserManager::FindUser(const std::string &username) {
 }
 
 // returns reference to User
-User &UserManager::GetUser(const std::string &username) {
+User &UserController::get_user(const std::string &username) {
   return userlist_m[username];
 }
 
 // loads account using cereal
-bool UserManager::LoadUserList() {
+bool UserController::LoadUserList() {
   // TODO - ensure file exists!
   bool loadstatus;
   std::string filename = "../data/users/users.xml";
@@ -102,7 +116,7 @@ bool UserManager::LoadUserList() {
 
 // saves account using cereal serialization library
 // will create new file or overwrite existing file
-bool UserManager::SaveUserList() {
+bool UserController::SaveUserList() {
 
   // TODO - filename should be a constant throughout the program
   bool savestatus;
@@ -131,7 +145,7 @@ bool UserManager::SaveUserList() {
   return 0;
 }
 
-// void UserManager::DeleteAccount(const std::string &accountname)
+// void UserController::DeleteAccount(const std::string &accountname)
 // {
 //   accountdata_m.erase(accountname);
 // }
@@ -140,7 +154,7 @@ bool UserManager::SaveUserList() {
 // // the UI should handle this! ui call FindAccount -> return desired Account
 // obj GetAccount
 // // displays acccount info in nice format
-// void UserManager::ViewAccount(const std::string &accountname)
+// void UserController::ViewAccount(const std::string &accountname)
 // {
 //   const Account &account = accountdata_m[accountname];
 //   std::cout << "Name: \t\t" << account.get_name() << std::endl;
@@ -153,7 +167,7 @@ bool UserManager::SaveUserList() {
 //   std::endl;
 // }
 
-// void UserManager::ViewAccountList(const std::string &format, const
+// void UserController::ViewAccountList(const std::string &format, const
 // std::string &sortstyle)
 // {
 //   //format "short" displays up to the 5 most recent accounts saved in the
@@ -189,4 +203,6 @@ bool UserManager::SaveUserList() {
 //   }
 //   amphora_util_m.PrettyTable(accountnamelist);
 // }
-}
+
+} // namespace core
+} // namespace amphora

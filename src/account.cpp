@@ -1,8 +1,11 @@
 
 
-#include "../include/account.hpp"
-#include <cereal/archives/xml.hpp> // serialize in xml format
-#include <cereal/types/string.hpp>
+#include "account.hpp"
+#include "cereal/archives/xml.hpp" // serialize in xml format
+#include "cereal/types/string.hpp"
+
+namespace amphora {
+namespace internal {
 
 void Account::clear() {
   Account::name_m.clear();
@@ -60,3 +63,6 @@ template void
 Account::serialize<cereal::XMLOutputArchive>(cereal::XMLOutputArchive &);
 template void
 Account::serialize<cereal::XMLInputArchive>(cereal::XMLInputArchive &);
+
+} // namespace internal
+} // namespace amphora

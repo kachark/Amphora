@@ -1,7 +1,10 @@
 
-#include "../include/user.hpp"
-#include <cereal/archives/xml.hpp> // serialize in xml format
-#include <cereal/types/string.hpp>
+#include "user.hpp"
+#include "cereal/archives/xml.hpp" // serialize in xml format
+#include "cereal/types/string.hpp"
+
+namespace amphora {
+namespace internal {
 
 void User::clear() {
   username_m.clear();
@@ -25,7 +28,7 @@ void User::set_accountfileid(const std::string &fileid) {
   accountfileid_m = fileid;
 }
 
-void User::set_cryptodbname(const std::string &cryptofileid) {
+void User::set_cryptoname(const std::string &cryptofileid) {
   cryptofileid_m = cryptofileid;
 }
 
@@ -41,7 +44,7 @@ std::string User::get_datemodified() const { return datemodified_m; }
 
 std::string User::get_accountfileid() const { return accountfileid_m; }
 
-std::string User::get_cryptodbname() const { return cryptofileid_m; }
+std::string User::get_cryptoname() const { return cryptofileid_m; }
 
 std::string User::get_salt() const { return salt_m; }
 
@@ -56,3 +59,6 @@ template void
 User::serialize<cereal::XMLOutputArchive>(cereal::XMLOutputArchive &);
 template void
 User::serialize<cereal::XMLInputArchive>(cereal::XMLInputArchive &);
+
+} // namespace internal
+} // namespace amphora

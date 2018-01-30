@@ -1,8 +1,8 @@
 
 // TODO
-// make sure account_manager, user_manager, crypto_manager each have similar
-// naming styles, code layout, and general functionality
-// name vs username, list vs vector vs data etc etc
+// make sure account_controller, user_controller, crypto_controller each have
+// similar naming styles, code layout, and general functionality name vs
+// username, list vs vector vs data etc etc
 // TODO
 // if user changes their encryption settings, reencrypt everything
 // TODO
@@ -15,10 +15,15 @@
 // of interface.
 // too messy and should be more simple to use - coincide with refactor of
 // crypto_util
-// rename crypto_manager.
+// rename crypto_controller.
 
-#include "../include/amphora_interface.hpp"
+#include "cli.hpp"
 #include <iostream>
+
+using namespace amphora::core;
+
+namespace amphora {
+namespace cli {
 
 /* Amphora Interface Constructor */
 AmphoraInterface::AmphoraInterface() { exit_flag_m = false; }
@@ -27,11 +32,11 @@ AmphoraInterface::AmphoraInterface() { exit_flag_m = false; }
 void AmphoraInterface::Start() {
   std::cout << "Welcome to AMPHORA" << std::endl;
   std::cout << "Press '~' at any time to return to the main menu" << std::endl;
-  AmphoraInterface::LoadCryptoFile();
-  AmphoraInterface::LoadUserFile();
-  AmphoraInterface::LogIn();
-  AmphoraInterface::LoadAccountFile();
-  AmphoraInterface::MainMenu();
+  LoadCryptoConfig();
+  LoadUserFile();
+  LogIn();
+  LoadAccountFile();
+  MainMenu();
 }
 
 /* Log In Page */
@@ -62,22 +67,22 @@ void AmphoraInterface::LogIn() {
       std::cout << "Password: ";
       getline(std::cin, password);
       bool verified =
-          user_manager_m.VerifyUser(username, password, crypto_manager_m);
+          user_controller_m.VerifyUser(username, password, crypto_controller_m);
       if (!verified) {
         std::cout << "Your username or password are not recognized! Please "
                      "reenter or register. "
                   << std::endl;
       } else if (verified) { // logged in!
         std::cout << "Logged In!" << std::endl;
-        currentuser_m = user_manager_m.GetUser(username);
-        cryptodb_m =
-            crypto_manager_m.GetCryptoDB(currentuser_m.get_cryptodbname());
+        currentuser_m = user_controller_m.get_user(username);
+        crypto_m =
+            crypto_controller_m.get_crypto(currentuser_m.get_cryptoname());
         currentacctid_m = currentuser_m.get_accountfileid();
         break;
       }
 
     } else if (input == "2") {
-      AmphoraInterface::RegisterUser();
+      RegisterUser();
     }
   }
 }
@@ -102,7 +107,7 @@ void AmphoraInterface::RegisterUser() {
     getline(std::cin, confirmedpw);
 
     // check username against database
-    bool usercollision = user_manager_m.FindUser(username);
+    bool usercollision = user_controller_m.FindUser(username);
     if (usercollision) {
       std::cout
           << "The username you entered is taken. Please enter another name"
@@ -113,9 +118,9 @@ void AmphoraInterface::RegisterUser() {
                 << std::endl;
     } else if ((usercollision == false) &&
                (password == confirmedpw)) { // register user
-      user_manager_m.AddUser(username, password, crypto_manager_m);
-      user_manager_m.SaveUserList();
-      currentuser_m = user_manager_m.GetUser(username);
+      user_controller_m.AddUser(username, password, crypto_controller_m);
+      user_controller_m.SaveUserList();
+      currentuser_m = user_controller_m.get_user(username);
 
       // add current user fileid to amphora interface to access their accounts
       // file
@@ -148,22 +153,22 @@ void AmphoraInterface::MainMenu() {
 
     // Add account
     if (userinput == "1") {
-      AmphoraInterface::AddAccountSubmenu();
+      AddAccountSubmenu();
     }
 
     // edit existing account
     else if (userinput == "2") { // edit account
-      AmphoraInterface::EditAccountSubmenu();
+      EditAccountSubmenu();
     }
 
     // delete account
     else if (userinput == "3") {
       // go into the xml file and delete the necessary index
-      AmphoraInterface::DeleteAccountSubmenu();
+      DeleteAccountSubmenu();
     }
 
     else if (userinput == "4") {
-      AmphoraInterface::ViewAccountsSubmenu();
+      ViewAccountsSubmenu();
     }
 
     // TODO
@@ -175,7 +180,7 @@ void AmphoraInterface::MainMenu() {
       // choose Encryption options, fingerprint scanner support, secure
       // password
       // generator etc.
-      // AmphoraInterface::advanced_options();
+      // cli::advanced_options();
     }
   }
 }
@@ -188,7 +193,7 @@ void AmphoraInterface::LoadUserFile() {
     return;
   }
   std::string input;
-  bool loadusers = user_manager_m.LoadUserList();
+  bool loadusers = user_controller_m.LoadUserList();
   if (loadusers) {
     std::cout << "Users loaded" << std::endl;
   } else if (!loadusers) {
@@ -200,7 +205,7 @@ void AmphoraInterface::LoadUserFile() {
                 << "(2): no" << std::endl;
       getline(std::cin, input);
       if (input == "1") {
-        AmphoraInterface::RegisterUser();
+        RegisterUser();
         break;
       } else if (input == "2") {
         exit_flag_m = true;
@@ -215,11 +220,11 @@ void AmphoraInterface::LoadUserFile() {
 /* Load Crypto Settings File */
 /* Attempts to load Crypto Settings into memory from crypto file. If CryptoDB is
  * unable to be loaded, it will resort to default settings. */
-void AmphoraInterface::LoadCryptoFile() {
+void AmphoraInterface::LoadCryptoConfig() {
   if (exit_flag_m == true) {
     return;
   }
-  bool loaded = crypto_manager_m.LoadCryptoDB();
+  bool loaded = crypto_controller_m.LoadCrypto();
   if (loaded) {
     std::cout << "Crypto settings loaded" << std::endl;
   } else if (!loaded) {
@@ -232,9 +237,9 @@ void AmphoraInterface::LoadCryptoFile() {
     std::size_t ivsize = 16;
     std::size_t keysize = 32;
     unsigned int iterations = 1000000;
-    crypto_manager_m.AddCryptoDB("default", saltsize, ivsize, keysize,
-                                 iterations);
-    crypto_manager_m.SaveCryptoDB();
+    crypto_controller_m.AddCrypto("default", saltsize, ivsize, keysize,
+                                  iterations);
+    bool saved = crypto_controller_m.SaveCrypto();
   }
 }
 
@@ -245,12 +250,12 @@ void AmphoraInterface::LoadAccountFile() {
     return;
   }
 
-  bool loadaccounts = account_manager_m.LoadAccountList(currentacctid_m);
+  bool loadaccounts = account_controller_m.LoadAccountList(currentacctid_m);
   if (loadaccounts) {
     std::cout << "Accounts loaded" << std::endl;
   } else if (!loadaccounts) {
     std::cout << "LOAD FAILED" << std::endl;
-    // AmphoraInterface::AddAccountSubmenu();
+    // cli::AddAccountSubmenu();
   }
 }
 
@@ -269,7 +274,7 @@ void AmphoraInterface::AddAccountSubmenu() {
 
     if (name == "~") {
       return;
-    } else if (account_manager_m.FindAccount(name)) {
+    } else if (account_controller_m.FindAccount(name)) {
       std::cout << "The account name you entered is already in use. Please "
                    "enter a new name for the account."
                 << std::endl;
@@ -286,10 +291,10 @@ void AmphoraInterface::AddAccountSubmenu() {
     }
   }
 
-  account_manager_m.AddAccount(name, purpose, username, password, cryptodb_m,
-                               currentuser_m);
+  account_controller_m.AddAccount(name, purpose, username, password, crypto_m,
+                                  currentuser_m);
   // this needs to change
-  AmphoraInterface::VerifyAddAccountPopup(name);
+  VerifyAddAccountPopup(name);
 }
 
 // TODO
@@ -299,7 +304,7 @@ void AmphoraInterface::EditAccountSubmenu() {
   std::string userinput;
   std::string f = "long";
   std::string s = "test";
-  account_manager_m.ViewAccountList(f, s);
+  account_controller_m.ViewAccountList(f, s);
 
   while (1) {
     std::cout
@@ -309,10 +314,10 @@ void AmphoraInterface::EditAccountSubmenu() {
 
     if (userinput == "~") {
       return;
-    } else if (account_manager_m.FindAccount(userinput)) {
+    } else if (account_controller_m.FindAccount(userinput)) {
       std::cout << "Account Found!" << std::endl;
-      account_manager_m.EditAccount(userinput);
-      account_manager_m.SaveAccountList(currentacctid_m);
+      account_controller_m.EditAccount(userinput);
+      account_controller_m.SaveAccountList(currentacctid_m);
       std::cout << std::endl;
       break;
     } else {
@@ -331,7 +336,7 @@ void AmphoraInterface::DeleteAccountSubmenu() {
   std::string userinput;
   std::string f = "long";
   std::string s = "test";
-  account_manager_m.ViewAccountList(f, s);
+  account_controller_m.ViewAccountList(f, s);
 
   while (1) {
     std::cout << "\nPlease type in the name of the account you would like "
@@ -341,9 +346,9 @@ void AmphoraInterface::DeleteAccountSubmenu() {
 
     if (userinput == "~") {
       return;
-    } else if (account_manager_m.FindAccount(userinput)) {
+    } else if (account_controller_m.FindAccount(userinput)) {
       std::cout << "Account Found!" << std::endl;
-      AmphoraInterface::VerifyDeleteAccountPopup(userinput);
+      VerifyDeleteAccountPopup(userinput);
       break;
     } else {
       std::cout << "\nPlease re-enter the name of the account you would like "
@@ -360,7 +365,7 @@ void AmphoraInterface::DeleteAccountSubmenu() {
 void AmphoraInterface::ViewAccountsSubmenu() {
   std::string viewstyle = "long";
   std::string sortchoice = "test";
-  account_manager_m.ViewAccountList(viewstyle, sortchoice);
+  account_controller_m.ViewAccountList(viewstyle, sortchoice);
 }
 
 // TODO
@@ -378,7 +383,7 @@ void AmphoraInterface::VerifyAddAccountPopup(const std::string &accountname) {
   std::string submenu;
   while (1) {
     std::cout << "\nIs the information correct?\n";
-    account_manager_m.ViewAccount(accountname);
+    account_controller_m.ViewAccount(accountname, crypto_m, currentuser_m);
     std::cout << "\n(1): Save account\n(2): Edit account\n(3): Return to Main "
                  "Menu without saving\n";
     getline(std::cin, submenu);
@@ -386,21 +391,21 @@ void AmphoraInterface::VerifyAddAccountPopup(const std::string &accountname) {
     if (submenu == "1") {
       std::cout << "Saving account..." << std::endl;
       std::cout << "currentacctid_m: " << currentacctid_m << std::endl;
-      account_manager_m.SaveAccountList(currentacctid_m);
+      account_controller_m.SaveAccountList(currentacctid_m);
       break;
     }
 
     // edit new account before saving
     else if (submenu == "2") {
       std::cout << "\n****** Editing account..." << std::endl;
-      account_manager_m.EditAccount(accountname);
+      account_controller_m.EditAccount(accountname);
     }
 
     // return to mainmenu without creating/saving new account
     else if (submenu == "3") {
       std::cout << "\nAccount not saved.\n";
       std::cout << "\nReturning to Main Menu...\n";
-      account_manager_m.DeleteAccount(accountname);
+      account_controller_m.DeleteAccount(accountname);
       break;
     }
   }
@@ -416,10 +421,12 @@ void AmphoraInterface::VerifyDeleteAccountPopup(
   std::cout << "*** " << accountname << " ***" << std::endl;
   getline(std::cin, userinput);
   if (userinput == "y" || userinput == "Y") {
-    account_manager_m.DeleteAccount(accountname);
-    account_manager_m.SaveAccountList(currentacctid_m);
+    account_controller_m.DeleteAccount(accountname);
+    account_controller_m.SaveAccountList(currentacctid_m);
     std::cout << "Account deleted!" << std::endl;
   } else if (userinput == "n" || userinput == "N") {
     return;
   }
 }
+} // namespace cli
+} // namespace amphora

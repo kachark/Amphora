@@ -1,14 +1,17 @@
 
-#ifndef AMPHORA_INTERFACE_HPP
-#define AMPHORA_INTERFACE_HPP
+#ifndef CLI_HPP
+#define CLI_HPP
 
-#include "account_manager.hpp"
+#include "account_controller.hpp"
 #include "amphora_util.hpp"
-#include "crypto_db.hpp"
-#include "crypto_manager.hpp"
+#include "crypto.hpp"
+#include "crypto_controller.hpp"
 #include "crypto_util.hpp"
-#include "user_manager.hpp"
+#include "user_controller.hpp"
 #include <string>
+
+namespace amphora {
+namespace cli {
 
 class AmphoraInterface {
 
@@ -20,21 +23,23 @@ public:
   void RegisterUser();
 
 private:
-  AmphoraBackend::AccountManager account_manager_m;
-  AmphoraBackend::UserManager user_manager_m;
-  AmphoraBackend::CryptoManager crypto_manager_m;
-  CryptoUtilities crypto_util_m;
-  CryptoDB cryptodb_m; // currently saved cryptographic settings - sizes, iterations
-  User currentuser_m; // has all the required fields for the logged in user
+  core::AccountController account_controller_m;
+  core::UserController user_controller_m;
+  core::CryptoController crypto_controller_m;
+  internal::CryptoUtilities crypto_util_m;
+  internal::Crypto
+      crypto_m; // currently saved cryptographic settings - sizes, iterations
+  internal::User
+      currentuser_m; // has all the required fields for the logged in user
   std::string currentacctid_m;
-  // AmphoraUtilities amphora_util_m;
+  // AmphoraUtilities core_m;
   bool exit_flag_m;
   static const unsigned int MAXLOGINS_m = 3;
 
   void Exit();
   void test();
   void LoadUserFile();
-  void LoadCryptoFile();
+  void LoadCryptoConfig();
   void LoadAccountFile();
   void AddAccountSubmenu();
   void EditAccountSubmenu();
@@ -45,4 +50,7 @@ private:
   void VerifyDeleteAccountPopup(const std::string &accountname);
 };
 
-#endif // AMPHORA_INTERFACE_HPP
+} // namespace cli
+} // namespace amphora
+
+#endif // CLI_HPP

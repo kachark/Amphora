@@ -1,9 +1,9 @@
 // Amphora main file
 
-#include "../include/amphora_interface.hpp"
+#include "cli.hpp"
 
 int main(int argc, const char *argv[]) {
-  AmphoraInterface interface;
+  amphora::cli::AmphoraInterface interface;
   interface.Start();
 
   return 0;

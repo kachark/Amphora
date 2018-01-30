@@ -3,17 +3,17 @@ add_executable(amphora
   amphora.cpp
   amphora_util.cpp
   crypto_util.cpp
-  amphora_interface.cpp
+  cli.cpp
   account.cpp
-  account_manager.cpp
+  account_controller.cpp
   user.cpp
-  user_manager.cpp
-  crypto_db.cpp
-  crypto_manager.cpp
+  user_controller.cpp
+  crypto.cpp
+  crypto_controller.cpp
   )
 
 target_link_libraries(amphora
   PRIVATE
     ${Boost_LIBRARIES}
-    cryptopp-shared
+    ${CRYPTOPP}
   )

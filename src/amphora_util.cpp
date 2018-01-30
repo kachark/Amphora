@@ -1,17 +1,21 @@
 
 
-#include "../include/amphora_util.hpp"
-#include "../include/account.hpp"
-#include "../include/crypto_db.hpp"
-#include "../include/user.hpp"
+#include "amphora_util.hpp"
+#include "account.hpp"
+#include "cereal/archives/json.hpp"
+#include "cereal/archives/xml.hpp"
+#include "cereal/types/string.hpp"
+#include "crypto.hpp"
+#include "user.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <boost/filesystem.hpp>
-#include <cereal/archives/xml.hpp> // serialize in xml format
-#include <cereal/types/string.hpp>
 #include <fstream>
 #include <iostream>
 #include <locale>
+
+namespace amphora {
+namespace internal {
 
 using namespace boost::posix_time;
 /* using namespace boost::filesystem; */
@@ -129,20 +133,23 @@ inline bool AmphoraUtilities::SaveToFile(const std::string &filename,
 
 // implemented templates above
 // explicitely instantiated the templates below to work with User, Account,
-// CryptoDB types
+// Crypto types
 template bool
 AmphoraUtilities::LoadFromFile<Account>(const std::string &filename,
                                         std::vector<Account> &buffer);
 template bool AmphoraUtilities::LoadFromFile<User>(const std::string &filename,
                                                    std::vector<User> &buffer);
 template bool
-AmphoraUtilities::LoadFromFile<CryptoDB>(const std::string &filename,
-                                         std::vector<CryptoDB> &buffer);
+AmphoraUtilities::LoadFromFile<Crypto>(const std::string &filename,
+                                       std::vector<Crypto> &buffer);
 template bool
 AmphoraUtilities::SaveToFile<Account>(const std::string &filename,
                                       std::vector<Account> &datalist);
 template bool AmphoraUtilities::SaveToFile<User>(const std::string &filename,
                                                  std::vector<User> &datalist);
 template bool
-AmphoraUtilities::SaveToFile<CryptoDB>(const std::string &filename,
-                                       std::vector<CryptoDB> &datalist);
+AmphoraUtilities::SaveToFile<Crypto>(const std::string &filename,
+                                     std::vector<Crypto> &datalist);
+
+} // namespace internal
+} // namespace amphora

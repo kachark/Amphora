@@ -4,6 +4,9 @@
 
 #include <string>
 
+namespace amphora {
+namespace internal {
+
 class User {
 
 public:
@@ -16,14 +19,14 @@ public:
   void set_datecreated(const std::string &date);
   void set_datemodified(const std::string &date);
   void set_accountfileid(const std::string &fileid);
-  void set_cryptodbname(const std::string &cryptofileid);
+  void set_cryptoname(const std::string &cryptofileid);
   void set_salt(const std::string &salt);
   std::string get_username() const;
   std::string get_password() const;
   std::string get_datecreated() const;
   std::string get_datemodified() const;
   std::string get_accountfileid() const;
-  std::string get_cryptodbname() const;
+  std::string get_cryptoname() const;
   std::string get_salt() const;
 
   // this method lets cereal know which data members to serialize for this type
@@ -33,5 +36,8 @@ private:
   std::string username_m, password_m, datecreated_m, datemodified_m,
       accountfileid_m, cryptofileid_m, salt_m;
 };
+
+} // namespace internal
+} // namespace amphora
 
 #endif // USER_HPP

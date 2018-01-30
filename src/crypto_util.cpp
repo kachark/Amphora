@@ -1,7 +1,7 @@
 
 
-#include "../include/crypto_util.hpp"
-#include "../include/AES_RNG.h"
+#include "crypto_util.hpp"
+#include "AES_RNG.h"
 #include <cryptopp/aes.h>
 #include <cryptopp/cryptlib.h>
 #include <cryptopp/filters.h>
@@ -12,6 +12,9 @@
 #include <cryptopp/pwdbased.h>
 #include <cryptopp/sha.h>
 #include <iostream>
+
+namespace amphora {
+namespace internal {
 
 /* AES-GCM Encryption */
 // std::string CryptoUtilities::AES_GCM_Encrypt(const std::string &plaintext,
@@ -93,13 +96,14 @@ std::string CryptoUtilities::AES_GCM_Decrypt(const std::string &ciphertext,
 
 /* PBKDF2 using SHA-512 */
 // CryptoPP::SecByteBlock CryptoUtilities::GetPBKDF2(unsigned int iterations,
-//                                                   CryptoPP::SecByteBlock &salt,
-//                                                   std::size_t keysize,
-//                                                   const std::string &message) {
+//                                                   CryptoPP::SecByteBlock
+//                                                   &salt, std::size_t keysize,
+//                                                   const std::string &message)
+//                                                   {
 std::string CryptoUtilities::PBKDF2(unsigned int iterations,
-                                                    const std::string &saltstr,
-                                                    std::size_t keysize,
-                                                    const std::string &message) {
+                                    const std::string &saltstr,
+                                    std::size_t keysize,
+                                    const std::string &message) {
 
   CryptoPP::SecByteBlock salt = StringToSecByteBlock(saltstr);
   // time in seconds to perform derivation
@@ -123,8 +127,7 @@ std::string CryptoUtilities::PBKDF2(unsigned int iterations,
 }
 
 /* Pseudo-Random Number Generator */
-std::string
-CryptoUtilities::AES_PRNG(const size_t &saltlen) {
+std::string CryptoUtilities::AES_PRNG(const size_t &saltlen) {
   // fetches random seed from the OS
   CryptoPP::SecByteBlock seed(32); // 32 byte
   CryptoPP::OS_GenerateRandomBlock(false, seed, seed.size());
@@ -165,3 +168,6 @@ CryptoUtilities::StringToSecByteBlock(const std::string &buffer) {
   CryptoPP::SecByteBlock result((const byte *)decoded.data(), decoded.size());
   return (result);
 }
+
+} // namespace internal
+} // namespace amphora

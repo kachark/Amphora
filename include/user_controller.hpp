@@ -1,29 +1,30 @@
 
-#ifndef USER_MANAGER_HPP
-#define USER_MANAGER_HPP
+#ifndef USER_CONTROLLER_HPP
+#define USER_CONTROLLER_HPP
 
 #include "amphora_util.hpp"
-#include "crypto_manager.hpp"
+#include "crypto_controller.hpp"
 #include "crypto_util.hpp"
 #include "user.hpp"
 #include <map>
 
-namespace AmphoraBackend {
+namespace amphora {
+namespace core {
 
-class UserManager {
+class UserController {
 
 public:
-  UserManager();
+  UserController();
   // void AddUser(const std::string &username, const std::string &password,
   //              const std::string &salt, const std::string &accountfileid,
   //              const std::string &cryptofileid);
   void AddUser(const std::string &username, const std::string &password,
-               CryptoManager &crypto_manager);
+               CryptoController &crypto_controller);
   bool VerifyUser(const std::string &username, const std::string &password,
-                  CryptoManager &crypto_manager);
+                  CryptoController &crypto_controller);
   void DeleteUser(const std::string &username);
   bool FindUser(const std::string &accountname); // find AND RETURN
-  User &GetUser(const std::string &username);
+  internal::User &get_user(const std::string &username);
   bool LoadUserList();
   bool SaveUserList();
   //     Account EditAccount(const std::string &account); // changed
@@ -32,11 +33,13 @@ public:
   //     &sortstyle);
 
 private:
-  AmphoraUtilities amphora_util_m;
-  CryptoUtilities crypto_util_m;
-  User tempuser_m;
-  std::map<std::string, User> userlist_m;
+  internal::AmphoraUtilities amphora_util_m;
+  internal::CryptoUtilities crypto_util_m;
+  internal::User tempuser_m;
+  std::map<std::string, internal::User> userlist_m;
 };
-}
 
-#endif // USER_MANAGER_HPP
+} // namespace core
+} // namespace amphora
+
+#endif // USER_CONTROLLER_HPP

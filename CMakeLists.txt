@@ -1,24 +1,36 @@
 
 # configure dependencies and output paths
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
+
+#execute_process(COMMAND "${CMAKE_COMMAND}" "-E" "environment")
+#get_cmake_property(_variableNames VARIABLES)
+#foreach (_variableNames ${_variableNames})
+#  message(STATUS "${_variableNames}=${${_variableNames}}")
+#endforeach()
+
+set(CMAKE_CXX_STANDARD 11)
 
 # Project's name
 project(Amphora)
 
+message("system: ${CMAKE_SYSTEM_PREFIX_PATH}")
+
 set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11")
 
 set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
 set(SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
 set(BINARY_DIR "${PROJECT_SOURCE_DIR}/bin")
 
-find_package(Boost 1.63 COMPONENTS filesystem date_time REQUIRED)
-find_package(CryptoPP REQUIRED)
+find_package(Boost 1.64 COMPONENTS filesystem date_time REQUIRED)
+find_library(CRYPTOPP cryptopp)
+message("cryptopp: ${CRYPTOPP}")
 
 
 # make header files accessible to the compiler
 include_directories(${INCLUDE_DIR})
+include_directories("${INCLUDE_DIR}/cereal")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BINARY_DIR})
 

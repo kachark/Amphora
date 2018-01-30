@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 
+namespace amphora {
+namespace internal {
+
 class AmphoraUtilities {
 
 public:
@@ -21,5 +24,8 @@ public:
 
 private:
 };
+
+} // namespace internal
+} // namespace amphora
 
 #endif // AMPHORA_UTIL_HPP

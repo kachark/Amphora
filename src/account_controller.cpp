@@ -1,31 +1,35 @@
 
-#include "../include/account_manager.hpp"
+#include "account_controller.hpp"
 #include <fstream>
 #include <iostream>
 #include <vector>
 
-namespace AmphoraBackend {
-AccountManager::AccountManager() {}
+using namespace amphora::internal;
+
+namespace amphora {
+namespace core {
+
+AccountController::AccountController() {}
 
 // initializes temp account and adds to accountlist_m
 // viewaccount and editaccount will check accountlist_m for the name of
 // tempAccount (similar to how it will check any other account
 // saveaccountlist will serialize the current buffer accountlist_m
 // tempAccount will be reset to NULL
-void AccountManager::AddAccount(const std::string &name,
-                                const std::string &purpose,
-                                const std::string &username,
-                                const std::string &password, CryptoDB &cryptodb,
-                                User &currentuser) {
+void AccountController::AddAccount(const std::string &name,
+                                   const std::string &purpose,
+                                   const std::string &username,
+                                   const std::string &password, Crypto &crypto,
+                                   User &currentuser) {
 
   std::string date = amphora_util_m.CurrentDate();
 
   std::string key = currentuser.get_password();
-  std::string iv = crypto_util_m.AES_PRNG(cryptodb.get_ivsize());
+  std::string iv = crypto_util_m.AES_PRNG(crypto.get_ivsize());
   std::string encrypted_uname =
       crypto_util_m.AES_GCM_Encrypt(username, key, iv);
   encrypted_uname = iv + encrypted_uname;
-  std::string iv2 = crypto_util_m.AES_PRNG(cryptodb.get_ivsize());
+  std::string iv2 = crypto_util_m.AES_PRNG(crypto.get_ivsize());
   std::string encrypted_pw = crypto_util_m.AES_GCM_Encrypt(password, key, iv2);
   encrypted_pw = iv2 + encrypted_pw;
 
@@ -47,7 +51,7 @@ void AccountManager::AddAccount(const std::string &name,
 // TODO
 // should pickup the account and pass it along to the UI
 // return desired Account obj
-Account AccountManager::EditAccount(const std::string &accountname) {
+Account AccountController::EditAccount(const std::string &accountname) {
   Account &account = accountlist_m[accountname];
 
   return account;
@@ -86,13 +90,13 @@ Account AccountManager::EditAccount(const std::string &accountname) {
   // }
 }
 
-void AccountManager::DeleteAccount(const std::string &accountname) {
+void AccountController::DeleteAccount(const std::string &accountname) {
   accountlist_m.erase(accountname);
 }
 
 // searches accountlist for account given accountname
 // returns true if found, false if not found
-bool AccountManager::FindAccount(const std::string &accountname) {
+bool AccountController::FindAccount(const std::string &accountname) {
   if (accountlist_m.count(accountname)) {
     return true; // found
   } else {       // account key not found
@@ -101,7 +105,7 @@ bool AccountManager::FindAccount(const std::string &accountname) {
 }
 
 // returns reference to Account
-Account &AccountManager::GetAccount(const std::string &accountname) {
+Account &AccountController::GetAccount(const std::string &accountname) {
   return accountlist_m[accountname];
 }
 
@@ -110,8 +114,8 @@ Account &AccountManager::GetAccount(const std::string &accountname) {
 // the UI should handle this! ui call FindAccount -> return desired Account obj
 // GetAccount
 // displays acccount info in nice format
-void AccountManager::ViewAccount(const std::string &accountname,
-                                 CryptoDB &cryptodb, User &currentuser) {
+void AccountController::ViewAccount(const std::string &accountname,
+                                    Crypto &crypto, User &currentuser) {
 
   const Account &account = accountlist_m[accountname];
   std::string username_cipher = account.get_username();
@@ -134,7 +138,7 @@ void AccountManager::ViewAccount(const std::string &accountname,
 }
 
 // loads account using cereal
-bool AccountManager::LoadAccountList(const std::string &fileid) {
+bool AccountController::LoadAccountList(const std::string &fileid) {
   bool loadstatus;
   std::string filename = "../data/user/" + fileid + ".xml";
   std::cout << filename << std::endl;
@@ -155,7 +159,7 @@ bool AccountManager::LoadAccountList(const std::string &fileid) {
 
 // saves account using cereal serialization library
 // will create new file or overwrite existing file
-bool AccountManager::SaveAccountList(const std::string &fileid) {
+bool AccountController::SaveAccountList(const std::string &fileid) {
   bool filefound, savestatus;
   std::string filename = "../data/users/" + fileid + ".xml";
   std::cout << filename << std::endl;
@@ -187,8 +191,8 @@ bool AccountManager::SaveAccountList(const std::string &fileid) {
 
 // TODO
 // move to amphorainterface?
-void AccountManager::ViewAccountList(const std::string &format,
-                                     const std::string &sortstyle) {
+void AccountController::ViewAccountList(const std::string &format,
+                                        const std::string &sortstyle) {
   // format "short" displays up to the 5 most recent accounts saved in the vault
   // format "long" displays all of the accounts in a given sort - default sort
   // is by acct purpose
@@ -220,4 +224,6 @@ void AccountManager::ViewAccountList(const std::string &format,
   }
   amphora_util_m.PrettyTable(accountnamelist);
 }
-}
+
+} // namespace core
+} // namespace amphora
