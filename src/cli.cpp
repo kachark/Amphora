@@ -1,26 +1,7 @@
 
-// TODO
-// make sure account_controller, user_controller, crypto_controller each have
-// similar naming styles, code layout, and general functionality name vs
-// username, list vs vector vs data etc etc
-// TODO
-// if user changes their encryption settings, reencrypt everything
-// TODO
-// if user tries to edit if they have no accounts, infinite loop
-// TODO
-// crypto_db prepend the iv to the the ciphertext - common practice
-// salt is also prepended to the pw hash
-// TODO CRITICAL
-// need to refactor such that hashing, encryption, decryption all done outside
-// of interface.
-// too messy and should be more simple to use - coincide with refactor of
-// crypto_util
-// rename crypto_controller.
 
 #include "cli.hpp"
 #include <iostream>
-
-using namespace amphora::core;
 
 namespace amphora {
 namespace cli {
@@ -64,6 +45,8 @@ void AmphoraInterface::LogIn() {
       attempts++;
       std::cout << "Username: ";
       getline(std::cin, username);
+
+      // TODO p1-7 mask password and secure input
       std::cout << "Password: ";
       getline(std::cin, password);
       bool verified =
@@ -76,8 +59,8 @@ void AmphoraInterface::LogIn() {
         std::cout << "Logged In!" << std::endl;
         currentuser_m = user_controller_m.get_user(username);
         crypto_m =
-            crypto_controller_m.get_crypto(currentuser_m.get_cryptoname());
-        currentacctid_m = currentuser_m.get_accountfileid();
+            crypto_controller_m.get_crypto(currentuser_m.get_crypto_id());
+        currentacctid_m = currentuser_m.get_account_file();
         break;
       }
 
@@ -124,7 +107,7 @@ void AmphoraInterface::RegisterUser() {
 
       // add current user fileid to amphora interface to access their accounts
       // file
-      currentacctid_m = currentuser_m.get_accountfileid();
+      currentacctid_m = currentuser_m.get_account_file();
       break;
     }
   }

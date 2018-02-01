@@ -24,11 +24,11 @@ void User::set_datecreated(const std::string &date) { datecreated_m = date; }
 
 void User::set_datemodified(const std::string &date) { datemodified_m = date; }
 
-void User::set_accountfileid(const std::string &fileid) {
+void User::set_account_file(const std::string &fileid) {
   accountfileid_m = fileid;
 }
 
-void User::set_cryptoname(const std::string &cryptofileid) {
+void User::set_crypto_id(const std::string &cryptofileid) {
   cryptofileid_m = cryptofileid;
 }
 
@@ -42,9 +42,9 @@ std::string User::get_datecreated() const { return datecreated_m; }
 
 std::string User::get_datemodified() const { return datemodified_m; }
 
-std::string User::get_accountfileid() const { return accountfileid_m; }
+std::string User::get_account_file() const { return accountfileid_m; }
 
-std::string User::get_cryptoname() const { return cryptofileid_m; }
+std::string User::get_crypto_id() const { return cryptofileid_m; }
 
 std::string User::get_salt() const { return salt_m; }
 

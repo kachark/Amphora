@@ -4,10 +4,12 @@
 #include <iostream>
 #include <vector>
 
-using namespace amphora::internal;
-
 namespace amphora {
 namespace core {
+
+using amphora::internal::Account;
+using amphora::internal::Crypto;
+using amphora::internal::User;
 
 AccountController::AccountController() {}
 
@@ -24,17 +26,20 @@ void AccountController::AddAccount(const std::string &name,
 
   std::string date = amphora_util_m.CurrentDate();
 
+  // Encrypt username
   std::string key = currentuser.get_password();
   std::string iv = crypto_util_m.AES_PRNG(crypto.get_ivsize());
   std::string encrypted_uname =
       crypto_util_m.AES_GCM_Encrypt(username, key, iv);
   encrypted_uname = iv + encrypted_uname;
+
+  // Encrypt password
   std::string iv2 = crypto_util_m.AES_PRNG(crypto.get_ivsize());
   std::string encrypted_pw = crypto_util_m.AES_GCM_Encrypt(password, key, iv2);
   encrypted_pw = iv2 + encrypted_pw;
 
   tempaccount_m.set_name(name);
-  tempaccount_m.set_purpose(purpose);
+  tempaccount_m.set_details(purpose);
   tempaccount_m.set_username(encrypted_uname);
   tempaccount_m.set_password(encrypted_pw);
   tempaccount_m.set_datecreated(date);
@@ -130,7 +135,7 @@ void AccountController::ViewAccount(const std::string &accountname,
       password_cipher, currentuser.get_password(), iv2);
 
   std::cout << "Name: \t\t" << account.get_name() << std::endl;
-  std::cout << "Purpose: \t" << account.get_purpose() << std::endl;
+  std::cout << "Purpose: \t" << account.get_details() << std::endl;
   std::cout << "Username: \t" << account.get_username() << std::endl;
   std::cout << "Password: \t" << account.get_password() << std::endl;
   std::cout << "Date created: \t" << account.get_datecreated() << std::endl;

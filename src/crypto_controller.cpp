@@ -5,16 +5,19 @@
 namespace amphora {
 namespace core {
 
+using amphora::internal::Crypto;
+
 CryptoController::CryptoController() {}
 
-internal::Crypto &CryptoController::get_crypto(const std::string &fileid) {
+Crypto &CryptoController::get_crypto(const std::string &fileid) {
   return crypto_m;
 }
 
+/* Updates current Crypto configuration */
 void CryptoController::AddCrypto(const std::string &fileid,
                                  std::size_t saltsize, std::size_t ivsize,
                                  std::size_t keysize, unsigned int iterations) {
-  internal::Crypto crypto;
+  Crypto crypto;
   crypto.set_saltsize(saltsize);
   crypto.set_ivsize(ivsize);
   crypto.set_keysize(keysize);
@@ -22,7 +25,7 @@ void CryptoController::AddCrypto(const std::string &fileid,
   crypto_m = crypto;
 }
 
-// load crypto config file json
+/* Load crypto configuration */
 bool CryptoController::LoadCrypto() {
   // bool loadstatus;
   // std::string filename = "../data/user/" + fileid + ".xml";
@@ -44,6 +47,7 @@ bool CryptoController::LoadCrypto() {
   // return false;
   return false;
 }
+
 bool CryptoController::SaveCrypto() { return true; }
 void CryptoController::ViewConfig() {}
 

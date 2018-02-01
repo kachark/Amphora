@@ -3,18 +3,20 @@
 #include "user_controller.hpp"
 #include "crypto.hpp"
 #include <algorithm>
+#include <cryptopp/misc.h> // p1-6 for test purposes
 #include <fstream>
 #include <iostream>
 #include <vector>
 
-using amphora::internal::Crypto;
-using amphora::internal::User;
-
 namespace amphora {
 namespace core {
 
+using internal::Crypto;
+using internal::User;
+
 UserController::UserController() {}
 
+// TODO P1-1 api clarity
 void UserController::AddUser(const std::string &username,
                              const std::string &password,
                              CryptoController &crypto_controller) {
@@ -22,7 +24,7 @@ void UserController::AddUser(const std::string &username,
   std::string date = amphora_util_m.CurrentDate();
 
   // generate fileid for new User to create/manage Accounts
-  internal::Crypto defaultcrypto = crypto_controller.get_crypto("default");
+  Crypto defaultcrypto = crypto_controller.get_crypto("default");
   unsigned int iterations = defaultcrypto.get_hmac_iterations();
   std::string accountfileid = crypto_util_m.AES_PRNG(3);
   std::string salt = crypto_util_m.AES_PRNG(defaultcrypto.get_saltsize());
@@ -34,8 +36,8 @@ void UserController::AddUser(const std::string &username,
   tempuser_m.set_password(hashedpassword);
   tempuser_m.set_datecreated(date);
   tempuser_m.set_datemodified(date);
-  tempuser_m.set_accountfileid(accountfileid);
-  tempuser_m.set_cryptoname("default");
+  tempuser_m.set_account_file(accountfileid);
+  tempuser_m.set_crypto_id("default");
   tempuser_m.set_salt(salt);
 
   // store temporary new user in map
@@ -44,6 +46,7 @@ void UserController::AddUser(const std::string &username,
   tempuser_m.clear();
 }
 
+// TODO p1-3 move the encryption setup into it's own function
 // verifies provided username and password as being registered in system
 bool UserController::VerifyUser(const std::string &username,
                                 const std::string &password,
@@ -54,19 +57,19 @@ bool UserController::VerifyUser(const std::string &username,
   } else { // username in database, now verify the password
     // compare this user's pw/key with what was passed into this function
     User loggedin = userlist_m[username];
+
+    // TODO p1-3 own function, return bool
+    // TODO p1-6 don't store secure data in std::strings
     // access this user's crypto settings
     internal::Crypto crypto =
-        crypto_controller.get_crypto(loggedin.get_cryptoname());
-    // std::size_t saltsize = cryptodb.get_saltsize();
+        crypto_controller.get_crypto(loggedin.get_crypto_id());
     std::string salt = loggedin.get_salt();
     std::size_t keysize = crypto.get_keysize();
     unsigned int iterations = crypto.get_hmac_iterations();
     std::string masterkey =
         crypto_util_m.PBKDF2(iterations, salt, keysize, password);
 
-    std::cout << masterkey << std::endl;
-    std::cout << loggedin.get_password() << std::endl;
-
+    // TODO p1-6 use cryptopp VerifyBufsEqual or similar
     // if (masterkey == loggedin.get_password()) {
     // if (masterkey.compare(loggedin.get_password())) {
     if (std::lexicographical_compare(masterkey.begin(), masterkey.end(),

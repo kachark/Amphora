@@ -12,6 +12,7 @@ namespace internal {
 class CryptoUtilities {
 
 public:
+  // TODO p1-6 use SecByteBlock only and neve std::string
   // std::string AES_GCM_Encrypt(const std::string &plaintext,
   //                                   CryptoPP::SecByteBlock &key,
   //                                   CryptoPP::SecByteBlock &iv);
