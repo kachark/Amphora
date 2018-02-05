@@ -2,12 +2,8 @@
 
 #include "crypto_controller.hpp"
 
-namespace amphora {
-namespace core {
-
-using amphora::internal::Crypto;
-
-CryptoController::CryptoController() {}
+CryptoController::CryptoController(const AmphoraMediator &mediator)
+    : mediator_m(mediator) {}
 
 Crypto &CryptoController::get_crypto(const std::string &fileid) {
   return crypto_m;
@@ -25,6 +21,7 @@ void CryptoController::AddCrypto(const std::string &fileid,
   crypto_m = crypto;
 }
 
+// TODO p1-6
 /* Load crypto configuration */
 bool CryptoController::LoadCrypto() {
   // bool loadstatus;
@@ -50,6 +47,3 @@ bool CryptoController::LoadCrypto() {
 
 bool CryptoController::SaveCrypto() { return true; }
 void CryptoController::ViewConfig() {}
-
-} // namespace core
-} // namespace amphora

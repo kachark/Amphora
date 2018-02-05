@@ -4,9 +4,6 @@
 
 #include <string>
 
-namespace amphora {
-namespace internal {
-
 class Account {
 
 public:
@@ -35,8 +32,5 @@ private:
   std::string name_m, details_m, username_m, password_m, datecreated_m,
       datemodified_m;
 };
-
-} // namespace internal
-} // namespace amphora
 
 #endif // ACCOUNT_HPP

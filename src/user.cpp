@@ -3,9 +3,6 @@
 #include "cereal/archives/xml.hpp" // serialize in xml format
 #include "cereal/types/string.hpp"
 
-namespace amphora {
-namespace internal {
-
 void User::clear() {
   username_m.clear();
   password_m.clear();
@@ -59,6 +56,3 @@ template void
 User::serialize<cereal::XMLOutputArchive>(cereal::XMLOutputArchive &);
 template void
 User::serialize<cereal::XMLInputArchive>(cereal::XMLInputArchive &);
-
-} // namespace internal
-} // namespace amphora

@@ -2,16 +2,15 @@
 #ifndef CLI_HPP
 #define CLI_HPP
 
-#include "account_controller.hpp"
-#include "amphora_util.hpp"
-#include "crypto.hpp"
-#include "crypto_controller.hpp"
-#include "crypto_util.hpp"
-#include "user_controller.hpp"
+// TODO p1-1
+// #include "account_controller.hpp"
+// #include "amphora_util.hpp"
+// #include "crypto.hpp"
+// #include "crypto_controller.hpp"
+// #include "crypto_util.hpp"
+// #include "user_controller.hpp"
+#include "amphora_mediator.hpp"
 #include <string>
-
-namespace amphora {
-namespace cli {
 
 class AmphoraInterface {
 
@@ -22,17 +21,26 @@ public:
   void MainMenu();
   void RegisterUser();
 
+protected:
+  void Setup();
+
 private:
-  core::AccountController account_controller_m;
-  core::UserController user_controller_m;
-  core::CryptoController crypto_controller_m;
-  internal::CryptoUtilities crypto_util_m;
-  internal::Crypto
-      crypto_m; // currently saved cryptographic settings - sizes, iterations
-  internal::User
-      currentuser_m; // has all the required fields for the logged in user
-  std::string currentacctid_m;
+  // TODO p1-1
+  // AccountController account_controller_m;
+  // UserController user_controller_m;
+  // CryptoController crypto_controller_m;
+  // // internal::CryptoUtilities crypto_util_m;
+  // // internal::Crypto
+  // //     crypto_m; // currently saved cryptographic settings - sizes,
+  // iterations
+  // // internal::User
+  // //     currentuser_m; // has all the required fields for the logged in user
+  // std::string currentacctid_m;
   // AmphoraUtilities core_m;
+
+  // singleton mediator instance
+  std::unique_ptr<AmphoraMediator> mediator_m;
+
   bool exit_flag_m;
   static const unsigned int MAXLOGINS_m = 3;
 
@@ -49,8 +57,5 @@ private:
   void VerifyAddAccountPopup(const std::string &accountname);
   void VerifyDeleteAccountPopup(const std::string &accountname);
 };
-
-} // namespace cli
-} // namespace amphora
 
 #endif // CLI_HPP

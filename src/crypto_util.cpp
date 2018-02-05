@@ -13,8 +13,7 @@
 #include <cryptopp/sha.h>
 #include <iostream>
 
-namespace amphora {
-namespace internal {
+CryptoUtilities::CryptoUtilities(const AmphoraMediator &m) : mediator_m(m) {}
 
 /* AES-GCM Encryption */
 // std::string CryptoUtilities::AES_GCM_Encrypt(const std::string &plaintext,
@@ -95,17 +94,16 @@ std::string CryptoUtilities::AES_GCM_Decrypt(const std::string &ciphertext,
 }
 
 /* PBKDF2 using SHA-512 */
-// CryptoPP::SecByteBlock CryptoUtilities::GetPBKDF2(unsigned int iterations,
-//                                                   CryptoPP::SecByteBlock
-//                                                   &salt, std::size_t keysize,
-//                                                   const std::string &message)
-//                                                   {
-std::string CryptoUtilities::PBKDF2(unsigned int iterations,
-                                    const std::string &saltstr,
-                                    std::size_t keysize,
-                                    const std::string &message) {
+CryptoPP::SecByteBlock CryptoUtilities::PBKDF2(unsigned int iterations,
+                                               CryptoPP::SecByteBlock &salt,
+                                               std::size_t keysize,
+                                               const std::string &message) {
+  // std::string CryptoUtilities::PBKDF2(unsigned int iterations,
+  //                                     const std::string &saltstr,
+  //                                     std::size_t keysize,
+  //                                     const std::string &message) {
 
-  CryptoPP::SecByteBlock salt = StringToSecByteBlock(saltstr);
+  // CryptoPP::SecByteBlock salt = StringToSecByteBlock(saltstr);
   // time in seconds to perform derivation
   // if 0, time not considered as a parameter
   double timeinSec = 0;
@@ -122,12 +120,13 @@ std::string CryptoUtilities::PBKDF2(unsigned int iterations,
 
   std::string result = CryptoUtilities::SecByteBlockToString(derived);
 
-  // return (derived); // return as a secbyte buffer
-  return result;
+  return (derived); // return as a secbyte buffer
+  // return result;
 }
 
 /* Pseudo-Random Number Generator */
-std::string CryptoUtilities::AES_PRNG(const size_t &saltlen) {
+// std::string CryptoUtilities::AES_PRNG(const size_t &saltlen) {
+CryptoPP::SecByteBlock CryptoUtilities::AES_PRNG(const size_t &saltlen) {
   // fetches random seed from the OS
   CryptoPP::SecByteBlock seed(32); // 32 byte
   CryptoPP::OS_GenerateRandomBlock(false, seed, seed.size());
@@ -139,8 +138,8 @@ std::string CryptoUtilities::AES_PRNG(const size_t &saltlen) {
   prng.GenerateBlock(randomval, randomval.size());
 
   std::string result = SecByteBlockToString(randomval);
-  // return (randomval);
-  return result;
+  return (randomval);
+  // return result;
 }
 
 /* Converts CryptoPP::SecByteBlock to std::string with hex encoding */
@@ -168,6 +167,3 @@ CryptoUtilities::StringToSecByteBlock(const std::string &buffer) {
   CryptoPP::SecByteBlock result((const byte *)decoded.data(), decoded.size());
   return (result);
 }
-
-} // namespace internal
-} // namespace amphora

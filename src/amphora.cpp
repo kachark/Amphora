@@ -3,7 +3,7 @@
 #include "cli.hpp"
 
 int main(int argc, const char *argv[]) {
-  amphora::cli::AmphoraInterface interface;
+  AmphoraInterface interface;
   interface.Start();
 
   return 0;

@@ -4,9 +4,6 @@
 
 #include <string>
 
-namespace amphora {
-namespace internal {
-
 class Crypto {
 
 public:
@@ -29,8 +26,5 @@ private:
   unsigned int hmac_iterations_m;
   std::size_t saltsize_m, keysize_m, ivsize_m;
 };
-
-} // namespace internal
-} // namespace amphora
 
 #endif // CRYPTO_HPP

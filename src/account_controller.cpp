@@ -4,20 +4,27 @@
 #include <iostream>
 #include <vector>
 
-namespace amphora {
-namespace core {
+AccountController::AccountController(const AmphoraMediator &m)
+    : mediator_m(m) {}
 
-using amphora::internal::Account;
-using amphora::internal::Crypto;
-using amphora::internal::User;
+AccountController::AccountController(const AccountController &ac) {
+  tempaccount_m = ac.tempaccount_m;
+  accountlist_m = ac.accountlist_m;
+}
 
-AccountController::AccountController() {}
+AccountController &AccountController::operator=(const AccountController &rhs) {
+  if (this != &rhs) {
+    tempaccount_m = rhs.tempaccount_m;
+    accountlist_m = rhs.accountlist_m;
+  }
+  return *this;
+}
 
-// initializes temp account and adds to accountlist_m
-// viewaccount and editaccount will check accountlist_m for the name of
-// tempAccount (similar to how it will check any other account
-// saveaccountlist will serialize the current buffer accountlist_m
-// tempAccount will be reset to NULL
+/*initializes temp account and adds to accountlist_m
+viewaccount and editaccount will check accountlist_m for the name of
+tempAccount (similar to how it will check any other account
+saveaccountlist will serialize the current buffer accountlist_m
+tempAccount will be reset to NULL*/
 void AccountController::AddAccount(const std::string &name,
                                    const std::string &purpose,
                                    const std::string &username,
@@ -116,9 +123,8 @@ Account &AccountController::GetAccount(const std::string &accountname) {
 
 // TODO remove from backend?
 // TODO decrypt username, password
-// the UI should handle this! ui call FindAccount -> return desired Account obj
-// GetAccount
-// displays acccount info in nice format
+// the UI should handle this! ui call FindAccount -> return desired Account
+// obj GetAccount displays acccount info in nice format
 void AccountController::ViewAccount(const std::string &accountname,
                                     Crypto &crypto, User &currentuser) {
 
@@ -148,12 +154,13 @@ bool AccountController::LoadAccountList(const std::string &fileid) {
   std::string filename = "../data/user/" + fileid + ".xml";
   std::cout << filename << std::endl;
   std::vector<Account> accountvector;
-  if (amphora_util_m.FindFile(filename)) {  // check if file exists in directory
-    std::cout << "File found" << std::endl; // debug
+  if (amphora_util_m.FindFile(filename)) {            // check if file exists in
+    directory std::cout << "File found" << std::endl; // debug
     loadstatus = amphora_util_m.LoadFromFile<Account>(filename, accountvector);
-    if (loadstatus) { // if load success + check file -> return true
-      // populate memory
-      for (auto account : accountvector) {
+    if (loadstatus) { // if load success + check file ->
+      return true
+          // populate memory
+          for (auto account : accountvector) {
         accountlist_m.insert(std::make_pair(account.get_name(), account));
       }
       return 1;
@@ -198,9 +205,9 @@ bool AccountController::SaveAccountList(const std::string &fileid) {
 // move to amphorainterface?
 void AccountController::ViewAccountList(const std::string &format,
                                         const std::string &sortstyle) {
-  // format "short" displays up to the 5 most recent accounts saved in the vault
-  // format "long" displays all of the accounts in a given sort - default sort
-  // is by acct purpose
+  // format "short" displays up to the 5 most recent accounts saved in the
+  // vault format "long" displays all of the accounts in a given sort -
+  // default sort is by acct purpose
 
   std::cout << std::endl << "Your Saved Accounts:" << std::endl;
   std::vector<std::string> accountnamelist;
@@ -229,6 +236,3 @@ void AccountController::ViewAccountList(const std::string &format,
   }
   amphora_util_m.PrettyTable(accountnamelist);
 }
-
-} // namespace core
-} // namespace amphora

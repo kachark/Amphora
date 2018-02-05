@@ -2,6 +2,7 @@
 add_executable(amphora
   amphora.cpp
   amphora_util.cpp
+  amphora_mediator.cpp
   crypto_util.cpp
   cli.cpp
   account.cpp

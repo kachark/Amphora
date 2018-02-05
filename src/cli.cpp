@@ -1,10 +1,10 @@
 
 
 #include "cli.hpp"
+#include "account_controller.hpp"
+#include "crypto_controller.hpp"
+#include "user_controller.hpp"
 #include <iostream>
-
-namespace amphora {
-namespace cli {
 
 /* Amphora Interface Constructor */
 AmphoraInterface::AmphoraInterface() { exit_flag_m = false; }
@@ -13,11 +13,20 @@ AmphoraInterface::AmphoraInterface() { exit_flag_m = false; }
 void AmphoraInterface::Start() {
   std::cout << "Welcome to AMPHORA" << std::endl;
   std::cout << "Press '~' at any time to return to the main menu" << std::endl;
-  LoadCryptoConfig();
-  LoadUserFile();
+
+  // TODO p1-1
+  Setup();
+  // LoadCryptoConfig();
+  // LoadUserFile();
   LogIn();
   LoadAccountFile();
   MainMenu();
+}
+
+/* Setup Mediator */
+void AmphoraInterface::Setup() {
+  mediator_m = std::unique_ptr<AmphoraMediator>(new AmphoraMediator());
+  mediator_m->Setup();
 }
 
 /* Log In Page */
@@ -411,5 +420,3 @@ void AmphoraInterface::VerifyDeleteAccountPopup(
     return;
   }
 }
-} // namespace cli
-} // namespace amphora

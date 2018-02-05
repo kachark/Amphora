@@ -14,11 +14,11 @@
 #include <iostream>
 #include <locale>
 
-namespace amphora {
-namespace internal {
-
+// TODO p2-2
 using namespace boost::posix_time;
 /* using namespace boost::filesystem; */
+
+AmphoraUtilities::AmphoraUtilities(const AmphoraMediator &m) : mediator_m(m) {}
 
 // retrieves system date and time in nice format
 std::string AmphoraUtilities::CurrentDate() {
@@ -150,6 +150,3 @@ template bool AmphoraUtilities::SaveToFile<User>(const std::string &filename,
 template bool
 AmphoraUtilities::SaveToFile<Crypto>(const std::string &filename,
                                      std::vector<Crypto> &datalist);
-
-} // namespace internal
-} // namespace amphora

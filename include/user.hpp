@@ -4,9 +4,6 @@
 
 #include <string>
 
-namespace amphora {
-namespace internal {
-
 class User {
 
 public:
@@ -36,8 +33,5 @@ private:
   std::string username_m, password_m, datecreated_m, datemodified_m,
       accountfileid_m, cryptofileid_m, salt_m;
 };
-
-} // namespace internal
-} // namespace amphora
 
 #endif // USER_HPP

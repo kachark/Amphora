@@ -2,18 +2,21 @@
 #ifndef CRYPTO_CONTROLLER_HPP
 #define CRYPTO_CONTROLLER_HPP
 
+#include "amphora_mediator.hpp"
 #include "crypto.hpp"
 #include <string>
 
-namespace amphora {
-namespace core {
+class AmphoraMediator;
 
 class CryptoController {
 
 public:
-  CryptoController();
+  // TODO p1-1 copy constructor and destructor
+  CryptoController(const AmphoraMediator &m);
+  CryptoController(const CryptoController &c);
+  ~CryptoController();
 
-  internal::Crypto &get_crypto(const std::string &fileid);
+  Crypto &get_crypto(const std::string &fileid);
 
   void AddCrypto(const std::string &fileid, std::size_t saltsize,
                  std::size_t ivsize, std::size_t keysize,
@@ -27,10 +30,9 @@ public:
   void ViewConfig();
 
 private:
-  internal::Crypto crypto_m;
-};
+  AmphoraMediator mediator_m;
 
-} // namespace core
-} // namespace amphora
+  Crypto crypto_m;
+};
 
 #endif // CRYPTO_CONTROLLER_HPP

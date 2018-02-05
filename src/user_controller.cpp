@@ -3,18 +3,12 @@
 #include "user_controller.hpp"
 #include "crypto.hpp"
 #include <algorithm>
-#include <cryptopp/misc.h> // p1-6 for test purposes
 #include <fstream>
 #include <iostream>
 #include <vector>
 
-namespace amphora {
-namespace core {
-
-using internal::Crypto;
-using internal::User;
-
-UserController::UserController() {}
+UserController::UserController(const AmphoraMediator &mediator)
+    : mediator_m(mediator) {}
 
 // TODO P1-1 api clarity
 void UserController::AddUser(const std::string &username,
@@ -48,6 +42,7 @@ void UserController::AddUser(const std::string &username,
 
 // TODO p1-3 move the encryption setup into it's own function
 // verifies provided username and password as being registered in system
+// TODO p1-1 move verifyuser into mediator
 bool UserController::VerifyUser(const std::string &username,
                                 const std::string &password,
                                 CryptoController &crypto_controller) {
@@ -59,7 +54,7 @@ bool UserController::VerifyUser(const std::string &username,
     User loggedin = userlist_m[username];
 
     // TODO p1-3 own function, return bool
-    // TODO p1-6 don't store secure data in std::strings
+    // TODO p1-6 don't st ore secure data in std::strings
     // access this user's crypto settings
     internal::Crypto crypto =
         crypto_controller.get_crypto(loggedin.get_crypto_id());
@@ -206,6 +201,3 @@ bool UserController::SaveUserList() {
 //   }
 //   amphora_util_m.PrettyTable(accountnamelist);
 // }
-
-} // namespace core
-} // namespace amphora
