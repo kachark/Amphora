@@ -3,6 +3,7 @@
 #define AMPHORA_MEDIATOR_HPP
 
 #include <memory>
+#include <string>
 
 /* Forward Declarations */
 class AccountController; // forward dec needs to be in correct scope
@@ -26,14 +27,17 @@ public:
   ~AmphoraMediator();
   AmphoraMediator &operator=(const AmphoraMediator &m);
 
+  void Setup();
+  bool VerifyUser(const std::string &username, const std::string &password);
+  void AddUser(const std::string &username); // ?
+  void FindUser(const std::string &username);
+
   void ShowSession();
   void SaveSession();
   void ShowAccount();
-  void VerifyUser();
-  void AddUser(); // ?
-  void Setup();
 
 private:
+  // TODO p1-4
   void Encrypt();
 
   // each of the controllers should be able to reference the mediator to

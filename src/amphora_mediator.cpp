@@ -46,3 +46,5 @@ void AmphoraMediator::Setup() {
   amphora_util_m =
       std::unique_ptr<AmphoraUtilities>(new AmphoraUtilities(*this));
 }
+
+void VerifyUser() {}

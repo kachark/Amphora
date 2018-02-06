@@ -52,20 +52,28 @@ void AmphoraInterface::LogIn() {
       return;
     } else if (input == "1") {
       attempts++;
-      std::cout << "Username: ";
-      getline(std::cin, username);
 
       // TODO p1-7 mask password and secure input
+      // TODO p1-1
+      std::cout << "Username: ";
+      // username = AmphoraInterface::SecureInput()
+      getline(std::cin, username);
       std::cout << "Password: ";
+      // password = AmphoraInterface::SecureInput()
       getline(std::cin, password);
+
+      // move VerifyUser into mediator
       bool verified =
           user_controller_m.VerifyUser(username, password, crypto_controller_m);
+      // keep here
       if (!verified) {
         std::cout << "Your username or password are not recognized! Please "
                      "reenter or register. "
                   << std::endl;
       } else if (verified) { // logged in!
         std::cout << "Logged In!" << std::endl;
+        // mediator_m->AddUser(username);
+        // all of these lines, inside mediator
         currentuser_m = user_controller_m.get_user(username);
         crypto_m =
             crypto_controller_m.get_crypto(currentuser_m.get_crypto_id());
@@ -91,6 +99,9 @@ void AmphoraInterface::RegisterUser() {
   while (1) {
     std::cout << "USER REGISTRATION" << std::endl;
     std::cout << "\nPlease enter a new username and password" << std::endl;
+
+    // TODO p1-7
+    // username = AmphoraInterface::SecureInput()
     std::cout << "Username: ";
     getline(std::cin, username);
     std::cout << "Password: ";
@@ -98,6 +109,7 @@ void AmphoraInterface::RegisterUser() {
     std::cout << "Confirm password: ";
     getline(std::cin, confirmedpw);
 
+    // TODO p1-1
     // check username against database
     bool usercollision = user_controller_m.FindUser(username);
     if (usercollision) {
@@ -105,11 +117,15 @@ void AmphoraInterface::RegisterUser() {
           << "The username you entered is taken. Please enter another name"
           << std::endl;
     }
+
+    // TODO p1-6 correct string comparison
     if (password != confirmedpw) {
       std::cout << "Please ensure your password is correctly entered"
                 << std::endl;
     } else if ((usercollision == false) &&
                (password == confirmedpw)) { // register user
+
+      // TODO p1-1
       user_controller_m.AddUser(username, password, crypto_controller_m);
       user_controller_m.SaveUserList();
       currentuser_m = user_controller_m.get_user(username);

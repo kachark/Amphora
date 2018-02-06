@@ -15,7 +15,7 @@
 class AmphoraInterface {
 
 public:
-  AmphoraInterface();
+  AmphoraInterface() = default;
   void Start();
   void LogIn();
   void MainMenu();
