@@ -62,6 +62,7 @@ void AmphoraInterface::LogIn() {
       // password = AmphoraInterface::SecureInput()
       getline(std::cin, password);
 
+      // TODO p1-1
       // move VerifyUser into mediator
       bool verified =
           user_controller_m.VerifyUser(username, password, crypto_controller_m);
@@ -73,11 +74,13 @@ void AmphoraInterface::LogIn() {
       } else if (verified) { // logged in!
         std::cout << "Logged In!" << std::endl;
         // mediator_m->AddUser(username);
+
+        // TODO p1-1
         // all of these lines, inside mediator
-        currentuser_m = user_controller_m.get_user(username);
-        crypto_m =
-            crypto_controller_m.get_crypto(currentuser_m.get_crypto_id());
-        currentacctid_m = currentuser_m.get_account_file();
+        // currentuser_m = user_controller_m.get_user(username);
+        // crypto_m =
+        //     crypto_controller_m.get_crypto(currentuser_m.get_crypto_id());
+        // currentacctid_m = currentuser_m.get_account_file();
         break;
       }
 

@@ -43,52 +43,53 @@ void UserController::AddUser(const std::string &username,
 // TODO p1-3 move the encryption setup into it's own function
 // verifies provided username and password as being registered in system
 // TODO p1-1 move verifyuser into mediator
-bool UserController::VerifyUser(const std::string &username,
-                                const std::string &password,
-                                CryptoController &crypto_controller) {
-  bool userfound = FindUser(username);
-  if (!userfound) {
-    std::cout << "User not found in userdata" << std::endl;
-  } else { // username in database, now verify the password
-    // compare this user's pw/key with what was passed into this function
-    User loggedin = userlist_m[username];
+// bool UserController::VerifyUser(const std::string &username,
+//                                 const std::string &password,
+//                                 CryptoController &crypto_controller) {
+//   bool userfound = FindUser(username);
+//   if (!userfound) {
+//     std::cout << "User not found in userdata" << std::endl;
+//   } else { // username in database, now verify the password
+//     // compare this user's pw/key with what was passed into this function
+//     User loggedin = userlist_m[username];
 
-    // TODO p1-3 own function, return bool
-    // TODO p1-6 don't st ore secure data in std::strings
-    // access this user's crypto settings
-    internal::Crypto crypto =
-        crypto_controller.get_crypto(loggedin.get_crypto_id());
-    std::string salt = loggedin.get_salt();
-    std::size_t keysize = crypto.get_keysize();
-    unsigned int iterations = crypto.get_hmac_iterations();
-    std::string masterkey =
-        crypto_util_m.PBKDF2(iterations, salt, keysize, password);
+//     // TODO p1-3 own function, return bool
+//     // TODO p1-6 don't st ore secure data in std::strings
+//     // access this user's crypto settings
+//     internal::Crypto crypto =
+//         crypto_controller.get_crypto(loggedin.get_crypto_id());
+//     std::string salt = loggedin.get_salt();
+//     std::size_t keysize = crypto.get_keysize();
+//     unsigned int iterations = crypto.get_hmac_iterations();
+//     std::string masterkey =
+//         crypto_util_m.PBKDF2(iterations, salt, keysize, password);
 
-    // TODO p1-6 use cryptopp VerifyBufsEqual or similar
-    // if (masterkey == loggedin.get_password()) {
-    // if (masterkey.compare(loggedin.get_password())) {
-    if (std::lexicographical_compare(masterkey.begin(), masterkey.end(),
-                                     loggedin.get_password().begin(),
-                                     loggedin.get_password().end())) {
-      return 1;
-    }
-  }
-  return 0;
-} // namespace core
+//     // TODO p1-6 use cryptopp VerifyBufsEqual or similar
+//     // if (masterkey == loggedin.get_password()) {
+//     // if (masterkey.compare(loggedin.get_password())) {
+//     if (std::lexicographical_compare(masterkey.begin(), masterkey.end(),
+//                                      loggedin.get_password().begin(),
+//                                      loggedin.get_password().end())) {
+//       return 1;
+//     }
+//   }
+//   return 0;
+// } // namespace core
 
 // searches accountlist for account given accountname
 // confirms if account is found
-bool UserController::FindUser(const std::string &username) {
-  // assumes userlist_m is map and all items are unique
-  if (userlist_m.count(username)) {
-    return true; // found
-  } else {       // account key not found
-    return false;
-  }
-}
+// bool UserController::FindUser(const std::string &username) {
+//   // assumes userlist_m is map and all items are unique
+//   if (userlist_m.count(username)) {
+//     return true; // found
+//   } else {       // account key not found
+//     return false;
+//   }
+// }
 
-// returns reference to User
+// // returns reference to User
 User &UserController::get_user(const std::string &username) {
+  // TODO if username not in userlist, will crash
   return userlist_m[username];
 }
 

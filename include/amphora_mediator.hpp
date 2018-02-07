@@ -2,6 +2,9 @@
 #ifndef AMPHORA_MEDIATOR_HPP
 #define AMPHORA_MEDIATOR_HPP
 
+#include "account.hpp"
+#include "crypto.hpp"
+#include "user.hpp"
 #include <memory>
 #include <string>
 
@@ -28,9 +31,10 @@ public:
   AmphoraMediator &operator=(const AmphoraMediator &m);
 
   void Setup();
-  bool VerifyUser(const std::string &username, const std::string &password);
+
+  // from UserController
   void AddUser(const std::string &username); // ?
-  void FindUser(const std::string &username);
+  bool VerifyUser(const std::string &username, const std::string &password);
 
   void ShowSession();
   void SaveSession();
@@ -39,6 +43,8 @@ public:
 private:
   // TODO p1-4
   void Encrypt();
+  bool VerifyCrypto(const User &user, const std::string &password);
+  bool FindUser(const std::string &username);
 
   // each of the controllers should be able to reference the mediator to
   // access the util objects
@@ -47,6 +53,11 @@ private:
   std::unique_ptr<UserController> user_controller_m;
   std::unique_ptr<CryptoUtilities> crypto_util_m;
   std::unique_ptr<AmphoraUtilities> amphora_util_m;
+  // std::unique_ptr<Logger> logger_m;
+
+  User current_user_m;
+  Crypto current_crypto_m;
+  // Error error_m;
 };
 
 #endif // AMPHORA_MEDIATOR_HPP

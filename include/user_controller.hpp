@@ -23,10 +23,10 @@ public:
   void AddUser(const std::string &username, const std::string &password,
                CryptoController &crypto_controller);
   // TODO p1-1
-  bool VerifyUser(const std::string &username, const std::string &password,
-                  CryptoController &crypto_controller);
+  // bool VerifyUser(const std::string &username, const std::string &password,
+  //                 CryptoController &crypto_controller);
   void DeleteUser(const std::string &username);
-  bool FindUser(const std::string &accountname); // find AND RETURN
+  // bool FindUser(const std::string &accountname); // find AND RETURN
   User &get_user(const std::string &username);
   bool LoadUserList();
   bool SaveUserList();
