@@ -17,17 +17,10 @@ public:
   UserController(const UserController &u);
   ~UserController();
 
-  // void AddUser(const std::string &username, const std::string &password,
-  //              const std::string &salt, const std::string &accountfileid,
-  //              const std::string &cryptofileid);
-  void AddUser(const std::string &username, const std::string &password,
-               CryptoController &crypto_controller);
-  // TODO p1-1
-  // bool VerifyUser(const std::string &username, const std::string &password,
-  //                 CryptoController &crypto_controller);
+  void AddUser(const User &newuser);
   void DeleteUser(const std::string &username);
-  // bool FindUser(const std::string &accountname); // find AND RETURN
   User &get_user(const std::string &username);
+  bool CheckUserList(const std::string &username);
   bool LoadUserList();
   bool SaveUserList();
   //     Account EditAccount(const std::string &account); // changed
@@ -37,10 +30,6 @@ public:
 
 private:
   AmphoraMediator mediator_m;
-
-  AmphoraUtilities amphora_util_m;
-  CryptoUtilities crypto_util_m;
-  User tempuser_m;
   std::map<std::string, User> userlist_m;
 };
 

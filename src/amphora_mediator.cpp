@@ -46,13 +46,57 @@ void AmphoraMediator::Setup() {
   crypto_util_m = std::unique_ptr<CryptoUtilities>(new CryptoUtilities(*this));
   amphora_util_m =
       std::unique_ptr<AmphoraUtilities>(new AmphoraUtilities(*this));
+
+  current_crypto_m = crypto_controller_m->get_crypto("default");
+
+  // LoadUsers();
+  // LoadCrypto();
+  // LoadAccountList();
+}
+
+/* Returns current date as string */
+std::string AmphoraMediator::get_date() {
+  return amphora_util_m->CurrentDate();
+}
+
+void AmphoraMediator::UpdateCurrentUser(const std::string &username) {
+  current_user_m = user_controller_m->get_user(username);
+  current_crypto_m =
+      crypto_controller_m->get_crypto(current_user_m.get_crypto_id());
+}
+
+/* Add new User */
+void AmphoraMediator::NewUser(const std::string &username,
+                              const std::string &password) {
+
+  User tempuser;
+  std::string date = get_date();
+  unsigned int iterations = current_crypto_m.get_hmac_iterations();
+  CryptoPP::SecByteBlock accountfileid = crypto_util_m->AES_PRNG(3);
+  CryptoPP::SecByteBlock salt =
+      crypto_util_m->AES_PRNG(current_crypto_m.get_saltsize());
+  std::size_t keysize = current_crypto_m.get_keysize();
+  CryptoPP::SecByteBlock hashedpassword =
+      crypto_util_m->PBKDF2(iterations, salt, keysize, password);
+
+  tempuser.set_username(username);
+  tempuser.set_password(crypto_util_m->SecByteBlockToString(hashedpassword));
+  tempuser.set_datecreated(date);
+  tempuser.set_datemodified(date);
+  tempuser.set_account_file(crypto_util_m->SecByteBlockToString(accountfileid));
+  tempuser.set_crypto_id("default");
+  tempuser.set_salt(crypto_util_m->SecByteBlockToString(salt));
+  user_controller_m->AddUser(tempuser);
+  user_controller_m->SaveUserList();
+
+  tempuser.clear();
 }
 
 // TODO p1-6 secure container
 bool AmphoraMediator::VerifyUser(const std::string &username,
                                  const std::string &password) {
   // TODO p1-4 error type
-  bool userfound = FindUser(username);
+  bool userfound = CheckUser(username);
   if (!userfound) {
     // TODO p1-1
     return 0; // User not found in database
@@ -71,6 +115,7 @@ bool AmphoraMediator::VerifyUser(const std::string &username,
 }
 
 /* Verifies a Users cryptographic credentials */
+// TODO p1-1 functinality doesn't make sense
 bool AmphoraMediator::VerifyCrypto(const User &user,
                                    const std::string &password) {
   // TODO p1-3 Move to it's own function, return bool
@@ -97,4 +142,19 @@ bool AmphoraMediator::VerifyCrypto(const User &user,
 /* Checks if User exists
 0: Does not exist
 1: Exists */
-bool AmphoraMediator::FindUser(const std::string &username) {}
+bool AmphoraMediator::CheckUser(const std::string &username) {
+  if (user_controller_m->CheckUserList(username)) {
+    return true; // found
+  } else {       // account key not found
+    return false;
+  }
+}
+
+bool AmphoraMediator::LoadUsers() { return user_controller_m->LoadUserList(); }
+
+bool AmphoraMediator::LoadAccountList() {
+  return account_controller_m->LoadAccountList(
+      current_user_m.get_account_file());
+}
+
+bool AmphoraMediator::LoadCrypto() { return crypto_controller_m->LoadCrypto(); }

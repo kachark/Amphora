@@ -9,17 +9,11 @@
 #include <string>
 
 /* Forward Declarations */
-class AccountController; // forward dec needs to be in correct scope
+class AccountController;
 class UserController;
 class CryptoController;
 class CryptoUtilities;
 class AmphoraUtilities;
-
-// typedef std::unique_ptr<AccountController> AccountControllerP;
-// typedef std::unique_ptr<CryptoController> CryptoControllerP;
-// typedef std::unique_ptr<AccountController> UserControllerP;
-// typedef std::unique_ptr<CryptoUtilities> CryptoUtilP;
-// typedef std::unique_ptr<AmphoraUtilities> AmphoraUtilP;
 
 class AmphoraMediator {
 
@@ -31,10 +25,17 @@ public:
   AmphoraMediator &operator=(const AmphoraMediator &m);
 
   void Setup();
+  std::string get_date();
 
-  // from UserController
-  void AddUser(const std::string &username); // ?
+  /* Users */
+  void NewUser(const std::string &username, const std::string &password); // ?
+  void DeleteUser(const std::string &username, const std::string &password);
   bool VerifyUser(const std::string &username, const std::string &password);
+  bool CheckUser(const std::string &username);
+  void UpdateCurrentUser(const std::string &username);
+  bool LoadUsers();
+  bool LoadCrypto();
+  bool LoadAccountList();
 
   void ShowSession();
   void SaveSession();
@@ -44,7 +45,6 @@ private:
   // TODO p1-4
   void Encrypt();
   bool VerifyCrypto(const User &user, const std::string &password);
-  bool FindUser(const std::string &username);
 
   // each of the controllers should be able to reference the mediator to
   // access the util objects

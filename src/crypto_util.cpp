@@ -16,17 +16,17 @@
 CryptoUtilities::CryptoUtilities(const AmphoraMediator &m) : mediator_m(m) {}
 
 /* AES-GCM Encryption */
-// std::string CryptoUtilities::AES_GCM_Encrypt(const std::string &plaintext,
-//                                              CryptoPP::SecByteBlock &key,
-//                                              CryptoPP::SecByteBlock &iv) {
 std::string CryptoUtilities::AES_GCM_Encrypt(const std::string &plaintext,
-                                             const std::string &keystr,
-                                             const std::string &ivstr) {
+                                             CryptoPP::SecByteBlock &key,
+                                             CryptoPP::SecByteBlock &iv) {
+  // std::string CryptoUtilities::AES_GCM_Encrypt(const std::string &plaintext,
+  //                                              const std::string &keystr,
+  //                                              const std::string &ivstr) {
 
   std::string ciphertext, encoded;
   // convert key and iv to CryptoPP::SecByteBlock
-  CryptoPP::SecByteBlock key = CryptoUtilities::StringToSecByteBlock(keystr);
-  CryptoPP::SecByteBlock iv = CryptoUtilities::StringToSecByteBlock(ivstr);
+  // CryptoPP::SecByteBlock key = CryptoUtilities::StringToSecByteBlock(keystr);
+  // CryptoPP::SecByteBlock iv = CryptoUtilities::StringToSecByteBlock(ivstr);
 
   encoded.clear();
   encoded = CryptoUtilities::SecByteBlockToString(key);
@@ -64,16 +64,16 @@ std::string CryptoUtilities::AES_GCM_Encrypt(const std::string &plaintext,
 }
 
 /* AES-GCM Decryption */
-// std::string CryptoUtilities::AES_GCM_Decrypt(const std::string &ciphertext,
-//                                              CryptoPP::SecByteBlock &key,
-//                                              CryptoPP::SecByteBlock &iv) {
 std::string CryptoUtilities::AES_GCM_Decrypt(const std::string &ciphertext,
-                                             const std::string &keystr,
-                                             const std::string &ivstr) {
+                                             CryptoPP::SecByteBlock &key,
+                                             CryptoPP::SecByteBlock &iv) {
+  // std::string CryptoUtilities::AES_GCM_Decrypt(const std::string &ciphertext,
+  //                                              const std::string &keystr,
+  //                                              const std::string &ivstr) {
   std::string recovered;
   // convert key and iv to CryptoPP::SecByteBlock
-  CryptoPP::SecByteBlock key = CryptoUtilities::StringToSecByteBlock(keystr);
-  CryptoPP::SecByteBlock iv = CryptoUtilities::StringToSecByteBlock(ivstr);
+  // CryptoPP::SecByteBlock key = CryptoUtilities::StringToSecByteBlock(keystr);
+  // CryptoPP::SecByteBlock iv = CryptoUtilities::StringToSecByteBlock(ivstr);
 
   try {
     CryptoPP::GCM<CryptoPP::AES>::Decryption d;

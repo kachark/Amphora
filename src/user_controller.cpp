@@ -11,81 +11,13 @@ UserController::UserController(const AmphoraMediator &mediator)
     : mediator_m(mediator) {}
 
 // TODO P1-1 api clarity
-void UserController::AddUser(const std::string &username,
-                             const std::string &password,
-                             CryptoController &crypto_controller) {
-
-  std::string date = amphora_util_m.CurrentDate();
-
-  // generate fileid for new User to create/manage Accounts
-  Crypto defaultcrypto = crypto_controller.get_crypto("default");
-  unsigned int iterations = defaultcrypto.get_hmac_iterations();
-  std::string accountfileid = crypto_util_m.AES_PRNG(3);
-  std::string salt = crypto_util_m.AES_PRNG(defaultcrypto.get_saltsize());
-  std::size_t keysize = defaultcrypto.get_keysize();
-  std::string hashedpassword =
-      crypto_util_m.PBKDF2(iterations, salt, keysize, password);
-
-  tempuser_m.set_username(username);
-  tempuser_m.set_password(hashedpassword);
-  tempuser_m.set_datecreated(date);
-  tempuser_m.set_datemodified(date);
-  tempuser_m.set_account_file(accountfileid);
-  tempuser_m.set_crypto_id("default");
-  tempuser_m.set_salt(salt);
+void UserController::AddUser(const User &newuser) {
 
   // store temporary new user in map
-  userlist_m.insert(std::make_pair(username, tempuser_m));
+  userlist_m.insert(std::make_pair(newuser.get_username(), newuser));
   // clear temporary user
   tempuser_m.clear();
 }
-
-// TODO p1-3 move the encryption setup into it's own function
-// verifies provided username and password as being registered in system
-// TODO p1-1 move verifyuser into mediator
-// bool UserController::VerifyUser(const std::string &username,
-//                                 const std::string &password,
-//                                 CryptoController &crypto_controller) {
-//   bool userfound = FindUser(username);
-//   if (!userfound) {
-//     std::cout << "User not found in userdata" << std::endl;
-//   } else { // username in database, now verify the password
-//     // compare this user's pw/key with what was passed into this function
-//     User loggedin = userlist_m[username];
-
-//     // TODO p1-3 own function, return bool
-//     // TODO p1-6 don't st ore secure data in std::strings
-//     // access this user's crypto settings
-//     internal::Crypto crypto =
-//         crypto_controller.get_crypto(loggedin.get_crypto_id());
-//     std::string salt = loggedin.get_salt();
-//     std::size_t keysize = crypto.get_keysize();
-//     unsigned int iterations = crypto.get_hmac_iterations();
-//     std::string masterkey =
-//         crypto_util_m.PBKDF2(iterations, salt, keysize, password);
-
-//     // TODO p1-6 use cryptopp VerifyBufsEqual or similar
-//     // if (masterkey == loggedin.get_password()) {
-//     // if (masterkey.compare(loggedin.get_password())) {
-//     if (std::lexicographical_compare(masterkey.begin(), masterkey.end(),
-//                                      loggedin.get_password().begin(),
-//                                      loggedin.get_password().end())) {
-//       return 1;
-//     }
-//   }
-//   return 0;
-// } // namespace core
-
-// searches accountlist for account given accountname
-// confirms if account is found
-// bool UserController::FindUser(const std::string &username) {
-//   // assumes userlist_m is map and all items are unique
-//   if (userlist_m.count(username)) {
-//     return true; // found
-//   } else {       // account key not found
-//     return false;
-//   }
-// }
 
 // // returns reference to User
 User &UserController::get_user(const std::string &username) {
@@ -111,6 +43,11 @@ bool UserController::LoadUserList() {
     }
   }
   return 0;
+}
+
+/* Returns 1 if User within userlist, else return 0 */
+bool UserController::CheckUserList(const std::string &username) {
+  return userlist_m.count(username);
 }
 
 // saves account using cereal serialization library
@@ -143,62 +80,3 @@ bool UserController::SaveUserList() {
   }
   return 0;
 }
-
-// void UserController::DeleteAccount(const std::string &accountname)
-// {
-//   accountdata_m.erase(accountname);
-// }
-
-// // TODO remove from backend
-// // the UI should handle this! ui call FindAccount -> return desired Account
-// obj GetAccount
-// // displays acccount info in nice format
-// void UserController::ViewAccount(const std::string &accountname)
-// {
-//   const Account &account = accountdata_m[accountname];
-//   std::cout << "Name: \t\t" << account.get_name() << std::endl;
-//   std::cout << "Purpose: \t" << account.get_purpose() << std::endl;
-//   std::cout << "Username: \t" << account.get_username() << std::endl;
-//   std::cout << "Password: \t" << account.get_password() << std::endl;
-//   std::cout << "Date created: \t" << account.get_datecreated() <<
-//   std::endl;
-//   std::cout << "Date modified: \t" << account.get_datemodified() <<
-//   std::endl;
-// }
-
-// void UserController::ViewAccountList(const std::string &format, const
-// std::string &sortstyle)
-// {
-//   //format "short" displays up to the 5 most recent accounts saved in the
-//   vault
-//   //format "long" displays all of the accounts in a given sort - default
-//   sort
-//   is by acct purpose
-
-//   std::cout << std::endl << "Your Saved Accounts:" << std::endl;
-//   std::vector<std::string> accountnamelist;
-//   std::size_t largestaccountname = 0;
-//   // sort accountlist_m before displaying
-
-//   // get names from account objects
-//   if (format == "long") {
-//     for (auto account : accountdata_m) {
-//       std::string accountname = account.second.get_name();
-//       accountnamelist.push_back(accountname);
-//     }
-//   }
-
-//   // displays first 5 accounts stored in accountlist_m
-//   // sorts by most recently modified!!
-//   else if (format == "short") {
-//     int i = 0;
-//     for (auto account : accountdata_m) {
-//       if (i < 5) {
-//         std::string accountname = account.second.get_name();
-//         accountnamelist.push_back(accountname);
-//       }
-//       ++i;
-//     }
-//   }
-//   amphora_util_m.PrettyTable(accountnamelist);
-// }
