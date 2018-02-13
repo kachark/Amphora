@@ -184,6 +184,7 @@ void AmphoraMediator::NewAccount(const std::string &name,
   tempaccount.set_datemodified(date);
 
   account_controller_m->AddAccount(tempaccount);
+  account_controller_m->SaveAccountList(current_user_m.get_account_file());
   tempaccount.clear();
 }
 
