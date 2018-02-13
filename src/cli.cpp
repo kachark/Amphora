@@ -230,6 +230,8 @@ void AmphoraInterface::LoadCryptoConfig() {
     std::size_t ivsize = 16;
     std::size_t keysize = 32;
     unsigned int iterations = 1000000;
+    // TODO p1-1
+    // mediator_m->Setup() already defaults crypto
     // crypto_controller_m.AddCrypto("default", saltsize, ivsize, keysize,
     //                               iterations);
     // bool saved = crypto_controller_m.SaveCrypto();
@@ -267,6 +269,7 @@ void AmphoraInterface::AddAccountSubmenu() {
 
     if (name == "~") {
       return;
+      // TODO p1-1
       // } else if (account_controller_m.FindAccount(name)) {
       //   std::cout << "The account name you entered is already in use. Please
       //   "
@@ -299,6 +302,7 @@ void AmphoraInterface::EditAccountSubmenu() {
   std::string userinput;
   std::string f = "long";
   std::string s = "test";
+  // TODO p1-1
   // account_controller_m.ViewAccountList(f, s);
 
   while (1) {
@@ -309,6 +313,7 @@ void AmphoraInterface::EditAccountSubmenu() {
 
     if (userinput == "~") {
       return;
+      // TODO p1-1
       // } else if (account_controller_m.FindAccount(userinput)) {
       //   std::cout << "Account Found!" << std::endl;
       //   account_controller_m.EditAccount(userinput);
@@ -341,6 +346,7 @@ void AmphoraInterface::DeleteAccountSubmenu() {
 
     if (userinput == "~") {
       return;
+      // TODO p1-1
       // } else if (account_controller_m.FindAccount(userinput)) {
       //   std::cout << "Account Found!" << std::endl;
       //   VerifyDeleteAccountPopup(userinput);
@@ -361,6 +367,7 @@ void AmphoraInterface::DeleteAccountSubmenu() {
 void AmphoraInterface::ViewAccountsSubmenu() {
   std::string viewstyle = "long";
   std::string sortchoice = "test";
+  // TODO p1-1
   // account_controller_m.ViewAccountList(viewstyle, sortchoice);
 }
 
@@ -379,6 +386,7 @@ void AmphoraInterface::VerifyAddAccountPopup(const std::string &accountname) {
   std::string submenu;
   while (1) {
     std::cout << "\nIs the information correct?\n";
+    // TODO p1-1
     // account_controller_m.ViewAccount(accountname, crypto_m, currentuser_m);
     std::cout << "\n(1): Save account\n(2): Edit account\n(3): Return to Main "
                  "Menu without saving\n";
@@ -386,6 +394,7 @@ void AmphoraInterface::VerifyAddAccountPopup(const std::string &accountname) {
 
     if (submenu == "1") {
       std::cout << "Saving account..." << std::endl;
+      // TODO p1-1
       // std::cout << "currentacctid_m: " << currentacctid_m << std::endl;
       // account_controller_m.SaveAccountList(currentacctid_m);
       break;
@@ -394,6 +403,7 @@ void AmphoraInterface::VerifyAddAccountPopup(const std::string &accountname) {
     // edit new account before saving
     else if (submenu == "2") {
       std::cout << "\n****** Editing account..." << std::endl;
+      // TODO p1-1
       // account_controller_m.EditAccount(accountname);
     }
 
@@ -417,6 +427,7 @@ void AmphoraInterface::VerifyDeleteAccountPopup(
   std::cout << "*** " << accountname << " ***" << std::endl;
   getline(std::cin, userinput);
   if (userinput == "y" || userinput == "Y") {
+    // TODO p1-1
     // account_controller_m.DeleteAccount(accountname);
     // account_controller_m.SaveAccountList(currentacctid_m);
     std::cout << "Account deleted!" << std::endl;

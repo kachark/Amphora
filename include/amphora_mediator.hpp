@@ -33,6 +33,10 @@ public:
   bool VerifyUser(const std::string &username, const std::string &password);
   bool CheckUser(const std::string &username);
   void UpdateCurrentUser(const std::string &username);
+
+  void NewAccount(const std::string &name, const std::string &purpose,
+                  const std::string &username, const std::string &password);
+
   bool LoadUsers();
   bool LoadCrypto();
   bool LoadAccountList();

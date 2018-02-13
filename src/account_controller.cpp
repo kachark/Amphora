@@ -20,41 +20,18 @@ AccountController &AccountController::operator=(const AccountController &rhs) {
   return *this;
 }
 
+void AccountController::set_user(const User &user) { account_owner_m = user; }
+
+User AccountController::get_user() { return account_owner_m; }
+
 /*initializes temp account and adds to accountlist_m
 viewaccount and editaccount will check accountlist_m for the name of
 tempAccount (similar to how it will check any other account
 saveaccountlist will serialize the current buffer accountlist_m
 tempAccount will be reset to NULL*/
-void AccountController::AddAccount(const std::string &name,
-                                   const std::string &purpose,
-                                   const std::string &username,
-                                   const std::string &password, Crypto &crypto,
-                                   User &currentuser) {
-
-  std::string date = amphora_util_m.CurrentDate();
-
-  // Encrypt username
-  std::string key = currentuser.get_password();
-  std::string iv = crypto_util_m.AES_PRNG(crypto.get_ivsize());
-  std::string encrypted_uname =
-      crypto_util_m.AES_GCM_Encrypt(username, key, iv);
-  encrypted_uname = iv + encrypted_uname;
-
-  // Encrypt password
-  std::string iv2 = crypto_util_m.AES_PRNG(crypto.get_ivsize());
-  std::string encrypted_pw = crypto_util_m.AES_GCM_Encrypt(password, key, iv2);
-  encrypted_pw = iv2 + encrypted_pw;
-
-  tempaccount_m.set_name(name);
-  tempaccount_m.set_details(purpose);
-  tempaccount_m.set_username(encrypted_uname);
-  tempaccount_m.set_password(encrypted_pw);
-  tempaccount_m.set_datecreated(date);
-  tempaccount_m.set_datemodified(date);
-
+void AccountController::AddAccount(const Account &account) {
   // store temporary new account in map
-  accountlist_m.insert(std::make_pair(name, tempaccount_m));
-  tempaccount_m.clear();
+  accountlist_m.insert(std::make_pair(account.get_name(), account));
 }
 
 // edit account information

@@ -15,8 +15,6 @@ void UserController::AddUser(const User &newuser) {
 
   // store temporary new user in map
   userlist_m.insert(std::make_pair(newuser.get_username(), newuser));
-  // clear temporary user
-  tempuser_m.clear();
 }
 
 // // returns reference to User

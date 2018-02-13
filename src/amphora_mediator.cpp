@@ -150,6 +150,43 @@ bool AmphoraMediator::CheckUser(const std::string &username) {
   }
 }
 
+void AmphoraMediator::NewAccount(const std::string &name,
+                                 const std::string &purpose,
+                                 const std::string &username,
+                                 const std::string &password) {
+
+  Account tempaccount;
+  std::string date = get_date();
+
+  // Encrypt username
+  std::string key = current_user_m.get_password();
+  CryptoPP::SecByteBlock cryptokey = crypto_util_m->StringToSecByteBlock(key);
+  CryptoPP::SecByteBlock iv =
+      crypto_util_m->AES_PRNG(current_crypto_m.get_ivsize());
+  std::string strIV = crypto_util_m->SecByteBlockToString(iv);
+  std::string encrypted_uname =
+      crypto_util_m->AES_GCM_Encrypt(username, cryptokey, iv);
+  encrypted_uname = strIV + encrypted_uname;
+
+  // Encrypt password
+  CryptoPP::SecByteBlock iv2 =
+      crypto_util_m->AES_PRNG(current_crypto_m.get_ivsize());
+  std::string strIV2 = crypto_util_m->SecByteBlockToString(iv2);
+  std::string encrypted_pw =
+      crypto_util_m->AES_GCM_Encrypt(password, cryptokey, iv2);
+  encrypted_pw = strIV2 + encrypted_pw;
+
+  tempaccount.set_name(name);
+  tempaccount.set_details(purpose);
+  tempaccount.set_username(encrypted_uname);
+  tempaccount.set_password(encrypted_pw);
+  tempaccount.set_datecreated(date);
+  tempaccount.set_datemodified(date);
+
+  account_controller_m->AddAccount(tempaccount);
+  tempaccount.clear();
+}
+
 bool AmphoraMediator::LoadUsers() { return user_controller_m->LoadUserList(); }
 
 bool AmphoraMediator::LoadAccountList() {
