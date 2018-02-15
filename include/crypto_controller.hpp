@@ -11,28 +11,31 @@ class AmphoraMediator;
 class CryptoController {
 
 public:
-  // TODO p1-1 copy constructor and destructor
-  CryptoController(const AmphoraMediator &m);
-  CryptoController(const CryptoController &c);
-  ~CryptoController();
+    // TODO p1-1 copy constructor and destructor
+    CryptoController(const AmphoraMediator &m);
 
-  Crypto &get_crypto(const std::string &fileid);
+    CryptoController(const CryptoController &c);
 
-  void AddCrypto(const std::string &fileid, std::size_t saltsize,
-                 std::size_t ivsize, std::size_t keysize,
-                 unsigned int iterations);
+    ~CryptoController();
 
-  // TODO
-  // return error type: 0 = fail, 1 = pass
-  bool LoadCrypto();
-  bool SaveCrypto();
+    Crypto &get_crypto(const std::string &fileid);
 
-  void ViewConfig();
+    void AddCrypto(const std::string &fileid, std::size_t saltsize,
+                   std::size_t ivsize, std::size_t keysize,
+                   unsigned int iterations);
+
+    // TODO
+    // return error type: 0 = fail, 1 = pass
+    bool LoadCrypto();
+
+    bool SaveCrypto();
+
+    void ViewConfig();
 
 private:
-  AmphoraMediator mediator_m;
+    AmphoraMediator mediator_m;
 
-  Crypto crypto_m;
+    Crypto crypto_m;
 };
 
 #endif // CRYPTO_CONTROLLER_HPP

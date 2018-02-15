@@ -10,20 +10,23 @@
 class AmphoraUtilities {
 
 public:
-  AmphoraUtilities(const AmphoraMediator &m);
+    AmphoraUtilities(const AmphoraMediator &m);
 
-  std::string CurrentDate();
-  bool FindFile(const std::string &filename);
-  void PrettyTable(const std::vector<std::string> &data);
+    std::string CurrentDate();
 
-  template <typename T>
-  bool LoadFromFile(const std::string &filename, std::vector<T> &buffer);
+    bool FindFile(const std::string &filename);
 
-  template <typename T>
-  bool SaveToFile(const std::string &filename, std::vector<T> &datalist);
+    // TODO move to cli.cpp
+    void PrettyTable(const std::vector<std::string> &data);
+
+    template<typename T>
+    bool LoadFromFile(const std::string &filename, std::vector<T> &buffer);
+
+    template<typename T>
+    bool SaveToFile(const std::string &filename, std::vector<T> &datalist);
 
 private:
-  AmphoraMediator mediator_m;
+    AmphoraMediator mediator_m;
 };
 
 #endif // AMPHORA_UTIL_HPP
