@@ -4,13 +4,13 @@
 #include "cereal/types/string.hpp"
 
 void User::clear() {
-    username_m.clear();
-    password_m.clear();
-    salt_m.clear();
-    datemodified_m.clear();
-    datemodified_m.clear();
-    accountfileid_m.clear();
-    cryptofileid_m.clear();
+  username_m.clear();
+  password_m.clear();
+  salt_m.clear();
+  datemodified_m.clear();
+  datemodified_m.clear();
+  accountfileid_m.clear();
+  cryptofileid_m.clear();
 }
 
 void User::set_username(const std::string &username) { username_m = username; }
@@ -22,11 +22,11 @@ void User::set_datecreated(const std::string &date) { datecreated_m = date; }
 void User::set_datemodified(const std::string &date) { datemodified_m = date; }
 
 void User::set_account_file(const std::string &fileid) {
-    accountfileid_m = fileid;
+  accountfileid_m = fileid;
 }
 
 void User::set_crypto_id(const std::string &cryptofileid) {
-    cryptofileid_m = cryptofileid;
+  cryptofileid_m = cryptofileid;
 }
 
 void User::set_salt(const std::string &salt) { salt_m = salt; }
@@ -47,8 +47,8 @@ std::string User::get_salt() const { return salt_m; }
 
 template<typename Archive>
 inline void User::serialize(Archive &ar) {
-    ar(username_m, password_m, salt_m, datecreated_m, datemodified_m,
-       accountfileid_m, cryptofileid_m);
+  ar(username_m, password_m, salt_m, datecreated_m, datemodified_m,
+     accountfileid_m, cryptofileid_m);
 }
 
 // have to initialize template for loading and saving although there is only a

@@ -21,7 +21,8 @@ set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11")
 
 set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
 set(SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
-set(BINARY_DIR "${PROJECT_SOURCE_DIR}/bin")
+set(LIB_DIR "${PROJECT_SOURCE_DIR}/lib")
+set(BINARY_DIR  "${PROJECT_SOURCE_DIR}/bin")
 
 find_package(Boost 1.64 COMPONENTS filesystem date_time REQUIRED)
 find_library(CRYPTOPP cryptopp)
@@ -30,7 +31,7 @@ message("cryptopp: ${CRYPTOPP}")
 
 # make header files accessible to the compiler
 include_directories(${INCLUDE_DIR})
-include_directories("${INCLUDE_DIR}/cereal")
+include_directories("${LIB_DIR}")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BINARY_DIR})
 

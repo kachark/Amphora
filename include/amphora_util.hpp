@@ -3,30 +3,29 @@
 #ifndef AMPHORA_UTIL_HPP
 #define AMPHORA_UTIL_HPP
 
-#include "amphora_mediator.hpp"
 #include <string>
 #include <vector>
 
 class AmphoraUtilities {
 
-public:
-    AmphoraUtilities(const AmphoraMediator &m);
+ public:
+  AmphoraUtilities() = default;
 
-    std::string CurrentDate();
+  ~AmphoraUtilities() = default;
 
-    bool FindFile(const std::string &filename);
+  std::string CurrentDate();
 
-    // TODO move to cli.cpp
-    void PrettyTable(const std::vector<std::string> &data);
+  bool FindFile(const std::string &filename);
 
-    template<typename T>
-    bool LoadFromFile(const std::string &filename, std::vector<T> &buffer);
+  // TODO move to cli.cpp
+  void PrettyTable(const std::vector<std::string> &data);
 
-    template<typename T>
-    bool SaveToFile(const std::string &filename, std::vector<T> &datalist);
+  template<typename T>
+  bool LoadFromFile(const std::string &filename, std::vector<T> &buffer);
 
-private:
-    AmphoraMediator mediator_m;
+  template<typename T>
+  bool SaveToFile(const std::string &filename, std::vector<T> &datalist);
+
 };
 
 #endif // AMPHORA_UTIL_HPP

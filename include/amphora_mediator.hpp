@@ -5,90 +5,102 @@
 #include "account.hpp"
 #include "crypto.hpp"
 #include "user.hpp"
+#include "amphora_types.hpp"
+#include "amphora_types.hpp"
+#include "amphora_util.hpp"
+#include "amphora_config.hpp"
+#include "account_controller.hpp"
+#include "user_controller.hpp"
+#include "crypto_controller.hpp"
+#include "crypto_util.hpp"
 #include <memory>
 #include <string>
 
-/* Forward Declarations */
-class AccountController;
-
-class UserController;
-
-class CryptoController;
-
-class CryptoUtilities;
-
-class AmphoraUtilities;
-
 class AmphoraMediator {
 
-public:
-    // TODO p1-1 overload = operator, copy constructor and destructor
-    AmphoraMediator() = default;
+ public:
+  AmphoraMediator() = default;
 
-    AmphoraMediator(const AmphoraMediator &m); // copy constructor
-    ~AmphoraMediator();
+  ~AmphoraMediator() = default;
 
-    AmphoraMediator &operator=(const AmphoraMediator &m);
+  AmphoraMediator(const AmphoraMediator &m);
 
-    void Setup();
+  AmphoraMediator &operator=(const AmphoraMediator &m);
 
-    std::string get_date();
+  void Setup();
 
-    /* Users */
-    void NewUser(const std::string &username, const std::string &password); // ?
-    void DeleteUser(const std::string &username, const std::string &password);
+  /* Users */
+  void NewUser(const std::string &username, const std::string &password); // ?
 
-    bool VerifyUser(const std::string &username, const std::string &password);
+  void DeleteUser(const std::string &username, const std::string &password);
 
-    bool CheckUser(const std::string &username);
+  bool VerifyUser(const std::string &username, const std::string &password);
 
-    void UpdateCurrentUser(const std::string &username);
+  bool CheckUser(const std::string &username);
 
-    void NewAccount(const std::string &name, const std::string &purpose,
-                    const std::string &username, const std::string &password);
+  void UpdateCurrentUser(const std::string &username);
 
-    Account GetAccount(const std::string &accountname);
+  void NewAccount(const std::string &name, const std::string &purpose,
+                  const std::string &username, const std::string &password);
 
-    bool LoadUsers();
+  Account GetAccount(const std::string &accountname);
 
-    bool LoadCrypto();
+  void ShowSession();
 
-    bool LoadAccountList();
+  void ShowAccount();
 
-    void ShowSession();
+  /* Utils */
+  std::string get_date();
 
-    void SaveSession();
+  bool Load(AmphoraType id);
 
-    void ShowAccount();
+  bool Save(AmphoraType id);
 
-    /* Utils */
-    bool FindFile(const std::string &filename);
+ private:
 
-    template<typename T>
-    bool Load(const std::string &filename, std::vector<T> &buffer);
+//  class AmphoraUtilities;
+//  class AmphoraConfig;
+//  class AccountController;
+//  class CryptoController;
+//  class UserController;
+//  class CryptoUtilities;
 
-    template<typename T>
-    bool Save(const std::string &filename, std::vector<T> &datalist);
-
-private:
     // TODO p1-4
-    void Encrypt();
-    void Decrypt();
+  template<typename T>
+  void Encrypt(T, AmphoraType id);
 
-    bool VerifyCrypto(const User &user, const std::string &password);
+  template<typename T>
+  void Decrypt(T, AmphoraType id);
 
-    // each of the controllers should be able to reference the mediator to
-    // access the util objects
-    std::unique_ptr<AccountController> account_controller_m;
-    std::unique_ptr<CryptoController> crypto_controller_m;
-    std::unique_ptr<UserController> user_controller_m;
-    std::unique_ptr<CryptoUtilities> crypto_util_m;
-    std::unique_ptr<AmphoraUtilities> amphora_util_m;
-    // std::unique_ptr<Logger> logger_m;
+  bool VerifyCrypto(const User &user, const std::string &password);
 
-    User current_user_m;
-    Crypto current_crypto_m;
-    // Error error_m;
+  AccountController account_controller_m;
+  CryptoController crypto_controller_m;
+  UserController user_controller_m;
+  CryptoUtilities crypto_util_m;
+//    Logger logger_m;
+//    AmphoraUtilities amphora_util_m;
+  AmphoraConfig amphora_config_m;
+
+//    std::unique_ptr<AccountController> account_controller_m;
+//    std::unique_ptr<CryptoController> crypto_controller_m;
+//    std::unique_ptr<UserController> user_controller_m;
+//    std::unique_ptr<CryptoUtilities> crypto_util_m;
+//    std::unique_ptr<AmphoraConfig> amphora_config_m;
+//    // std::unique_ptr<Logger> logger_m;
+  std::shared_ptr<AmphoraUtilities> amphora_util_m;
+
+  // TODO
+  /* Status flags */
+  bool users_loaded_m;
+  bool crypto_loaded_m;
+  bool accounts_loaded_m;
+  bool config_loaded_m;
+
+  User current_user_m;
+  Crypto current_crypto_m;
+  // Error error_m;
+
 };
 
 #endif // AMPHORA_MEDIATOR_HPP

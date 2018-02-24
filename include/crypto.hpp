@@ -7,39 +7,41 @@
 
 class Crypto {
 
-public:
-    Crypto() = default;
+ public:
+  Crypto() = default;
 
-    void clear();
+  ~Crypto() = default;
 
-    void set_salt(const CryptoPP::SecByteBlock &salt);
+  void clear();
 
-    void set_saltsize(const std::size_t saltsize);
+  void set_salt(const CryptoPP::SecByteBlock &salt);
 
-    void set_keysize(const std::size_t keysize);
+  void set_saltsize(const std::size_t saltsize);
 
-    void set_ivsize(const unsigned int);
+  void set_keysize(const std::size_t keysize);
 
-    void set_hmac_iterations(const unsigned int);
+  void set_ivsize(const unsigned int);
 
-    CryptoPP::SecByteBlock get_salt() const;
+  void set_hmac_iterations(const unsigned int);
 
-    std::size_t get_saltsize() const;
+  CryptoPP::SecByteBlock get_salt() const;
 
-    std::size_t get_keysize() const;
+  std::size_t get_saltsize() const;
 
-    std::size_t get_ivsize() const;
+  std::size_t get_keysize() const;
 
-    unsigned int get_hmac_iterations() const;
+  std::size_t get_ivsize() const;
 
-    template<typename Archive>
-    void serialize(Archive &ar);
+  unsigned int get_hmac_iterations() const;
 
-private:
-    CryptoPP::SecByteBlock salt_m;
-    std::string encryption_m, prng_m;
-    unsigned int hmac_iterations_m;
-    std::size_t saltsize_m, keysize_m, ivsize_m;
+  template<typename Archive>
+  void serialize(Archive &ar);
+
+ private:
+  CryptoPP::SecByteBlock salt_m;
+  std::string encryption_m, prng_m;
+  unsigned int hmac_iterations_m;
+  std::size_t saltsize_m, keysize_m, ivsize_m;
 };
 
 #endif // CRYPTO_HPP

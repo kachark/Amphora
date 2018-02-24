@@ -3,55 +3,54 @@
 #define CLI_HPP
 
 #include "amphora_mediator.hpp"
-#include "amphora_util.hpp"
 #include <string>
 
 class AmphoraInterface {
 
-public:
-    AmphoraInterface();
+ public:
+  AmphoraInterface();
 
-    void Start();
+  void Start();
 
-    void LogIn();
+  void Setup();
 
-    void MainMenu();
+  void LogIn();
 
-    void RegisterUser();
+  void MainMenu();
 
-protected:
-    void Setup();
+  void RegisterUser();
 
-private:
-    void Exit();
+  void Exit();
 
-    void test();
+ private:
 
-    void LoadUserFile();
+  void test();
 
-    void LoadCryptoConfig();
+  void LoadUserFile();
 
-    void LoadAccountFile();
+  void LoadCryptoConfig();
 
-    void AddAccountSubmenu();
+  void LoadAccountFile();
 
-    void EditAccountSubmenu();
+  void AddAccountSubmenu();
 
-    void DeleteAccountSubmenu();
+  void EditAccountSubmenu();
 
-    void ViewAccountsSubmenu();
+  void DeleteAccountSubmenu();
 
-    void OptionsSubmenu();
+  void ViewAccountsSubmenu();
 
-    void VerifyAddAccountPopup(const std::string &accountname);
+  void OptionsSubmenu();
 
-    void VerifyDeleteAccountPopup(const std::string &accountname);
+  void VerifyAddAccountPopup(const std::string &accountname);
 
-    // singleton mediator instance
-    std::unique_ptr<AmphoraMediator> mediator_m;
+  void VerifyDeleteAccountPopup(const std::string &accountname);
 
-    bool exit_flag_m;
-    static const unsigned int MAXLOGINS_m = 3;
+  // singleton mediator instance
+  std::unique_ptr<AmphoraMediator> mediator_m;
+
+  bool exit_flag_m;
+  static const unsigned int MAXLOGINS_m = 3;
 
 };
 
