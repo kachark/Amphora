@@ -2,6 +2,7 @@
 
 #include "amphora_util.hpp"
 #include "account.hpp"
+#include "amphora_config.hpp"
 #include "cereal/archives/json.hpp"
 #include "cereal/archives/xml.hpp"
 #include "cereal/types/string.hpp"
@@ -78,8 +79,8 @@ void AmphoraUtilities::PrettyTable(const std::vector<std::string> &data) {
 
 // deserializes vector of data using cereal serialization library
 template<typename T>
-inline bool AmphoraUtilities::LoadFromFile(const std::string &filename,
-                                           std::vector<T> &buffer) {
+inline bool AmphoraUtilities::LoadVector(const std::string &filename,
+                                         std::vector<T> &buffer) {
   std::size_t num_saved;
   try {
     {
@@ -99,14 +100,14 @@ inline bool AmphoraUtilities::LoadFromFile(const std::string &filename,
     }
   } catch (cereal::Exception &e) {
     std::cout << filename << " is EMPTY" << std::endl;
-    return 0;
+    return false;
   }
-  return 1;
+  return true;
 }
 
 // serializes vector of objects using cereal serialization library
 template<typename T>
-inline bool AmphoraUtilities::SaveToFile(const std::string &filename,
+inline bool AmphoraUtilities::SaveVector(const std::string &filename,
                                          std::vector<T> &datalist) {
   std::size_t num_saved;
   std::cout << "NUMBER BEING SAVED" << datalist.size() << std::endl;
@@ -125,32 +126,72 @@ inline bool AmphoraUtilities::SaveToFile(const std::string &filename,
     // contents to its stream
   } catch (cereal::Exception &e) {
     std::cout << "Failed to save " << filename << std::endl;
-    return 0;
+    return false;
   }
-  return 1;
+  return true;
+}
+
+template<typename T>
+bool AmphoraUtilities::LoadSingle(const std::string &filename, T &element) {
+  try {
+    {
+      std::ifstream is(filename);
+      cereal::XMLInputArchive archive(is);
+      archive(element);
+    }
+  } catch (cereal::Exception &e) {
+    std::cout << filename << " is EMPTY" << std::endl;
+    return false;
+  }
+  return true;
+}
+
+template<typename T>
+bool AmphoraUtilities::SaveSingle(const std::string &filename, T &element) {
+  try {
+    {
+      std::ofstream file(filename);
+      cereal::XMLOutputArchive archive(file);
+
+//      archive(cereal::make_nvp("Total: ", num_saved));
+
+      archive(element);
+    } // when archive goes out of scope it is guaranteed to have flushed its
+    // contents to its stream
+  } catch (cereal::Exception &e) {
+    std::cout << "Failed to save " << filename << std::endl;
+    return false;
+  }
+  return true;
 }
 
 // implemented templates above
 // explicitely instantiated the templates below to work with User, Account,
 // Crypto types
 template bool
-AmphoraUtilities::LoadFromFile<Account>(const std::string &filename,
-                                        std::vector<Account> &buffer);
+AmphoraUtilities::LoadVector<Account>(const std::string &filename,
+                                      std::vector<Account> &buffer);
 
-template bool AmphoraUtilities::LoadFromFile<User>(const std::string &filename,
-                                                   std::vector<User> &buffer);
-
-template bool
-AmphoraUtilities::LoadFromFile<Crypto>(const std::string &filename,
-                                       std::vector<Crypto> &buffer);
+template bool AmphoraUtilities::LoadVector<User>(const std::string &filename,
+                                                 std::vector<User> &buffer);
 
 template bool
-AmphoraUtilities::SaveToFile<Account>(const std::string &filename,
+AmphoraUtilities::LoadVector<Crypto>(const std::string &filename,
+                                     std::vector<Crypto> &buffer);
+
+template bool
+AmphoraUtilities::SaveVector<Account>(const std::string &filename,
                                       std::vector<Account> &datalist);
 
-template bool AmphoraUtilities::SaveToFile<User>(const std::string &filename,
+template bool AmphoraUtilities::SaveVector<User>(const std::string &filename,
                                                  std::vector<User> &datalist);
 
 template bool
-AmphoraUtilities::SaveToFile<Crypto>(const std::string &filename,
+AmphoraUtilities::SaveVector<Crypto>(const std::string &filename,
                                      std::vector<Crypto> &datalist);
+
+template bool
+AmphoraUtilities::SaveSingle(const std::string &filename, AmphoraConfig &element);
+
+template bool
+AmphoraUtilities::LoadSingle(const std::string &filename, AmphoraConfig &element);

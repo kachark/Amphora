@@ -21,10 +21,16 @@ class AmphoraUtilities {
   void PrettyTable(const std::vector<std::string> &data);
 
   template<typename T>
-  bool LoadFromFile(const std::string &filename, std::vector<T> &buffer);
+  bool LoadVector(const std::string &filename, std::vector<T> &buffer);
 
   template<typename T>
-  bool SaveToFile(const std::string &filename, std::vector<T> &datalist);
+  bool SaveVector(const std::string &filename, std::vector<T> &datalist);
+
+  template<typename T>
+  bool LoadSingle(const std::string &filename, T &element);
+
+  template<typename T>
+  bool SaveSingle(const std::string &filename, T &element);
 
 };
 

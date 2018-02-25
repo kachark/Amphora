@@ -41,8 +41,17 @@ void AmphoraMediator::Setup() {
 //            std::unique_ptr<UserController>(new UserController(this));
 //    amphora_config_m = std::unique_ptr<AmphoraConfig>(new AmphoraConfig(this));
 
+  /* debug */
+  std::string configDir = "../";
   std::string userDir = "../data/users/users.xml";
+  std::string accountDir = "../log/";
+  std::string cryptoDir = "../log/";
+  std::string loggerDir = "../log/";
+  amphora_config_m.set_config_dir(configDir);
   amphora_config_m.set_user_dir(userDir);
+  amphora_config_m.set_account_dir(accountDir);
+  amphora_config_m.set_crypto_dir(cryptoDir);
+  amphora_config_m.set_logger_dir(loggerDir);
 }
 
 /* Returns current date as string */
@@ -233,11 +242,12 @@ bool AmphoraMediator::Load(AmphoraType id) {
     }
   }
 
-//    return amphora_util_m->LoadFromFile(filename, buffer);
+//    return amphora_util_m->LoadVector(filename, buffer);
 }
 
 bool AmphoraMediator::Save(AmphoraType id) {
 
+  std::string configDir = amphora_config_m.get_config_dir();
   std::string userDir = amphora_config_m.get_user_dir();
   std::string accountDir = amphora_config_m.get_account_dir();
   std::string accountFileID = current_user_m.get_account_file();
@@ -262,10 +272,11 @@ bool AmphoraMediator::Save(AmphoraType id) {
     }
 
     case AmphoraType::Config: {
-      return false;
+//      return amphora_config_m.SaveConfig(wP_util, configDir);
+      return amphora_util_m->SaveSingle(configDir, amphora_config_m);
     }
   }
-//return amphora_util_m->SaveToFile(filename, buffer);
+//return amphora_util_m->SaveVector(filename, buffer);
 }
 
 //void AmphoraMediator::ElementChanged(const Element &element) {

@@ -26,6 +26,8 @@ class AmphoraInterface {
 
   void test();
 
+  void LoadAmphoraConfig();
+
   void LoadUserFile();
 
   void LoadCryptoConfig();
@@ -46,7 +48,6 @@ class AmphoraInterface {
 
   void VerifyDeleteAccountPopup(const std::string &accountname);
 
-  // singleton mediator instance
   std::unique_ptr<AmphoraMediator> mediator_m;
 
   bool exit_flag_m;

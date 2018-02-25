@@ -5,7 +5,7 @@
 #include <iostream>
 
 /* Amphora Interface Constructor */
-AmphoraInterface::AmphoraInterface() { exit_flag_m = false; }
+AmphoraInterface::AmphoraInterface() : exit_flag_m(false), mediator_m(new AmphoraMediator()) {}
 
 /* Start Amphora Interface */
 void AmphoraInterface::Start() {
@@ -15,6 +15,7 @@ void AmphoraInterface::Start() {
   // TODO p1-1
   Setup();
 
+  LoadAmphoraConfig();
   LoadCryptoConfig();
   LoadUserFile();
 
@@ -25,7 +26,6 @@ void AmphoraInterface::Start() {
 
 void AmphoraInterface::Setup() {
   // Setup Amphora backend
-  std::unique_ptr<AmphoraMediator> mediator_m(new AmphoraMediator());
   mediator_m->Setup();
 }
 
@@ -206,6 +206,32 @@ void AmphoraInterface::LoadUserFile() {
         std::cout << "Command not recognized" << std::endl;
       }
     }
+  }
+}
+
+void AmphoraInterface::LoadAmphoraConfig() {
+  if (exit_flag_m == true) {
+    return;
+  }
+
+  bool loaded = mediator_m->Load(AmphoraType::Config);
+  if (loaded) {
+    std::cout << "Config loaded" << std::endl;
+  } else if (!loaded) {
+    std::cout << "Config load FAILED" << std::endl;
+    std::cout << "Reverting to default settings!" << std::endl;
+//    std::cout << "Salt Size: 16 bytes\nIV Size: 16 bytes\nKey Size: 32 "
+//        "bytes\nHMAC Iterations: 200,000"
+//              << std::endl;
+//    std::string user_dir = "../";
+//    std::string accout_dir = ;
+//    std::string crypto_dir = 32;
+//    std::string logger_dir = 1000000;
+    // TODO p1-1
+    // mediator_m->Setup() already defaults crypto
+    // crypto_controller_m.AddCrypto("default", saltsize, ivsize, keysize,
+    //                               iterations);
+    // bool saved = crypto_controller_m.SaveCrypto();
   }
 }
 

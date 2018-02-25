@@ -13,13 +13,13 @@ class AccountController {
 
  public:
 
-  AccountController() = default;
-
-  ~AccountController();
-
-  AccountController(const AccountController &a);
-
-  AccountController &operator=(const AccountController &rhs);
+//  AccountController() = default;
+//
+//  ~AccountController();
+//
+//  AccountController(const AccountController &a);
+//
+//  AccountController &operator=(const AccountController &rhs);
 
   void set_user(const User &user);
 

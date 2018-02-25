@@ -13,11 +13,11 @@ class UserController {
 
  public:
   // TODO p1-1 copy constructor and destructor
-  UserController() = default;
-
-  ~UserController() = default;
-
-  UserController(const UserController &u);
+//  UserController() = default;
+//
+//  ~UserController() = default;
+//
+//  UserController(const UserController &u);
 
   void AddUser(const User &newuser);
 

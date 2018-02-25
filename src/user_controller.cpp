@@ -31,7 +31,7 @@ bool UserController::LoadUserList(std::weak_ptr<AmphoraUtilities> wP_util, const
   if (sP_util) {
     if (sP_util->FindFile(filename)) {  // check if file exists in directory
       std::cout << "File found" << std::endl; // debug
-      loadstatus = sP_util->LoadFromFile<User>(filename, uservector);
+      loadstatus = sP_util->LoadVector<User>(filename, uservector);
       if (loadstatus) { // if load success + check file -> return true
         // populate memory
         for (auto user : uservector) {
@@ -76,7 +76,7 @@ bool UserController::SaveUserList(std::weak_ptr<AmphoraUtilities> wP_util, const
     }
     if (filefound) {
       std::cout << "File found" << std::endl; // debug
-      savestatus = sP_util->SaveToFile<User>(filename, uservector);
+      savestatus = sP_util->SaveVector<User>(filename, uservector);
       if (savestatus) { // if save success + check file -> return true
         return true;
       }

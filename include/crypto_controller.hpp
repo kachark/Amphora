@@ -10,11 +10,11 @@
 class CryptoController {
 
  public:
-  CryptoController() = default;
-
-  CryptoController(const CryptoController &c);
-
-  ~CryptoController() = default;
+//  CryptoController() = default;
+//
+//  CryptoController(const CryptoController &c);
+//
+//  ~CryptoController() = default;
 
   Crypto &get_crypto(const std::string &fileid);
 

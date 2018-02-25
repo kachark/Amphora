@@ -4,16 +4,16 @@
 #include <iostream>
 #include <vector>
 
-AccountController::~AccountController() {
-}
-
-AccountController &AccountController::operator=(const AccountController &rhs) {
-  if (this != &rhs) {
-    tempaccount_m = rhs.tempaccount_m;
-    accountlist_m = rhs.accountlist_m;
-  }
-  return *this;
-}
+//AccountController::~AccountController() {
+//}
+//
+//AccountController &AccountController::operator=(const AccountController &rhs) {
+//  if (this != &rhs) {
+//    tempaccount_m = rhs.tempaccount_m;
+//    accountlist_m = rhs.accountlist_m;
+//  }
+//  return *this;
+//}
 
 void AccountController::set_user(const User &user) { account_owner_m = user; }
 
@@ -133,7 +133,7 @@ bool AccountController::LoadAccountList(std::weak_ptr<AmphoraUtilities> wP_util,
   if (sP_util) {
     if (sP_util->FindFile(filepath)) {            // check if file exists in directory
       std::cout << "File found" << std::endl; // debug
-      loadstatus = sP_util->LoadFromFile<Account>(filepath, accountvector);
+      loadstatus = sP_util->LoadVector<Account>(filepath, accountvector);
       if (loadstatus) { // if load success + check file ->
         return true;
         // populate memory
@@ -175,7 +175,7 @@ bool AccountController::SaveAccountList(std::weak_ptr<AmphoraUtilities> wP_util,
   }
   if (filefound) {
     std::cout << "File found" << std::endl; // debug
-    savestatus = sP_util->SaveToFile<Account>(filepath, accountvector);
+    savestatus = sP_util->SaveVector<Account>(filepath, accountvector);
     if (savestatus) { // if save success + check file -> return true
       return true;
     }
